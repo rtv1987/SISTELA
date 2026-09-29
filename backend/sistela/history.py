@@ -364,6 +364,7 @@ def historical_suggestions(session, current):
                     item_line.status == "CONFIRMED" for item_line, _, _ in members
                 ),
                 "compatible": compatible,
+                "evidence_eligible": best.evidence_type != "AMBIGUOUS" or best.status == "CONFIRMED",
                 "last_used_at": None,
                 "source_date": max(dates) if dates else None,
                 "last_used_kind": "estimate KODAT; not a proven usage date",

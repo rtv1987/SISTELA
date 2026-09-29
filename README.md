@@ -3,12 +3,18 @@
 Lokalus įrankis sąnaudų žiniaraščio paruošimui prieš suvedimą į SISTELA.
 Tai nėra SISTELA skaičiavimo variklis ar jos kopija.
 
-**Dabartinis etapas: veikianti vietinė React darbo vieta.** PDF importas, redaguojama
+**Dabartinis etapas: PHASE 7 – peržiūra ir rankinis perdavimas į SISTELA.** PDF importas, redaguojama
 lentelė, masiniai pakeitimai, vieno veiksmo undo, eilučių ir projektų kopijos,
 patvirtintų normatyvų istorija ir pasiūlymai, SISTELA Entry Mode, XLSX importas ir
 eksportas. DBF analizė read-only. Package Text – EXPERIMENTAL leksinė analizė;
 eksportas blokuotas iki patvirtinto SISTELA round-trip. Veikia istorinių DBF sąmatų importas, kandidatų peržiūra, patvirtinimas / atmetimas
 ir pasiūlymai su kilmės įrodymais.
+
+Veikia Review Queue, blokuojančių klaidų / įspėjimų validacija, aiškus `m ↔ 100M`
+patvirtinimas nekeičiant projekto kiekio, parengties santrauka, Entry Mode V2
+klavišai ir išsaugoma suvedimo eiga, darbinis XLSX su atskirais tiksliniais kiekiais
+bei vietinė darbo statistika. Automatinis importas į SISTELA dar nepatvirtintas.
+[Darbo eiga ir bandymas su Dariumi](docs/estimator-workflow.md).
 
 ## Windows paleidimas
 

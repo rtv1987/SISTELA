@@ -25,7 +25,7 @@ from .mapping import (
     mark_entry,
     suggestions,
 )
-from .models import ImportRun, Project, SourceDocument, utc_now
+from .models import EstimateSection, ImportRun, Project, SourceDocument, utc_now
 from .schemas import (
     GridCommand,
     ImportOut,
@@ -37,6 +37,7 @@ from .schemas import (
 )
 from .services import ServiceError, add_line, create_project, edit_line, get_project, import_pdf
 from .spreadsheets import ExcelExporter, import_xlsx, workbook_preview
+from .workflow import workflow_router
 
 MAX_FILE_BYTES = 25 * 1024 * 1024
 ALLOWED_ORIGINS = {
@@ -107,7 +108,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
         engine.dispose()
 
     app = FastAPI(
-        title="SISTELA Assistant", version="0.3.0", lifespan=lifespan, docs_url=None, redoc_url=None
+        title="SISTELA Assistant", version="0.4.0", lifespan=lifespan, docs_url=None, redoc_url=None
     )
     app.add_middleware(BodyLimitMiddleware)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
@@ -134,11 +135,12 @@ def create_app(directory: Path | None = None) -> FastAPI:
             yield session
 
     app.include_router(history_router(session_dependency))
+    app.include_router(workflow_router(session_dependency))
 
     @app.get("/health")
     def health(session: Session = Depends(session_dependency)):
         session.execute(text("SELECT 1"))
-        return {"status": "ok", "phase": "0-6,7-8", "external_ai": False}
+        return {"status": "ok", "phase": "0-7", "external_ai": False}
 
     @app.get("/integration/capabilities")
     def integration_capabilities():
@@ -191,7 +193,8 @@ def create_app(directory: Path | None = None) -> FastAPI:
     @app.get("/projects/{project_id}/export.xlsx")
     def xlsx_export(project_id: str, session: Session = Depends(session_dependency)):
         project = get_project(session, project_id)
-        data, warnings = ExcelExporter().render(project, active_lines(session, project_id))
+        data, warnings = ExcelExporter().render(project, active_lines(session, project_id),
+            {s.id: s.name for s in session.scalars(select(EstimateSection).where(EstimateSection.project_id == project_id))})
         return Response(data, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             headers={"Content-Disposition": 'attachment; filename="sistela-assistant.xlsx"',
                      "X-Export-Warnings": str(len(warnings))})

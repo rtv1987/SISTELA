@@ -229,6 +229,7 @@ def import_xlsx(session, directory, project_id, filename, data, sheet, header_ro
         run.warnings = warnings
         run.completed_at = utc_now()
         run.elapsed_ms = int((time.perf_counter()-started)*1000)
+        project.status = "IMPORTED"
         project.updated_at = utc_now()
         session.commit()
     except Exception:
@@ -244,15 +245,21 @@ def import_xlsx(session, directory, project_id, filename, data, sheet, header_ro
 
 
 class ExcelExporter:
-    def render(self, project, lines):
+    def render(self, project, lines, sections=None):
+        from .handoff import target
         wb = Workbook()
         ws = wb.active
         ws.title = "Darbo lentelė"
         fields = ["system_type", "line_type", "project_description", "technical_reference", "unit", "quantity",
                   "sistela_code", "sistela_original_description", "output_description", "material_price", "work_price", "notes"]
-        ws.append(["Projektas"] + [FIELDS[f] for f in fields])
+        ws.append(["Projektas"] + [FIELDS[f] for f in fields] + ["Skyrius", "SISTELA tikslinis vienetas", "SISTELA tikslinis kiekis", "Normatyvo būsena", "Kainos būsena", "Konversija patvirtinta"])
         for line in lines:
-            ws.append([project.name] + [getattr(line, f) for f in fields])
+            quantity, unit, valid = target(line)
+            review = line.review_data or {}
+            ws.append([project.name] + [getattr(line, f) for f in fields] + [
+                (sections or {}).get(line.section_id, ""), unit if valid else "", quantity if valid else None,
+                line.mapping_status, review.get("price_status", "ENTERED" if (line.material_price if line.line_type == "Material" else line.work_price) is not None else "MISSING"),
+                "TAIP" if review.get("conversion") and valid else "NE" if review.get("conversion") else "NEREIKALINGA"])
         warnings = []
         for row in ws:
             for cell in row:
@@ -264,13 +271,13 @@ class ExcelExporter:
                         cell.data_type = "s"
                         warnings.append("High precision decimal preserved as text")
                     else:
-                        cell.number_format = "0.######"
+                        cell.number_format = "0.########"
                 cell.alignment = Alignment(vertical="top", wrap_text=True)
         for cell in ws[1]:
             cell.font = Font(bold=True, color="FFFFFF")
             cell.fill = PatternFill("solid", fgColor="276F4C")
         from openpyxl.utils import get_column_letter
-        for i, width in enumerate([28, 12, 12, 48, 23, 12, 16, 18, 48, 48, 18, 18, 40], 1):
+        for i, width in enumerate([28, 12, 12, 48, 23, 12, 16, 18, 48, 48, 18, 18, 40, 24, 20, 22, 20, 22, 24], 1):
             ws.column_dimensions[get_column_letter(i)].width = width
         ws.freeze_panes = "D2"
         ws.auto_filter.ref = ws.dimensions
@@ -279,7 +286,7 @@ class ExcelExporter:
         info = wb.create_sheet("Apie eksportą")
         info.append(["SISTELA Assistant darbo eksportas"])
         info.append(["Tai nėra patvirtintas SISTELA importo formatas."])
-        info.append(["Kainos yra vieneto kainos. Vienetai ir kiekiai nekonvertuoti."])
+        info.append(["Darbinė sąmata, ne galutinė komercinė SISTELA sąmata. Projekto ir patvirtinti tiksliniai kiekiai atskiri."])
         info.append(["Normatyvų ir suvedimo patvirtinimai neperkeliami per XLSX."])
         for warning in sorted(set(warnings)):
             info.append([warning])

@@ -74,6 +74,7 @@ class LineOut(LineCreate):
     updated_at: str
     entered_at: str | None
     deleted_at: str | None
+    review_data: dict
 
 
 class GridEdit(InputModel):

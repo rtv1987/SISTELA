@@ -5,6 +5,7 @@ from pydantic import ValidationError
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
+from .handoff import invalidate_review
 from .models import (
     EstimateLine,
     EstimateSection,
@@ -40,6 +41,7 @@ def update_versioned(session, line, version, values):
         EstimateLine.version == version).values(**values, version=version + 1, updated_at=utc_now()))
     if result.rowcount != 1:
         raise ServiceError(409, "Duomenys jau pakeisti. Atnaujinkite lentelę.")
+    session.execute(update(Project).where(Project.id == line.project_id).values(status="NEEDS_REVIEW"))
     session.flush()
     session.refresh(line)
 
@@ -62,6 +64,7 @@ def apply_grid(session: Session, project_id: str, command: GridCommand):
             if any(values[k] != getattr(line, k) for k in ("project_description", "system_type", "unit",
                     "line_type", "sistela_code", "sistela_original_description")):
                 values.update(mapping_status="unmapped", confidence=None)
+            invalidate_review(line, values)
             values["entered_at"] = None
             update_versioned(session, line, edit.version, values)
             versions[line.id] = line.version
@@ -78,7 +81,7 @@ def apply_grid(session: Session, project_id: str, command: GridCommand):
             values = snapshot(original)
             for key in ("id", "project_id", "created_at", "updated_at", "version"):
                 values.pop(key)
-            values.update(sort_order=order+i, entered_at=None, mapping_status="unmapped", confidence=None)
+            values.update(sort_order=order+i, entered_at=None, mapping_status="unmapped", confidence=None, review_data={})
             line = EstimateLine(project_id=project_id, **values)
             session.add(line)
             session.flush()
@@ -93,7 +96,7 @@ def apply_grid(session: Session, project_id: str, command: GridCommand):
             versions[line.id] = line.version
         if versions:
             session.add(GridChange(project_id=project_id, before=before, after_versions=versions))
-            session.execute(update(Project).where(Project.id == project_id).values(updated_at=utc_now()))
+            session.execute(update(Project).where(Project.id == project_id).values(updated_at=utc_now(), status="NEEDS_REVIEW"))
         session.commit()
     except ValidationError as exc:
         session.rollback()
@@ -147,7 +150,7 @@ def duplicate_project(session: Session, project_id: str):
         for key in ("id", "project_id", "created_at", "updated_at", "version"):
             values.pop(key)
         values.update(section_id=sections.get(row.section_id), source_document_id=documents.get(row.source_document_id),
-                      entered_at=None, mapping_status="unmapped", confidence=None)
+                      entered_at=None, mapping_status="unmapped", confidence=None, review_data={})
         copy = EstimateLine(project_id=project.id, **values)
         session.add(copy)
         session.flush()

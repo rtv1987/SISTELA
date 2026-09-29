@@ -55,3 +55,18 @@ internetas, paleistai aplikacijai – ne. Migracijos vykdomos aiškia komanda pr
 Kopijavimui/atsarginei kopijai sustabdyti API ir kopijuoti visą duomenų katalogą.
 Logai: importo ID, parserio versija, puslapis, eilučių ir įspėjimų skaičius, klaidos kodas,
 trukmė. Dokumentų tekstas ir pavadinimai į logus nerašomi.
+
+
+## PHASE 7 — estimator review
+
+`handoff.py` owns pure target-quantity validation and invalidation invariants.
+`workflow.py` exposes the shared project validator and versioned explicit review
+commands. GET validation is read-only; POST validation stores Project.status.
+Entry marking checks central blocking issues. Existing mapping confirmation,
+grid transactions, undo and document provenance remain in their original services.
+
+React `Workflow.tsx` integrates Review Queue, source details, mapping evidence,
+conversion acceptance, readiness summary and local statistics. Entry Mode V2
+uses Decimal-safe clipboard values and persisted `entered_at`. Excel export keeps
+source columns intact and appends separate target/review columns. No verified
+automatic SISTELA import exists. See [estimator workflow](estimator-workflow.md).

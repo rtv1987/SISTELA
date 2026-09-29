@@ -9,6 +9,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from .handoff import invalidate_review
 from .models import EstimateLine, EstimateSection, ImportRun, Project, SourceDocument, utc_now
 from .parsers.pdf import PARSER_VERSION, PdfImportError, parse_pdf
 from .schemas import LineCreate, LineEdit, ProjectCreate
@@ -73,6 +74,7 @@ def add_line(session: Session, project_id: str, data: LineCreate) -> EstimateLin
     values["system_type"] = values["system_type"] or project.system_type
     line = EstimateLine(project_id=project_id, sort_order=next_order(session, project_id), **values)
     session.add(line)
+    project.status = "NEEDS_REVIEW"
     project.updated_at = utc_now()
     session.commit()
     session.refresh(line)
@@ -91,6 +93,7 @@ def edit_line(session: Session, project_id: str, line_id: str, data: LineEdit) -
         for k in ("project_description", "unit", "system_type", "line_type", "sistela_code", "sistela_original_description")
     ):
         values.update(mapping_status="unmapped", confidence=None)
+    invalidate_review(line, values)
     values["entered_at"] = None
     result = session.execute(
         update(EstimateLine)
@@ -104,7 +107,7 @@ def edit_line(session: Session, project_id: str, line_id: str, data: LineEdit) -
     if result.rowcount != 1:
         session.rollback()
         raise ServiceError(409, "Eilutė jau pakeista. Atnaujinkite duomenis prieš išsaugodami.")
-    session.execute(update(Project).where(Project.id == project_id).values(updated_at=utc_now()))
+    session.execute(update(Project).where(Project.id == project_id).values(updated_at=utc_now(), status="NEEDS_REVIEW"))
     session.commit()
     session.refresh(line)
     return line
@@ -185,6 +188,7 @@ def import_pdf(
         run.rows_detected = len(result.lines)
         run.pages = result.pages
         run.warnings = result.warnings
+        project.status = "IMPORTED"
         project.updated_at = utc_now()
         run.completed_at = utc_now()
         run.elapsed_ms = int((time.perf_counter() - started) * 1000)

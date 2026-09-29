@@ -7,6 +7,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 
 from .grid import owned_line, update_versioned
+from .handoff import target
 from .history import historical_suggestions
 from .models import MappingConfirmation, SistelaMapping, utc_now
 from .parsers.common import normalize_text, normalize_unit
@@ -66,7 +67,13 @@ def suggestions(session, line):
     # Preserve correction recency within each tier; explicit exact confirmations rank first.
     result.sort(key=lambda x: (Decimal(x["confidence"]), x["last_used_at"] or "", x["confirmed_count"]), reverse=True)
     result.sort(key=lambda x: (not x["compatible"], x["priority"]))
-    return result[:5]
+    review = line.review_data or {}
+    _, unit, valid = target(line)
+    for candidate in result:
+        candidate["compatible"] = (valid and normalize_unit(unit) == normalize_unit(candidate["source_unit"])
+            and candidate.get("evidence_eligible", True))
+    result.sort(key=lambda x: (not x["compatible"], x["priority"]))
+    return [r for r in result if r["mapping_id"] not in review.get("rejected_ids", [])][:5]
 
 
 def apply_suggestion(session, project_id, line_id, request: ApplyMapping):
@@ -76,7 +83,8 @@ def apply_suggestion(session, project_id, line_id, request: ApplyMapping):
         raise ServiceError(422, "Pasiūlymas nebetinka arba nesutampa normatyvinis vienetas.")
     update_versioned(session, line, request.version, {
         "sistela_code": candidate["sistela_code"], "sistela_original_description": candidate["sistela_description"],
-        "confidence": Decimal(candidate["confidence"]), "mapping_status": "suggested", "entered_at": None})
+        "confidence": Decimal(candidate["confidence"]), "mapping_status": "suggested", "entered_at": None,
+        "review_data": {**(line.review_data or {}), "suggestion": candidate, "suggestion_offered": True, "manual": False}})
     session.commit()
     session.refresh(line)
     return line
@@ -89,15 +97,23 @@ def confirm_mapping(session, project_id, line_id, request: ConfirmMapping):
     if line.line_type != "Work":
         raise ServiceError(422, "Normatyvų istorija skirta darbų eilutėms.")
     unit = normalize_unit(request.normative_unit)
-    if unit != normalize_unit(line.unit):
-        raise ServiceError(422, "Nesutampa vienetai. Pirma aiškiai perskaičiuokite kiekį ir vienetą lentelėje.")
+    if not target(line)[2] or unit != normalize_unit(target(line)[1]):
+        raise ServiceError(422, "Nesutampa vienetai. Peržiūroje aiškiai patvirtinkite konversiją.")
     if line.mapping_status == "confirmed" and line.sistela_code == request.sistela_code and line.sistela_original_description == request.sistela_original_description:
         return line
     previous = line.sistela_code
+    review = dict(line.review_data or {})
+    review.setdefault("suggestion_offered", bool(suggestions(session, line)))
+    candidate = review.get("suggestion", {})
+    review["confirmation_kind"] = "unchanged" if candidate.get("sistela_code") == request.sistela_code else "changed" if candidate else "manual"
+    review["normative_unit"] = unit
+    review["manual"] = bool(review.get("manual")) or not candidate
+    if candidate and candidate.get("sistela_code") != request.sistela_code:
+        review.pop("suggestion", None)
     try:
         update_versioned(session, line, request.version, {"sistela_code": request.sistela_code,
             "sistela_original_description": request.sistela_original_description, "mapping_status": "confirmed", "entered_at": None,
-            "confidence": line.confidence if previous == request.sistela_code else None})
+            "confidence": line.confidence if previous == request.sistela_code else None, "review_data": review})
         normalized = normalize_text(line.project_description)
         item = session.scalar(select(SistelaMapping).where(SistelaMapping.system_type == line.system_type,
             SistelaMapping.normalized_source_text == normalized, SistelaMapping.source_unit == unit,
@@ -124,10 +140,17 @@ def confirm_mapping(session, project_id, line_id, request: ConfirmMapping):
 
 def mark_entry(session, project_id, line_id, request: EntryUpdate):
     line = owned_line(session, project_id, line_id)
-    if request.entered and (not line.unit or (line.line_type == "Work" and
+    if request.entered and (not target(line)[2] or line.quantity <= 0 or not line.unit or (line.line_type == "Work" and
             (line.mapping_status != "confirmed" or not line.sistela_code))):
         raise ServiceError(422, "Prieš suvedimą patikrinkite vienetą ir patvirtinkite darbo normatyvą.")
+    from .workflow import validate_project_for_sistela
+    if request.entered:
+        row = next(r for r in validate_project_for_sistela(session, project_id)["rows"] if r["id"] == line_id)
+        if any(i["severity"] == "BLOCKING" for i in row["issues"]):
+            raise ServiceError(422, "Eilutėje liko blokuojančių peržiūros klausimų.")
     update_versioned(session, line, request.version, {"entered_at": utc_now() if request.entered else None})
+    from .services import get_project
+    get_project(session, project_id).status = validate_project_for_sistela(session, project_id)["status"]
     session.commit()
     session.refresh(line)
     return line

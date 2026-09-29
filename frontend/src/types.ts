@@ -6,7 +6,9 @@ export interface Line {
   source_position: string; source_page: number | null; source_raw_text: string;
   unit: string; quantity: string; sistela_code: string; sistela_original_description: string;
   material_price: string | null; work_price: string | null; confidence: string | null;
-  mapping_status: 'unmapped' | 'suggested' | 'confirmed'; notes: string;
+  mapping_status: 'unmapped' | 'suggested' | 'confirmed' | 'rejected' | 'needs_review'; notes: string;
+  review_data?: {conversion?: {source_quantity:string;source_unit:string;target_quantity:string;target_unit:string;confirmed_by_user:boolean}; manual?:boolean; price_status?:string};
+  source_document_id?: string | null;
   version: number; sort_order: number; entered_at: string | null;
 }
 export interface ImportRun { id: string; status: string; rows_detected: number; pages: number[]; error_message: string | null; warnings: { code: string; message: string; page?: number }[] }

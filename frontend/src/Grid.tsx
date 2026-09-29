@@ -39,7 +39,7 @@ export function EstimateGrid({ lines, active, onActive, onEdit, selection, setSe
       edit('output_description', 'Galutinis pavadinimas', 290), edit('system_type', 'Sistema', 90),
       edit('line_type', 'Tipas', 125, ['Material','Work','Other']), edit('material_price', 'Medž. kaina €', 125),
       edit('work_price', 'Darbo kaina €', 125), edit('sistela_original_description', 'Originalus normatyvo pavadinimas', 300),
-      { accessorKey: 'confidence', header: 'Atitikimas', size: 105, cell: ({ getValue }) => { const v = getValue<string | null>(); return v === null ? '—' : `${new Decimal(v).times(100).toFixed(0)} %`; } },
+      { accessorKey: 'confidence', header: 'Atitikimas', size: 105, cell: ({ getValue }) => { const v = getValue<string | null>(); return v === null ? '—' : new Decimal(v).gte('.9') ? 'High' : new Decimal(v).gte('.7') ? 'Medium' : 'Low'; } },
       edit('notes', 'Pastabos', 250),
     ];
   }, [onEdit]);

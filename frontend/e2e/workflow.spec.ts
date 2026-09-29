@@ -46,11 +46,13 @@ test('create, edit, confirm, remember, enter, export and reimport', async ({page
   mkdirSync(resolve('../docs/screenshots'), {recursive:true});
   await page.screenshot({path:resolve('../docs/screenshots/estimate-grid.png'), fullPage:true, style:'.suggestion:has(details) { display: none; }'});
   await page.getByRole('tab', {name:'SISTELA Entry Mode'}).click();
+  await page.getByRole('checkbox', {name:'Įtraukti medžiagas'}).check();
   await page.getByRole('button', {name:'Pažymėti suvestą'}).click();
   await expect(page.locator('.entry-progress strong')).toHaveText('1 / 2');
   await page.screenshot({path:resolve('../docs/screenshots/entry-mode.png'), fullPage:true});
   await page.reload();
   await page.getByRole('tab', {name:'SISTELA Entry Mode'}).click();
+  await page.getByRole('checkbox', {name:'Įtraukti medžiagas'}).check();
   await expect(page.locator('.entry-progress strong')).toHaveText('1 / 2');
   await page.getByRole('tab', {name:'Darbo lentelė'}).click();
   const downloadEvent = page.waitForEvent('download');

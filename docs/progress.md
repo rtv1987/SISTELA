@@ -71,3 +71,16 @@ Tikras rinkinys: 3 sąmatos, 104 pozicijos, 39 darbų kandidatai, 34 skirtingi d
 Pradinė 75 testų patikra praėjo; galutinė – 103 (79 backend, 19 frontend, 5 Playwright).
 Lint, TypeScript, build ir migracijos atitinka; originalai nepakeisti.
 [Išsami ataskaita ir PHASE 7 užduotis](iteration-03.md).
+
+
+## 7 – sąmatininko peržiūra ir rankinis perdavimas (2026-09-29)
+
+Įgyvendinta bendra validacija ir Review Queue, normatyvų būsenos ir atmetimas,
+aiškus m ↔ 100M patvirtinimas su atskiru tiksliniu kiekiu, parengties santrauka,
+Entry Mode V2, vietinė statistika, darbinis XLSX ir tikro GSS E2E eiga.
+Projekto kiekio keitimas anuliuoja konversijos patvirtinimą. Originalų kilmė išlaikyta.
+DBF tebėra read-only, Package Text eksperimentinis ir gamybinėje eigoje blokuotas.
+Migracija: 007_estimator_review. Nauji testai: 16 backend, 8 frontend, 2 Playwright.
+Praėjo 129 testai (95 backend, 27 frontend, 7 Playwright), Ruff, ESLint, TypeScript,
+build ir migracijų patikra. Originalių šaltinių SHA-256 patikros praėjo.
+[Išsami ataskaita](iteration-04.md), [darbo eiga ir realus bandymas](estimator-workflow.md).

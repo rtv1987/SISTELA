@@ -59,3 +59,26 @@ HistoricalEstimate.source_date saugo tik nd KODAT, ne paskutinio panaudojimo fak
 HistoricalLine.historical_price saugo raw dd GRUP=10 KAINA. Abiejų semantika ribota;
 šaltinio įrašas ir importo laikas visada pasiekiami. Originalus istorinis tekstas
 niekada automatiškai neįrašomas į sistela_original_description.
+
+
+## PHASE 7 review state
+
+Migration `007_estimator_review` adds `EstimateLine.review_data` (JSON) and expands
+the mapping-state CHECK with `rejected` and `needs_review`, preserving existing
+rows, source foreign keys and the other row CHECK constraints. Domain models do
+not participate in migration execution.
+
+The versioned review snapshot contains the explicitly accepted conversion
+(source/target decimal strings, units, rule, user confirmation and timestamp),
+selected suggestion evidence, rejected suggestion identifiers, manual-selection
+flag, confirmation category, first-reviewed suggestion availability, price status
+and duplicate-pair acknowledgments. No current-project quantity is replaced.
+Source edits invalidate a conversion; duplication clears review approvals.
+Price edits clear price approval. Mapping confirmations still use the existing
+MappingConfirmation audit and SistelaMapping history.
+
+Project.status uses IMPORTED, NEEDS_REVIEW, MAPPING_IN_PROGRESS,
+READY_FOR_SISTELA and HANDED_OFF during review. Existing newly created draft
+projects remain compatible; an empty project cannot pass validation. HANDED_OFF
+records user-marked work entry, not a receipt from SISTELA. Local metrics aggregate
+current rows and stored decisions; they are not cumulative usage telemetry.
