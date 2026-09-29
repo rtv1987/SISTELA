@@ -1,0 +1,65 @@
+import { expect, test } from '@playwright/test';
+import { existsSync, mkdirSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+test('DBF archive → candidate evidence → confirmation → current estimate suggestion',async({page,request})=>{
+  const files=['sd','dd','nd','pd','td','od'].map(role=>[resolve(`../${role}25-04-14.dbf`),resolve(`../samples/sistela/${role}25-04-14.dbf`)].find(existsSync));
+  test.skip(files.some(file=>!file),'Private DBF archive not supplied.');
+  await page.goto('/');
+  await page.getByRole('button',{name:'Istorinės SISTELA sąmatos',exact:true}).click();
+  await page.getByLabel('DBF archyvo failai').setInputFiles(files as string[]);
+  await expect(page.getByRole('status')).toContainText('39 darbų kandidatų');
+  await expect(page.getByText('39 rezultatų',{exact:true})).toBeVisible();
+  await page.getByLabel('Istorijos sistema').selectOption('GSS');
+  await page.getByLabel('Istorijos SISTELA kodas').fill('N50-270');
+  await expect(page.getByText('1 rezultatų',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Įrodymai N50-270',exact:true}).click();
+  await expect(page.getByRole('dialog')).toContainText('dd25-04-14.dbf');
+  await page.getByLabel('Uždaryti įrodymus').click();
+  await page.getByRole('button',{name:'Peržiūrėti',exact:true}).click();
+  await expect(page.getByLabel('Patvirtinama istorijos sistema')).toHaveValue('GSS');
+  await page.getByRole('button',{name:'Patvirtinti kandidatą',exact:true}).click();
+  await expect(page.getByRole('status')).toContainText('patvirtinta');
+  await page.getByLabel('Istorijos būsena').selectOption('CONFIRMED');
+  await expect(page.getByText('1 rezultatų',{exact:true})).toBeVisible();
+  await page.getByLabel('DBF archyvo failai').setInputFiles(files as string[]);
+  await expect(page.getByRole('status')).toContainText('nesidubliavo');
+  const historical=(await (await request.get('/history/lines?system=GSS&code=N50-270&status=CONFIRMED')).json()).items[0];
+  const project=await (await request.post('/projects',{data:{name:'Istorijos integracijos testas',system_type:'GSS'}})).json();
+  await request.post(`/projects/${project.id}/lines`,{data:{system_type:'GSS',line_type:'Work',project_description:historical.description,output_description:'Dabartinio projekto tekstas',quantity:'28',unit:historical.unit,work_price:'42'}});
+  await page.reload();
+  await page.getByRole('button',{name:/Istorijos integracijos testas GSS/}).click();
+  await expect(page.locator('.suggestion').first()).toContainText('N50-270');
+  await page.locator('.suggestion').first().getByText(/Istoriniai įrodymai/).click();
+  await page.locator('.suggestion').first().getByRole('button',{name:'Atverti šaltinį 1'}).click();
+  await expect(page.getByRole('dialog')).toContainText('Patvirtinta');
+  await page.getByLabel('Uždaryti įrodymus').click();
+  await page.locator('.suggestion').first().getByRole('button',{name:'Pritaikyti pasiūlymą'}).click();
+  await expect(page.locator('.status.suggested')).toHaveCount(1);
+  const current=(await (await request.get(`/projects/${project.id}/lines`)).json())[0];
+  expect(current.output_description).toBe('Dabartinio projekto tekstas');
+  expect(current.work_price).toBe('42');
+  // A rejected historical row is removed from future historical suggestions.
+  await page.getByRole('button',{name:'Istorinės SISTELA sąmatos',exact:true}).click();
+  await page.getByLabel('Istorijos SISTELA kodas').fill('N50-270');
+  await page.getByLabel('Istorijos būsena').selectOption('CONFIRMED');
+  await page.getByRole('button',{name:'Atmesti',exact:true}).click();
+  await expect(page.getByText('0 rezultatų',{exact:true})).toBeVisible();
+  const suggestions=await (await request.get(`/projects/${project.id}/lines/${current.id}/suggestions`)).json();
+  expect(suggestions.some((s:{evidence_ids?:string[]})=>s.evidence_ids?.includes(historical.id))).toBe(false);
+});
+
+test('history UI screenshots use only synthetic presentation data',async({page})=>{
+  const row={id:'demo',version:1,description:'Detektorių montavimas',sistela_code:'TEST-270',unit:'vnt.',quantity:'28',historical_price:null,system_type:'GSS',status:'CANDIDATE',evidence_type:'DERIVED',bulk_eligible:true,estimate_name:'Gaisro aptikimo sistema',project_name:'Demonstracinis objektas',section_name:'Darbai',line_type:'Work',system_evidence:'INFERENCE',source_date:null};
+  await page.route('**/history/imports',route=>route.fulfill({json:[{id:'demo-import',source_reference:'sd-demo.dbf, dd-demo.dbf, nd-demo.dbf',imported_at:'2026-09-29',line_count:3,work_count:3,confirmed_count:0,rejected_count:0,warning_count:0,warnings:[],estimates:[{id:'e',name:row.estimate_name,project_name:row.project_name,system_type:'GSS'}]}]}));
+  await page.route('**/history/lines?**',route=>route.fulfill({json:{total:3,items:[row,{...row,id:'demo2',description:'Kabelio tiesimas',sistela_code:'TEST-210',unit:'100m'},{...row,id:'demo3',description:'Signalizacijos įrangos montavimas',sistela_code:'TEST-333'}]}}));
+  await page.route('**/history/lines/demo/evidence',route=>route.fulfill({json:{...row,imported_at:'2026-09-29',evidence:{header:{file:'dd-demo.dbf',record:42},parents:[{}]},reviews:[]}}));
+  await page.route('**/projects',route=>route.fulfill({json:[]}));
+  await page.goto('/');await page.getByRole('button',{name:'Istorinės SISTELA sąmatos',exact:true}).click();
+  await expect(page.getByText('3 rezultatų',{exact:true})).toBeVisible();
+  mkdirSync(resolve('../docs/screenshots'),{recursive:true});
+  await page.screenshot({path:resolve('../docs/screenshots/historical-import.png'),fullPage:true});
+  await page.getByRole('button',{name:'Įrodymai TEST-270'}).click();
+  await expect(page.getByRole('dialog')).toContainText('dd-demo.dbf');
+  await page.screenshot({path:resolve('../docs/screenshots/historical-evidence.png'),fullPage:true});
+});

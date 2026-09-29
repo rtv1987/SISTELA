@@ -508,3 +508,21 @@ dd GRUP pasiskirstymas: {'10': 104, '20': 104, '30': 157, '40': 26}.
 Galima pateikti vartotojui sd + dd GRUP=10 istorinio kodo/aprašymo kandidatus
 su šaltinio nuoroda. Jų negalima automatiškai laikyti patvirtintais mappingais ar
 originaliais normatyvų pavadinimais. Reikalinga žmogaus patvirtinimo eiga (6 fazė).
+
+
+## FACT: PHASE 6 papildoma kardinalumo patikra (2026-09-29)
+
+Pagal KOMPLEKSAS/OBJEKTAS/RANGOVAS/SAMATA rasta 3 unikalios nd POZ=3 antraštės
+su SKYRIUS=null. Pridėjus SKYRIUS – 6 unikalios nd POZ=4 skyrių antraštės.
+Visos 104 dd GRUP=10 pozicijos turi po vieną iš šių sąmatų ir skyrių.
+nd POZ=2 su SAMATA=null pagal KOMPLEKSAS/OBJEKTAS atitinka vieną objektą.
+
+Antraščių tekstai „Medžiagos“ / „Darbai“ pasiskirsto: sąmata 1 – 20/10 pozicijų,
+sąmata 2 – 20/13, sąmata 3 – 25/16. Darbų skyriuose 39 pozicijos ir 34 skirtingi
+IKAINIS kodai. Visų trijų sąmatų nd KODAT reikšmė 2026-08-21; ji neįrodo paskutinio
+normatyvo panaudojimo datos. Darbo sistemos AS/GSS/ER yra interpretacija iš sąmatų
+pavadinimų, ne DBF sistemų klasifikatoriaus faktas.
+
+Šie faktai regresiškai tikrinami tests/test_history.py. Kitų archyvų kardinalumas
+perskaičiuojamas importuojant; neatitikimai pažymimi AMBIGUOUS. Pilnos nd/pd/td/od
+semantikos ir katalogo originalių pavadinimų ši patikra neįrodo.

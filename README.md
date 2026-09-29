@@ -7,8 +7,8 @@ Tai nėra SISTELA skaičiavimo variklis ar jos kopija.
 lentelė, masiniai pakeitimai, vieno veiksmo undo, eilučių ir projektų kopijos,
 patvirtintų normatyvų istorija ir pasiūlymai, SISTELA Entry Mode, XLSX importas ir
 eksportas. DBF analizė read-only. Package Text – EXPERIMENTAL leksinė analizė;
-eksportas blokuotas iki patvirtinto SISTELA round-trip. Istorinių DBF susiejimų
-peržiūra ir importas į patvirtintą istoriją dar liko MVP apimtyje.
+eksportas blokuotas iki patvirtinto SISTELA round-trip. Veikia istorinių DBF sąmatų importas, kandidatų peržiūra, patvirtinimas / atmetimas
+ir pasiūlymai su kilmės įrodymais.
 
 ## Windows paleidimas
 
@@ -134,3 +134,17 @@ suvedimo būsenos per Excel neperkeliamos. Palaikoma iki 500 eilučių vienu imp
 
 [Package Text tyrimas](docs/sistela-package-format.md) ·
 [Šios iteracijos ataskaita](docs/iteration-02.md)
+
+
+## Istorinės SISTELA sąmatos (PHASE 6)
+
+Kairėje pasirinkite „Istorinės SISTELA sąmatos“, įkelkite vieno archyvo sd/dd/nd
+ir turimus pd/td/od DBF failus, pasirinkę cp1257 pateiktam rinkiniui. Peržiūrėkite
+kandidatą, patikrinkite jo sistemą ir vienetą, patvirtinkite arba atmeskite.
+Įrodymai atveriami tiek istorijoje, tiek dabartinės sąmatos pasiūlymuose.
+Pakartotinis tų pačių pagrindinių failų importas duomenų nedubliuoja.
+
+Po šios versijos atnaujinimo vykdykite `dev.ps1` – jis sukompiliuoja UI ir pritaiko
+migraciją. Atsarginei kopijai prieš migraciją sustabdykite programą ir kopijuokite
+visą data katalogą. [Importo taisyklės ir ribos](docs/historical-dbf-import.md),
+[PHASE 6 ataskaita](docs/iteration-03.md).

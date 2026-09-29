@@ -44,8 +44,8 @@ importas/eksportas, kolonų susiejimas, lapo pasirinkimas bei clipboard.
 Package Text turi read-only leksinę analizę; gramatika UNKNOWN, būsena EXPERIMENTAL.
 DBF ir Package Text rašymas lieka užblokuoti.
 
-Liko 6 fazės istorinių DBF susiejimų peržiūra ir aiškus vartotojo patvirtinimas
-prieš perkeliant į mapping istoriją. Esami DBF analizės įrankiai veikia read-only.
+Šioje antroje iteracijoje dar buvo likusi 6 fazė; ji užbaigta tolesnėje iteracijoje
+(žr. naujausią įrašą žemiau). Esami DBF analizės įrankiai veikia read-only.
 Išsami darbų, failų, patikrų ir ribų ataskaita: [iteration-02.md](iteration-02.md).
 
 ## Galutinė patikra (2026-09-28)
@@ -62,3 +62,12 @@ Išsami darbų, failų, patikrų ir ribų ataskaita: [iteration-02.md](iteration
 - Originalių 9 failų SHA-256 sutampa su manifestu.
 - Vienas trečiosios šalies deprecation įspėjimas: Starlette TestClient praneša apie
   būsimą `httpx` → `httpx2` pakeitimą. Tai testavimo adapterio įspėjimas, ne testų klaida.
+
+## 6 – istorinės DBF žinios (2026-09-29)
+
+Veikia read-only archyvo importas, istorinės sąmatos ir pozicijos, kilmės įrodymai,
+kandidatų peržiūra, patvirtinimas / atmetimas, agreguoti pasiūlymai ir vienetų apsauga.
+Tikras rinkinys: 3 sąmatos, 104 pozicijos, 39 darbų kandidatai, 34 skirtingi darbų kodai.
+Pradinė 75 testų patikra praėjo; galutinė – 103 (79 backend, 19 frontend, 5 Playwright).
+Lint, TypeScript, build ir migracijos atitinka; originalai nepakeisti.
+[Išsami ataskaita ir PHASE 7 užduotis](iteration-03.md).

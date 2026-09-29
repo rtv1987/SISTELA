@@ -29,6 +29,7 @@ def test_migration_is_repeatable_and_complete(engine, tmp_path):
         "import_runs",
         "requirements",
         "grid_changes", "mapping_confirmations",
+        "historical_imports", "historical_estimates", "historical_lines", "historical_reviews",
     }
 
 

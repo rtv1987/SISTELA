@@ -1,6 +1,6 @@
 # Domeno modelis
 
-Schema valdoma `backend/migrations/versions/231609db4375_initial_domain.py`.
+Schema valdoma Alembic migracijomis `backend/migrations/versions/`; naujausia – `66611011cc47_historical_knowledge.py`.
 ID – UUID tekstas, laikai – ISO-8601 UTC su laiko juosta. DB foreign keys įjungti.
 
 | Esybė | Paskirtis ir papildomi sprendimai |
@@ -9,7 +9,7 @@ ID – UUID tekstas, laikai – ISO-8601 UTC su laiko juosta. DB foreign keys į
 | SourceDocument | Projekto failas, originalus vardas, SHA-256, tipas, lokali kopija, puslapių skaičius, ištrauktas tekstas. Unikalus project_id + checksum. |
 | EstimateSection | Projekto blokas, pavadinimas ir tvarka. |
 | EstimateLine | Visi užduotyje išvardyti laukai, papildomai system_type ir version. |
-| SistelaMapping | Normalizuotas ir tikslus šaltinio tekstas, sistemos tipas, kodas, aprašymas, naudojimo ir patvirtinimų istorija. Šiame etape lentelė dar nepildoma. |
+| SistelaMapping | Normalizuotas ir tikslus šaltinio tekstas, sistemos tipas, kodas, aprašymas, naudojimo ir patvirtinimų istorija. Pildoma tik aiškiai patvirtinus dabartinio projekto normatyvą. Unikalumas apima sistemą, normalizuotą tekstą, vienetą ir kodą. |
 | ImportRun | Parserio versija, būsena, trukmė, klaida, puslapiai, eilučių skaičius ir struktūriniai įspėjimai. |
 | Requirement | Reikalavimas, projekto ID, pasirinktinė eilutės ir dokumento nuoroda, puslapis, tekstas, tipas. Automatinio produkto parinkimo nėra. |
 
@@ -37,4 +37,25 @@ Importo eilutės turi `mapping_status=unmapped`, importas `needs_review`.
 
 Eilutės PUT naudoja optimistinę `version` patikrą SQL UPDATE sąlygoje.
 Pasenusi versija grąžina 409. Šaltinio/ID/audito laukai per PUT nekeičiami.
-Mapping kodo parinkimo ir žmogaus pasirinkimo istorijos endpointai planuojami 5 fazėje.
+Mapping kodo parinkimas, žmogaus patvirtinimai ir jų istorijos endpointai veikia.
+
+
+## Istorinės esybės
+
+| Esybė | Paskirtis |
+|---|---|
+| HistoricalImport | Unikalus pagrindinių failų source_hash, failų vardai/hashai/dydžiai, koduotė, importo laikas, būsena, parserio versija ir įspėjimai. |
+| HistoricalEstimate | Importo FK, išoriniai kompleksas/objektas/rangovas/sąmata raktai JSON, objektas, sąmatos vardas, numanoma sistema, jos įrodymo tipas, source_date ir nd kilmė. |
+| HistoricalLine | Sąmatos FK, išorinė pozicija, tipas, istorinis ir normalizuotas aprašymas, kodas, nežinomas katalogo originalas (tuščias), vienetas, Decimal kiekis, historical_price, skyrius, sistema, kokybė, įrodymų JSON, kandidato statusas ir version. |
+| HistoricalReview | Istorinės eilutės FK, buvusi/nauja būsena, patvirtinta sistema, neaiškumo pripažinimas ir peržiūros laikas. |
+
+HistoricalLine kartu atlieka HistoricalMappingCandidate vaidmenį; medžiagos turi
+NOT_APPLICABLE. Darbų būsenos CANDIDATE/CONFIRMED/REJECTED ir įrodymo klasės
+DIRECT/DERIVED/AMBIGUOUS apribotos CHECK sąlygomis. Automatinio CONFIRMED nėra.
+Istorinės ir einamojo projekto peržiūros nesuplakamos; istorijos atmetimas nepanaikina
+vėlesnio savarankiško žmogaus sprendimo projekte.
+
+HistoricalEstimate.source_date saugo tik nd KODAT, ne paskutinio panaudojimo faktą.
+HistoricalLine.historical_price saugo raw dd GRUP=10 KAINA. Abiejų semantika ribota;
+šaltinio įrašas ir importo laikas visada pasiekiami. Originalus istorinis tekstas
+niekada automatiškai neįrašomas į sistela_original_description.

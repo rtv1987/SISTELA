@@ -211,3 +211,64 @@ class MappingConfirmation(Identity, Base):
     selected_code: Mapped[str]
     source_text: Mapped[str]
     created_at: Mapped[str] = mapped_column(default=utc_now)
+
+
+class HistoricalImport(Identity, Base):
+    __tablename__ = "historical_imports"
+    source_hash: Mapped[str] = mapped_column(unique=True)
+    source_reference: Mapped[str]
+    source_files: Mapped[list] = mapped_column(JSON)
+    encoding: Mapped[str]
+    imported_at: Mapped[str] = mapped_column(default=utc_now)
+    import_status: Mapped[str] = mapped_column(default="needs_review")
+    parser_version: Mapped[str]
+    warnings: Mapped[list] = mapped_column(JSON, default=list)
+
+
+class HistoricalEstimate(Identity, Base):
+    __tablename__ = "historical_estimates"
+    historical_import_id: Mapped[str] = mapped_column(ForeignKey("historical_imports.id"), index=True)
+    external_key: Mapped[dict] = mapped_column(JSON)
+    name: Mapped[str]
+    project_name: Mapped[str]
+    system_type: Mapped[str]
+    system_evidence: Mapped[str]
+    source_date: Mapped[str | None]
+    source_reference: Mapped[dict] = mapped_column(JSON)
+
+
+class HistoricalLine(Identity, Base):
+    """One candidate per work line; avoid a duplicate candidate table with identical fields."""
+    __tablename__ = "historical_lines"
+    __table_args__ = (
+        CheckConstraint("status IN ('CANDIDATE','CONFIRMED','REJECTED','NOT_APPLICABLE')"),
+        CheckConstraint("evidence_type IN ('DIRECT','DERIVED','AMBIGUOUS')"),
+    )
+    historical_estimate_id: Mapped[str] = mapped_column(ForeignKey("historical_estimates.id"), index=True)
+    external_key: Mapped[dict] = mapped_column(JSON)
+    line_type: Mapped[str]
+    description: Mapped[str] = mapped_column(Text)
+    normalized_description: Mapped[str] = mapped_column(index=True)
+    sistela_code: Mapped[str]
+    sistela_original_description: Mapped[str] = mapped_column(Text, default="")
+    unit: Mapped[str]
+    quantity: Mapped[Decimal | None] = mapped_column(ExactDecimal)
+    historical_price: Mapped[Decimal | None] = mapped_column(ExactDecimal)
+    section_name: Mapped[str]
+    system_type: Mapped[str]
+    evidence_type: Mapped[str]
+    confidence: Mapped[Decimal] = mapped_column(ExactDecimal)
+    evidence: Mapped[dict] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(default="CANDIDATE")
+    version: Mapped[int] = mapped_column(default=1)
+    reviewed_at: Mapped[str | None]
+
+
+class HistoricalReview(Identity, Base):
+    __tablename__ = "historical_reviews"
+    historical_line_id: Mapped[str] = mapped_column(ForeignKey("historical_lines.id"), index=True)
+    previous_status: Mapped[str]
+    status: Mapped[str]
+    system_type: Mapped[str]
+    acknowledged_ambiguity: Mapped[bool]
+    created_at: Mapped[str] = mapped_column(default=utc_now)

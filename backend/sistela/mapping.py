@@ -7,10 +7,12 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 
 from .grid import owned_line, update_versioned
+from .history import historical_suggestions
 from .models import MappingConfirmation, SistelaMapping, utc_now
 from .parsers.common import normalize_text, normalize_unit
 from .schemas import InputModel
 from .services import ServiceError
+from .units import unit_compatibility
 
 
 class ConfirmMapping(InputModel):
@@ -47,7 +49,8 @@ def suggestions(session, line):
         if similarity < .45:
             continue
         method = "exact" if item.source_text == line.project_description else "normalized" if normalized == item.normalized_source_text else "fuzzy"
-        compatible = normalize_unit(line.unit) == item.source_unit
+        compatibility = unit_compatibility(line.unit, item.source_unit)
+        compatible = compatibility["status"] == "IDENTICAL"
         score = .94 if method == "exact" else .90 if method == "normalized" else similarity * .86
         newest = latest[(item.normalized_source_text, item.source_unit)].id == item.id
         score += .05 if newest else min(item.confirmed_count, 4) * .001
@@ -57,8 +60,13 @@ def suggestions(session, line):
             "sistela_description": item.sistela_description, "source_unit": item.source_unit,
             "confidence": str(Decimal(str(min(score, .99))).quantize(Decimal('.01'))),
             "method": method, "confirmed_count": item.confirmed_count, "compatible": compatible,
-            "last_used_at": item.last_used_at})
-    return sorted(result, key=lambda x: (Decimal(x["confidence"]), x["last_used_at"] or "", x["confirmed_count"]), reverse=True)[:5]
+            "last_used_at": item.last_used_at, "origin": "user", "unit_compatibility": compatibility,
+            "priority": 0 if method == "exact" else 1 if method == "normalized" else 6})
+    result.extend(historical_suggestions(session, line))
+    # Preserve correction recency within each tier; explicit exact confirmations rank first.
+    result.sort(key=lambda x: (Decimal(x["confidence"]), x["last_used_at"] or "", x["confirmed_count"]), reverse=True)
+    result.sort(key=lambda x: (not x["compatible"], x["priority"]))
+    return result[:5]
 
 
 def apply_suggestion(session, project_id, line_id, request: ApplyMapping):

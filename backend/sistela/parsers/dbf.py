@@ -1,6 +1,6 @@
 """Read-only DBF introspection; never infer semantics from a filename."""
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from pathlib import Path
@@ -48,6 +48,7 @@ class DbfSnapshot:
     deleted_records: int
     fields: list[DbfField]
     records: list[dict]
+    record_numbers: list[int] = field(default_factory=list)
 
     def schema(self):
         return [asdict(field) for field in self.fields]
@@ -82,6 +83,9 @@ def read_dbf(path: Path, *, encoding: str) -> DbfSnapshot:
         raise DbfReadError("DBF decoding failed; check encoding, schema and memo files") from exc
     if len(records) + deleted != count:
         raise DbfReadError("DBF record count does not match header")
+    record_numbers = [i + 1 for i in range(count) if before[header_length + i * record_length:header_length + i * record_length + 1] == b" "]
+    if len(record_numbers) != len(records):
+        raise DbfReadError("DBF active record positions do not match parsed rows")
     checksum = sha256(before).hexdigest()
     if sha256(path.read_bytes()).hexdigest() != checksum:
         raise DbfReadError("Source changed during inspection")
@@ -96,4 +100,5 @@ def read_dbf(path: Path, *, encoding: str) -> DbfSnapshot:
         deleted,
         fields,
         records,
+        record_numbers,
     )

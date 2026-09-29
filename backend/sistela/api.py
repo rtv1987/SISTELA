@@ -14,6 +14,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .db import data_dir, make_engine
 from .grid import active_lines, apply_grid, duplicate_project, owned_line, undo_grid
+from .history_api import history_router
 from .integration import capabilities
 from .mapping import (
     ApplyMapping,
@@ -106,7 +107,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
         engine.dispose()
 
     app = FastAPI(
-        title="SISTELA Assistant", version="0.2.0", lifespan=lifespan, docs_url=None, redoc_url=None
+        title="SISTELA Assistant", version="0.3.0", lifespan=lifespan, docs_url=None, redoc_url=None
     )
     app.add_middleware(BodyLimitMiddleware)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
@@ -132,10 +133,12 @@ def create_app(directory: Path | None = None) -> FastAPI:
         with Session(engine) as session:
             yield session
 
+    app.include_router(history_router(session_dependency))
+
     @app.get("/health")
     def health(session: Session = Depends(session_dependency)):
         session.execute(text("SELECT 1"))
-        return {"status": "ok", "phase": "0-5,7-8", "external_ai": False}
+        return {"status": "ok", "phase": "0-6,7-8", "external_ai": False}
 
     @app.get("/integration/capabilities")
     def integration_capabilities():

@@ -11,7 +11,7 @@ export interface Line {
 }
 export interface ImportRun { id: string; status: string; rows_detected: number; pages: number[]; error_message: string | null; warnings: { code: string; message: string; page?: number }[] }
 export interface Capability { id: string; name: string; status: string; production: boolean; limitation: string }
-export interface Suggestion { mapping_id: string; sistela_code: string; sistela_description: string; source_unit: string; confidence: string; method: string; confirmed_count: number; compatible: boolean }
+export interface Suggestion { mapping_id: string; sistela_code: string; sistela_description: string; source_unit: string; confidence: string; method: string; confirmed_count: number; compatible: boolean; origin?: 'user' | 'historical'; usage_count?: number; project_count?: number; estimate_count?: number; matching_descriptions?: string[]; evidence_quality?: string[]; evidence_ids?: string[]; last_used_at?: string | null; source_date?: string | null; unit_compatibility?: {status:string;source:string;target:string;factor:string|null} }
 export const editableKeys = ['system_type','line_type','project_description','technical_reference','unit','quantity','output_description','material_price','work_price','notes','sistela_code','sistela_original_description'] as const;
 export const editable = (line: Line) => Object.fromEntries(editableKeys.map(k => [k, line[k]]));
 export const blankLine = (system: string) => ({ system_type: system, line_type: 'Other', project_description: 'Nauja eilutė', output_description: 'Nauja eilutė', quantity: '1', unit: 'vnt.', notes: '', technical_reference: '', material_price: null, work_price: null, sistela_code: '', sistela_original_description: '' });
