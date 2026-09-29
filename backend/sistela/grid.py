@@ -25,6 +25,7 @@ def active_lines(session: Session, project_id: str):
 
 
 def owned_line(session: Session, project_id: str, line_id: str) -> EstimateLine:
+    get_project(session, project_id)
     line = session.get(EstimateLine, line_id)
     if not line or line.project_id != project_id or line.deleted_at:
         raise ServiceError(404, "Eilutė nerasta.")

@@ -1,14 +1,9 @@
-import os
 from pathlib import Path
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import URL
 
-ROOT = Path(__file__).resolve().parents[2]
-
-
-def data_dir() -> Path:
-    return Path(os.environ.get("SISTELA_DATA_DIR", ROOT / "data")).resolve()
+from .paths import ROOT, data_dir, resource_root  # noqa: F401
 
 
 def database_url(directory: Path) -> URL:
@@ -32,8 +27,8 @@ def migrate(directory: Path):
     from alembic.config import Config
 
     directory.mkdir(parents=True, exist_ok=True)
-    config = Config(str(ROOT / "alembic.ini"))
-    config.set_main_option("script_location", str(ROOT / "backend/migrations"))
+    config = Config(str(resource_root() / "alembic.ini"))
+    config.set_main_option("script_location", str(resource_root() / "backend/migrations"))
     config.set_main_option(
         "sqlalchemy.url", database_url(directory).render_as_string().replace("%", "%%")
     )

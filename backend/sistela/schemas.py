@@ -27,6 +27,7 @@ class ProjectCreate(InputModel):
 
 
 class ProjectOut(ProjectCreate):
+    deleted_at: str | None
     model_config = ConfigDict(from_attributes=True)
     id: str
     status: str

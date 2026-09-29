@@ -3,7 +3,7 @@
 Lokalus įrankis sąnaudų žiniaraščio paruošimui prieš suvedimą į SISTELA.
 Tai nėra SISTELA skaičiavimo variklis ar jos kopija.
 
-**Dabartinis etapas: PHASE 7 – peržiūra ir rankinis perdavimas į SISTELA.** PDF importas, redaguojama
+**Dabartinis etapas: PHASE 8 – Windows diegiklis ir projektų šiukšlinė.** PDF importas, redaguojama
 lentelė, masiniai pakeitimai, vieno veiksmo undo, eilučių ir projektų kopijos,
 patvirtintų normatyvų istorija ir pasiūlymai, SISTELA Entry Mode, XLSX importas ir
 eksportas. DBF analizė read-only. Package Text – EXPERIMENTAL leksinė analizė;
@@ -16,7 +16,19 @@ klavišai ir išsaugoma suvedimo eiga, darbinis XLSX su atskirais tiksliniais ki
 bei vietinė darbo statistika. Automatinis importas į SISTELA dar nepatvirtintas.
 [Darbo eiga ir bandymas su Dariumi](docs/estimator-workflow.md).
 
-## Windows paleidimas
+## END USER INSTALLATION — diegimas vartotojui
+
+1. Paleiskite **SISTELA-Assistant-Setup-0.1.0.exe** ir pasirinkite **Diegti**.
+2. Atverkite **SISTELA Assistant** iš meniu Pradžia. Programa atsidarys naršyklėje.
+3. Sukurkite projektą ir importuokite dokumentą. Baigdami spauskite **Uždaryti programą**.
+
+Administratoriaus teisių įprastam diegimui nereikia. Projektai ir istorija saugomi
+`%LOCALAPPDATA%\SISTELA Assistant`; pašalinus ar atnaujinus programą duomenys lieka.
+Šiukšlinėje projektą galima atkurti; galutiniam trynimui reikia įvesti jo pavadinimą.
+Bendra SISTELA patirtis ir originalūs dokumentai nešalinami.
+[Diegimas ir priėmimo sąrašas](docs/windows-packaging.md) · [Šiukšlinė](docs/project-lifecycle.md).
+
+## DEVELOPER SETUP — Windows kūrėjo aplinka
 
 Reikia Python 3.12+ su pip, Node.js 22 LTS, pnpm ir Git. Priklausomybės diegiamos iš interneto vieną kartą;
 runtime dokumentų niekur nesiunčia ir API rakto nereikia.

@@ -65,6 +65,7 @@ class Project(Identity, Timestamps, Base):
     customer: Mapped[str] = mapped_column(default="")
     system_type: Mapped[str]
     status: Mapped[str] = mapped_column(default="draft")
+    deleted_at: Mapped[str | None]
 
 
 class SourceDocument(Identity, Base):

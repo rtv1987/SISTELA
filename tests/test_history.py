@@ -449,3 +449,59 @@ def test_historical_text_matching(client, archive, variant, method):
         s for s in client.get(url + "/suggestions").json() if s["sistela_code"] == "N50-270"
     )
     assert candidate["method"] == method and candidate["compatible"]
+
+
+@pytest.mark.fixtures
+def test_confirmed_history_reused_across_different_wording_without_auto_confirmation(client, archive, tmp_path):
+    upload(client, archive)
+    historical = client.get("/history/lines", params={"system": "GSS", "code": "N50-270"}).json()["items"][0]
+    url, current = project_line(client, "Detektorių montavimas", "vnt.")
+    # Real historical wording is below the old fuzzy threshold.
+    from rapidfuzz.fuzz import ratio
+
+    from sistela.parsers.common import normalize_text
+    assert ratio(normalize_text(current["project_description"]), normalize_text(historical["description"])) < 45
+    assert not any(s["sistela_code"] == "N50-270" for s in client.get(url + "/suggestions").json())
+    assert review(client, historical).status_code == 200
+    preferred = client.get(url + "/suggestions").json()[0]
+    assert preferred["sistela_code"] == "N50-270"
+    assert preferred["historical_confirmed"] is True and preferred["confirmed_count"] >= 1
+    assert preferred["origin"] == "historical" and historical["id"] in preferred["evidence_ids"]
+    assert preferred["sistela_description"] == ""  # Historical text is not catalogue truth.
+    assert historical["description"] in preferred["matching_descriptions"]
+    rows = client.get(f"/projects/{current['project_id']}/lines").json()
+    assert rows[0]["mapping_status"] == "unmapped" and rows[0]["sistela_code"] == ""
+    with TestClient(create_app(tmp_path), base_url="http://127.0.0.1") as reopened:
+        assert reopened.get(url + "/suggestions").json()[0]["sistela_code"] == "N50-270"
+        evidence = reopened.get(f"/history/lines/{historical['id']}/evidence").json()
+        assert evidence["status"] == "CONFIRMED" and evidence["reviews"]
+        future_url, _ = project_line(reopened, "Detektorių montavimas", "vnt.")
+        assert reopened.get(future_url + "/suggestions").json()[0]["sistela_code"] == "N50-270"
+    applied = client.post(url + "/mapping/apply", json={"version": current["version"], "mapping_id": preferred["mapping_id"]}).json()
+    assert applied["mapping_status"] == "suggested"
+    confirmed = client.post(url + "/mapping/confirm", json={"version": applied["version"], "sistela_code": "N50-270", "normative_unit": "vnt."}).json()
+    assert confirmed["mapping_status"] == "confirmed"
+    assert client.get(url + "/suggestions").json()[0]["origin"] == "user"
+
+
+@pytest.mark.fixtures
+@pytest.mark.parametrize("system,unit", [("AS", "vnt."), ("GSS", "kg"), ("GSS", "100M")])
+def test_confirmed_history_does_not_cross_system_or_incompatible_units(client, archive, system, unit):
+    upload(client, archive)
+    historical = client.get("/history/lines", params={"system": "GSS", "code": "N50-270"}).json()["items"][0]
+    assert review(client, historical).status_code == 200
+    url, row = project_line(client, "Detektorių montavimas", unit)
+    response = client.post(f"/projects/{row['project_id']}/grid", json={"edits": [{"id": row["id"], "version": row["version"], "values": {"system_type": system}}]})
+    assert response.status_code == 200
+    assert not any(s["sistela_code"] == "N50-270" for s in client.get(url + "/suggestions").json())
+
+
+@pytest.mark.parametrize("source,target,status", [
+    ("vnt", "vnt.", "IDENTICAL"), ("kompl", "kompl.", "IDENTICAL"),
+    ("m", "m", "IDENTICAL"), ("m", "100M", "CONVERTIBLE"),
+    ("vnt", "100M", "INCOMPATIBLE"), ("m", "", "UNKNOWN"),
+])
+def test_conversion_requires_an_actual_supported_target(source, target, status):
+    result = unit_compatibility(source, target)
+    assert result["status"] == status
+    assert (result["factor"] is not None) == (status == "CONVERTIBLE")

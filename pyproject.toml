@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sistela-assistant"
-version = "0.1.0"
-description = "Local estimate preparation assistant; phase 0-3 backend"
+dynamic = ["version"]
+description = "Local estimate preparation assistant"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi==0.141.1", "uvicorn==0.54.0", "sqlalchemy==2.1.1",
@@ -18,6 +18,9 @@ dev = ["pytest==9.1.1", "httpx==0.28.1", "ruff==0.16.9"]
 
 [tool.setuptools.packages.find]
 where = ["backend"]
+
+[tool.setuptools.dynamic]
+version = {attr = "sistela.version.VERSION"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

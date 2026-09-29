@@ -48,7 +48,7 @@ def store_document(destination: Path, data: bytes, checksum: str) -> None:
 
 def get_project(session: Session, project_id: str) -> Project:
     project = session.get(Project, project_id)
-    if not project:
+    if not project or project.deleted_at:
         raise ServiceError(404, "Projektas nerastas.")
     return project
 

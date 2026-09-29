@@ -24,8 +24,10 @@ test('real GSS → human review → explicit conversion → ready → persisted 
     const row=works[i];
     await page.getByRole('navigation',{name:'Peržiūros eilutės'}).getByRole('button').filter({has:page.getByText(row.project_description,{exact:true})}).click();
     if(row.unit==='m'){
-      await page.getByLabel('Tikslinis konversijos vienetas').selectOption('100m');
+      await page.getByLabel('Normatyvo vienetas',{exact:true}).fill('100m');
       await page.getByRole('button',{name:'Patvirtinti konversiją',exact:true}).click();
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: needs_review');
+  await expect(page.getByText('Išsaugota lokaliai',{exact:true})).toBeVisible();
       await expect(page.getByLabel('Normatyvo vienetas',{exact:true})).toHaveValue('100m');
     }
     // Operator choices supplied by the test; these are not verified normative codes.
@@ -59,10 +61,14 @@ test('review and ready screenshots with synthetic data; Entry Mode fits half a s
   const row=await(await request.post(`/projects/${project.id}/lines`,{data:{line_type:'Work',system_type:'GSS',project_description:'Kabelio montavimas',output_description:'Kabelio montavimas',quantity:'650',unit:'m'}})).json();
   await page.goto('/');await page.getByRole('button',{name:/SISTELA · Darbo peržiūra GSS/}).click();
   await page.getByRole('tab',{name:'Peržiūra',exact:true}).click();
+  await expect(page.locator('.conversion-review')).toHaveCount(0);
+  await page.getByLabel('Normatyvo vienetas',{exact:true}).fill('100m');
   await expect(page.getByRole('button',{name:'Patvirtinti konversiją',exact:true})).toBeVisible();
   mkdirSync(resolve('../docs/screenshots'),{recursive:true});
   await page.screenshot({path:resolve('../docs/screenshots/phase7-review.png'),fullPage:true,style:'.suggestion{display:none} .project-list button:not(.current){display:none}'});
   await page.getByRole('button',{name:'Patvirtinti konversiją',exact:true}).click();
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: needs_review');
+  await expect(page.getByText('Išsaugota lokaliai',{exact:true})).toBeVisible();
   await expect(page.getByLabel('Normatyvo vienetas',{exact:true})).toHaveValue('100m');
   await page.getByLabel('Patvirtinamas SISTELA kodas').fill('DEMO-N50');
   await page.getByRole('button',{name:'Patvirtinti pasirinkimą',exact:true}).click();

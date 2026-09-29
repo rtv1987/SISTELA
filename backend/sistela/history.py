@@ -305,7 +305,14 @@ def historical_suggestions(session, current):
     groups = defaultdict(list)
     for line, estimate in rows:
         similarity = ratio(normalized, line.normalized_description) / 100
-        if similarity < 0.45 or not line.sistela_code:
+        compatibility = unit_compatibility(current.unit, line.unit)
+        # Confirmation validates historical evidence, not the current description.
+        # Reuse it as a same-system/unit shortlist even when wording differs;
+        # retain the low text score and require explicit current-row approval.
+        confirmed = line.status == "CONFIRMED"
+        if confirmed and compatibility["status"] not in {"IDENTICAL", "CONVERTIBLE"}:
+            continue
+        if (similarity < 0.45 and not confirmed) or not line.sistela_code:
             continue
         groups[(line.sistela_code, line.unit)].append((line, estimate, similarity))
     result = []
@@ -314,11 +321,10 @@ def historical_suggestions(session, current):
         def rank(member):
             line, _, similarity = member
             exact = line.description == current.project_description
-            same = line.normalized_description == normalized
             strong = line.evidence_type != "AMBIGUOUS"
             tier = (
                 2
-                if line.status == "CONFIRMED" and (exact or same)
+                if line.status == "CONFIRMED"
                 else 3
                 if strong and exact
                 else 4
@@ -369,6 +375,7 @@ def historical_suggestions(session, current):
                 "source_date": max(dates) if dates else None,
                 "last_used_kind": "estimate KODAT; not a proven usage date",
                 "origin": "historical",
+                "historical_confirmed": best.status == "CONFIRMED",
                 "priority": rank(members[0])[0],
                 "usage_count": len(distinct),
                 "project_count": len(projects),

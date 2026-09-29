@@ -20,7 +20,10 @@ telemetry or AI integration are present.
    individual suggestion, or mark the row for manual selection. Manual selection
    still requires a code and explicit confirmation before handoff.
 5. If the project says `650 m` and the chosen norm says `100M`, review the preview
-   `650 m → 6.5 × 100m` and press **Patvirtinti konversiją**. Then confirm the code
+   `650 m → 6.5 × 100m` and press **Patvirtinti konversiją**. Select the conversion
+   from an actual candidate's unit or enter the verified unit in **Normatyvo vienetas**.
+   No conversion panel is shown for identical, incompatible or unknown target units;
+   `100m` is never chosen as a generic default. Then confirm the code
    against the target unit. Only `m ↔ 100m` is supported. No automatic scaling.
 6. Edit quantities, descriptions and prices in the existing grid. Keep both
    possible duplicates explicitly, or combine their quantities and delete the

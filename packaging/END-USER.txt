@@ -1,0 +1,14 @@
+SISTELA Assistant
+
+1. Paleiskite Setup failą ir pasirinkite Diegti.
+2. Paleiskite SISTELA Assistant iš meniu Pradžia.
+3. Programa automatiškai atsidarys naršyklėje. Interneto ryšio darbui nereikia.
+4. Sukurkite projektą ir importuokite PDF arba Excel žiniaraštį.
+5. Baigdami darbą pasirinkite „Uždaryti programą“. Viskas išsaugoma automatiškai.
+
+Pašalinus programą projektai ir istorija lieka kompiuteryje.
+Atnaujinimui paleiskite naują Setup failą. Duomenys išlieka.
+Jei programa nepasileidžia, perduokite logus kūrėjui. Originalių dokumentų siųsti nereikia.
+
+Duomenys: %LOCALAPPDATA%\SISTELA Assistant
+Programa padeda rankiniu būdu suvesti sąmatą į SISTELA; automatinio importo neatlieka.

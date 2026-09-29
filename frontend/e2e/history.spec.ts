@@ -49,6 +49,49 @@ test('DBF archive → candidate evidence → confirmation → current estimate s
   expect(suggestions.some((s:{evidence_ids?:string[]})=>s.evidence_ids?.includes(historical.id))).toBe(false);
 });
 
+test('confirmed N50-270 is preferred for detector wording; no unrelated conversion; explicit current confirmation',async({page,request})=>{
+  const files=['sd','dd','nd','pd','td','od'].map(role=>[resolve(`../${role}25-04-14.dbf`),resolve(`../samples/sistela/${role}25-04-14.dbf`)].find(existsSync));
+  test.skip(files.some(file=>!file),'Private DBF archive not supplied.');
+  const project=await(await request.post('/projects',{data:{name:'Detector review regression',system_type:'GSS'}})).json();
+  const row=await(await request.post(`/projects/${project.id}/lines`,{data:{system_type:'GSS',line_type:'Work',project_description:'Detektorių montavimas',output_description:'Detektorių montavimas',quantity:'28',unit:'vnt.'}})).json();
+  await page.goto('/');
+  await page.getByRole('button',{name:/Detector review regression GSS/}).click();
+  await page.getByRole('tab',{name:'Peržiūra',exact:true}).click();
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: unmapped');
+  await page.getByRole('button',{name:'Istorinės SISTELA sąmatos',exact:true}).click();
+  await page.getByLabel('DBF archyvo failai').setInputFiles(files as string[]);
+  await expect(page.getByRole('status')).toContainText(/39 darbų kandidatų|nesidubliavo/);
+  await page.getByLabel('Istorijos būsena').selectOption('');
+  await page.getByLabel('Istorijos sistema').selectOption('GSS');
+  await page.getByLabel('Istorijos SISTELA kodas').fill('N50-270');
+  await expect(page.getByText('1 rezultatų',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Peržiūrėti',exact:true}).click();
+  await page.getByRole('button',{name:'Patvirtinti kandidatą',exact:true}).click();
+  await expect(page.getByRole('status')).toContainText('patvirtinta');
+  // Return without reloading: the same current row/version must receive fresh knowledge.
+  await page.getByRole('button',{name:/Detector review regression GSS/}).click();
+  await expect(page.locator('.suggestion').first()).toContainText('N50-270');
+  await expect(page.locator('.suggestion').first()).toContainText('Patvirtinta istorinė patirtis');
+  await expect(page.locator('.conversion-review')).toHaveCount(0);
+  await expect(page.getByLabel('Tikslinis konversijos vienetas')).toHaveCount(0);
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: unmapped');
+  await page.locator('.suggestion').first().getByText(/Istoriniai įrodymai/).click();
+  await page.locator('.suggestion').first().getByRole('button',{name:'Atverti šaltinį 1'}).click();
+  await expect(page.getByRole('dialog')).toContainText('dd25-04-14.dbf');
+  await page.getByLabel('Uždaryti įrodymus').click();
+  await page.locator('.suggestion').first().getByRole('button',{name:'Pritaikyti pasiūlymą'}).click();
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: suggested');
+  expect((await(await request.get(`/projects/${project.id}/lines`)).json())[0].mapping_status).toBe('suggested');
+  await page.getByRole('button',{name:'Patvirtinti pasirinkimą',exact:true}).click();
+  await expect(page.locator('.confirmation-note')).toBeVisible();
+  const saved=(await(await request.get(`/projects/${project.id}/lines`)).json())[0];
+  expect(saved.mapping_status).toBe('confirmed');expect(saved.sistela_code).toBe('N50-270');
+  expect(saved.quantity).toBe(row.quantity);expect(saved.unit).toBe('vnt.');
+  await page.reload();await page.getByRole('tab',{name:'Peržiūra',exact:true}).click();
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: confirmed');
+  await expect(page.locator('.conversion-review')).toHaveCount(0);
+});
+
 test('history UI screenshots use only synthetic presentation data',async({page})=>{
   const row={id:'demo',version:1,description:'Detektorių montavimas',sistela_code:'TEST-270',unit:'vnt.',quantity:'28',historical_price:null,system_type:'GSS',status:'CANDIDATE',evidence_type:'DERIVED',bulk_eligible:true,estimate_name:'Gaisro aptikimo sistema',project_name:'Demonstracinis objektas',section_name:'Darbai',line_type:'Work',system_evidence:'INFERENCE',source_date:null};
   await page.route('**/history/imports',route=>route.fulfill({json:[{id:'demo-import',source_reference:'sd-demo.dbf, dd-demo.dbf, nd-demo.dbf',imported_at:'2026-09-29',line_count:3,work_count:3,confirmed_count:0,rejected_count:0,warning_count:0,warnings:[],estimates:[{id:'e',name:row.estimate_name,project_name:row.project_name,system_type:'GSS'}]}]}));

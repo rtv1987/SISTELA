@@ -1,9 +1,11 @@
 import json
 import logging
+import os
+import secrets
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Form, HTTPException, Request, UploadFile
+from fastapi import BackgroundTasks, Depends, FastAPI, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -16,6 +18,7 @@ from .db import data_dir, make_engine
 from .grid import active_lines, apply_grid, duplicate_project, owned_line, undo_grid
 from .history_api import history_router
 from .integration import capabilities
+from .lifecycle import lifecycle_router
 from .mapping import (
     ApplyMapping,
     ConfirmMapping,
@@ -26,6 +29,7 @@ from .mapping import (
     suggestions,
 )
 from .models import EstimateSection, ImportRun, Project, SourceDocument, utc_now
+from .paths import resource_root
 from .schemas import (
     GridCommand,
     ImportOut,
@@ -37,6 +41,7 @@ from .schemas import (
 )
 from .services import ServiceError, add_line, create_project, edit_line, get_project, import_pdf
 from .spreadsheets import ExcelExporter, import_xlsx, workbook_preview
+from .version import VERSION
 from .workflow import workflow_router
 
 MAX_FILE_BYTES = 25 * 1024 * 1024
@@ -78,9 +83,10 @@ class BodyLimitMiddleware:
             )
 
 
-def create_app(directory: Path | None = None) -> FastAPI:
+def create_app(directory: Path | None = None, *, runtime_origin=None, shutdown=None, runtime_token=None, instance_id=None) -> FastAPI:
     directory = directory or data_dir()
     engine = make_engine(directory)
+    origins = {runtime_origin} if runtime_origin else ALLOWED_ORIGINS
 
     @asynccontextmanager
     async def lifespan(app):
@@ -108,13 +114,13 @@ def create_app(directory: Path | None = None) -> FastAPI:
         engine.dispose()
 
     app = FastAPI(
-        title="SISTELA Assistant", version="0.4.0", lifespan=lifespan, docs_url=None, redoc_url=None
+        title="SISTELA Assistant", version=VERSION, lifespan=lifespan, docs_url=None, redoc_url=None
     )
     app.add_middleware(BodyLimitMiddleware)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=sorted(ALLOWED_ORIGINS),
+        allow_origins=sorted(origins),
         allow_methods=["GET", "POST", "PUT"],
         allow_headers=["Content-Type"],
     )
@@ -122,7 +128,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
     @app.middleware("http")
     async def local_origin(request: Request, call_next):
         origin = request.headers.get("origin")
-        if origin is not None and origin not in ALLOWED_ORIGINS:
+        if origin is not None and origin not in origins:
             return JSONResponse({"detail": "Neleidžiama kilmė."}, status_code=403)
         return await call_next(request)
 
@@ -134,8 +140,32 @@ def create_app(directory: Path | None = None) -> FastAPI:
         with Session(engine) as session:
             yield session
 
+    app.include_router(lifecycle_router(session_dependency, directory))
     app.include_router(history_router(session_dependency))
     app.include_router(workflow_router(session_dependency))
+
+    @app.get("/app/info")
+    def app_info():
+        return {"version": VERSION, "managed": shutdown is not None, "instance_id": instance_id}
+
+    @app.post("/app/logs/open")
+    def open_logs():
+        if os.name != "nt":
+            raise HTTPException(409, "Logų aplanką galima atverti Windows aplinkoje.")
+        folder = directory / "logs"
+        folder.mkdir(parents=True, exist_ok=True)
+        os.startfile(str(folder.resolve()))
+        return {"opened": True}
+
+    @app.post("/app/quit")
+    def quit_app(request: Request, background: BackgroundTasks):
+        if shutdown is None:
+            raise HTTPException(409, "Šis serveris paleistas kūrėjo režimu.")
+        token = request.headers.get("x-sistela-token", "")
+        if not (runtime_token and secrets.compare_digest(token, runtime_token)) and request.headers.get("origin") != runtime_origin:
+            raise HTTPException(403, "Neleidžiama kilmė.")
+        background.add_task(shutdown)
+        return {"stopping": True}
 
     @app.get("/health")
     def health(session: Session = Depends(session_dependency)):
@@ -217,7 +247,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
 
     @app.get("/projects", response_model=list[ProjectOut])
     def projects_list(session: Session = Depends(session_dependency)):
-        return session.scalars(select(Project).order_by(Project.updated_at.desc())).all()
+        return session.scalars(select(Project).where(Project.deleted_at.is_(None)).order_by(Project.updated_at.desc())).all()
 
     @app.get("/projects/{project_id}", response_model=ProjectOut)
     def project_get(project_id: str, session: Session = Depends(session_dependency)):
@@ -288,7 +318,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
             )
         ]
 
-    frontend = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+    frontend = resource_root() / "frontend" / "dist"
     if frontend.is_dir():
         app.mount("/", StaticFiles(directory=frontend, html=True), name="frontend")
     return app

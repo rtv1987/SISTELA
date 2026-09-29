@@ -84,3 +84,81 @@ Migracija: 007_estimator_review. Nauji testai: 16 backend, 8 frontend, 2 Playwri
 Praėjo 129 testai (95 backend, 27 frontend, 7 Playwright), Ruff, ESLint, TypeScript,
 build ir migracijų patikra. Originalių šaltinių SHA-256 patikros praėjo.
 [Išsami ataskaita](iteration-04.md), [darbo eiga ir realus bandymas](estimator-workflow.md).
+
+
+## PHASE 7 – pirmojo realaus bandymo klaidų pataisos (2026-09-29)
+
+Taisytos tik dvi atkuriamos klaidos. N50-270 istorinio ir projekto detektorių
+aprašymų tekstinis panašumas yra 28.32 %, todėl istorinis patvirtinimas buvo
+atmetamas iki rikiavimo ties 45 % slenksčiu. Pirmenybė patvirtintai istorijai
+anksčiau dar reikalavo tikslaus/normalizuoto aprašymo sutapimo. Istorinė būsena ir
+auditas buvo išsaugomi teisingai; pasiūlymų API juos jau naudojo, o UI grįžtant iš
+istorijos persikraudavo. Naujos SistelaMapping kopijos ar duomenų migracijos nereikia.
+
+Dabar vartotojo atitikmenys turi pirmenybę prieš patvirtintą istorinę patirtį, ši –
+prieš nepatvirtintus fuzzy kandidatus. Patvirtintos istorijos tos pačios sistemos
+ir tinkamų vienetų kandidatai neatmetami vien dėl skirtingų formuluočių; žemas
+teksto įvertis nekeičiamas. Rodoma „Patvirtinta istorinė patirtis“ ir esami įrodymai.
+Projektas lieka unmapped, po pritaikymo suggested, po atskiro patvirtinimo confirmed.
+
+Konversijos blokas anksčiau buvo besąlyginis visiems darbams su 100m numatytąja
+būsena. Jis perkeltas prie konkretaus normatyvo vieneto: rodomas tik m ↔ 100m,
+kai tikslas žinomas iš pasiūlymo arba vartotojas jį nurodė normatyvo lauke.
+Vienodiems, nesuderinamiems ir nežinomiems vienetams blokas nerodomas.
+
+Pridėta 10 backend ir 14 frontend testų / parametrizuotų atvejų bei 1 Playwright
+regresija su tikru DBF ir „Detektorių montavimas“, grįžimu iš istorijos be puslapio
+perkrovimo, įrodymais, paslėpta konversija, pritaikymu ir aiškiu patvirtinimu.
+Keisti backend history.py / mapping.py; frontend MappingPanel.tsx, Workflow.tsx,
+types.ts; pridėtas conversion.ts. Testai: tests/test_history.py,
+frontend/src/review-defects.test.tsx, frontend/e2e/history.spec.ts ir esamo
+z_estimator.spec.ts konversijos žingsniai. Atnaujintos historical-dbf-import.md,
+estimator-workflow.md ir automatiškai atkuriami estimate-grid / phase7-review ekranai.
+
+## PHASE 8 — Windows paketas ir projektų gyvavimo ciklas (2026-09-29)
+
+Prieš tęsiant peržiūrėti necommitinti pakeitimai ir išsaugotos abi realaus bandymo
+pataisos. Pradinė žalia bazė: 105 backend + 41 frontend + 8 Playwright = 154 testai;
+Ruff, TypeScript/ESLint, UI build ir Alembic patikra praėjo.
+
+Įgyvendintas windowless PyInstaller x64 vykdomasis failas, produkcinis React UI,
+vieno proceso localhost runtime su laisvu portu, automatinis naršyklės atvėrimas,
+per-user AppData katalogai, migracijos su SQLite backup, versija, logų atvėrimas ir
+uždarymo mygtukas. NSIS diegiklis su Start Menu / neprivaloma Desktop nuoroda ir
+duomenis išsaugančiu uninstaller. Viena build komanda sukuria tikrą Setup, portable
+ZIP ir SHA256SUMS; artefaktai ignoruojamame `dist/windows/`.
+
+Projektai turi soft delete (migracija `008_project_trash`), šiukšlinę, atkūrimą ir
+galutinio ištrynimo patvirtinimą tiksliu pavadinimu. Globali mapping/DBF patirtis
+lieka. Bendros kopijos išsaugomos, kol jas naudoja kitas projektas; originalūs failai
+nešalinami. Ankstesnės normatyvų prioriteto ir konversijų pataisos nepakeistos.
+
+Pridėta 11 backend testų, 5 frontend ir 2 Playwright testai. Rezultatas:
+**116 backend + 46 frontend + 10 Playwright = 172**, įskaitant tikrus privačius
+GSS/DBF mėginius. Ruff, TypeScript, ESLint, Vite build ir Alembic schema check praeina.
+Lieka bibliotekos Starlette/httpx deprecation įspėjimas; testų praleidimų nėra.
+Du atskiri smoke scenarijai tikrina patį EXE bei tikrą diegimą/perinstaliavimą/
+pašalinimą izoliuotuose duomenyse. Tai papildomos priėmimo patikros, ne į 172
+įskaičiuoti pytest/Vitest/Playwright testai.
+
+PHASE 8 pakeisti / pridėti failai:
+
+- `backend/sistela/{api,db,grid,models,schemas,services}.py`;
+  nauji `desktop.py`, `paths.py`, `version.py`, `lifecycle.py`;
+  `backend/migrations/versions/008_project_trash.py`.
+- `frontend/src/App.tsx`, nauji `Lifecycle.tsx`, `lifecycle.css`, `lifecycle.test.tsx`;
+  `frontend/e2e/zz_lifecycle.spec.ts`, `frontend/package.json`.
+- `packaging/{windows.spec,windows_launcher.py,installer.nsi,requirements-build.txt,END-USER.txt}`;
+  `scripts/build-windows.ps1`, `scripts/smoke_windows.py`, `scripts/smoke-installer.py`;
+  `pyproject.toml`, `tests/test_desktop_lifecycle.py`.
+- `README.md`, `docs/windows-packaging.md`, `docs/project-lifecycle.md`,
+  `docs/decisions/0007-windows-runtime-and-project-trash.md`, šis failas;
+  nauji `docs/screenshots/phase8-trash.png`, `phase8-delete-confirmation.png` ir
+  esami automatiškai atnaujinti demonstraciniai UI ekranai su nauja navigacija.
+
+Švarus Dariaus Windows kompiuteris šiame seanse nepasiekiamas. Kitas konkretus
+veiksmas: perduoti Setup ir SHA256SUMS, atlikti `windows-packaging.md` priėmimo sąrašą
+paprasto vartotojo paskyroje. Diegiklis kol kas nepasirašytas; nėra online update.
+Realiame update teste perinstaliuojama ta pati 0.1.0, nes ankstesnio išleisto Setup
+nėra; schemos 007 → 008 backup atskirai patikrintas backend testu. Kita produkto
+fazė nepradėta.

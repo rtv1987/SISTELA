@@ -62,7 +62,7 @@ def suggestions(session, line):
             "confidence": str(Decimal(str(min(score, .99))).quantize(Decimal('.01'))),
             "method": method, "confirmed_count": item.confirmed_count, "compatible": compatible,
             "last_used_at": item.last_used_at, "origin": "user", "unit_compatibility": compatibility,
-            "priority": 0 if method == "exact" else 1 if method == "normalized" else 6})
+            "priority": 0 if method == "exact" else 1})
     result.extend(historical_suggestions(session, line))
     # Preserve correction recency within each tier; explicit exact confirmations rank first.
     result.sort(key=lambda x: (Decimal(x["confidence"]), x["last_used_at"] or "", x["confirmed_count"]), reverse=True)

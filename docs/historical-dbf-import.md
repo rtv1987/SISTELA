@@ -104,11 +104,18 @@ Rodomi naudojimai, atskiri objektai, sąmatos, skirtingi aprašymai, patvirtinim
 identifikuojamas KOMPLEKSAS/OBJEKTAS pora. Sąmatų skaičius apima importuotus vaizdus.
 Atmesti kandidatai neįtraukiami. Dažnis nėra normatyvo teisingumo įrodymas.
 
-Taikomi pasiūlymai rikiuojami prieš blokuotus. Toliau: vartotojo tikslus patvirtinimas,
-vartotojo normalizuotas patvirtinimas, tikslus/normalizuotas patvirtintas istorinis
-pasirinkimas, stiprus istorinis tikslus, stiprus istorinis normalizuotas/fuzzy,
-kiti istoriniai kandidatai, bendras patvirtintos istorijos fuzzy. Išlaikyta ankstesnio
-vartotojo pataisymo naujumo pirmenybė savo grupėje. Įvertis – euristika, ne tikimybė.
+Taikomi pasiūlymai rikiuojami prieš blokuotus. Toliau: vartotojo patvirtinti
+atitikmenys, žmogaus patvirtinta istorinė patirtis, nepatvirtinti istoriniai kandidatai.
+Patvirtinta istorija toje pačioje sistemoje ir su suderinamu vienetu įtraukiama net
+kai skiriasi aprašymų formuluotės; 0.45 tekstinio panašumo slenkstis lieka
+nepatvirtintiems kandidatams. m/100m pora gali būti siūloma tik su atskiru aiškiu
+konversijos patvirtinimu. Nesuderinami patvirtintos istorijos vienetai neįtraukiami.
+Teksto įvertis nepadidinamas dėl patvirtinimo; UI atskirai rodo „Patvirtinta istorinė
+patirtis“ ir įrodymus. Tai kandidatų sąrašas, ne semantinio tapatumo įrodymas.
+Dabartinę eilutę būtina atskirai pritaikyti ir patvirtinti. Istorinės būsenos jau
+saugomos HistoricalLine / HistoricalReview; jų nereikia dubliuoti į SistelaMapping.
+Išlaikyta ankstesnio vartotojo pataisymo naujumo pirmenybė savo grupėje.
+Įvertis – euristika, ne tikimybė.
 
 ## Vienetai
 
