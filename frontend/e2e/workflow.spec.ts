@@ -41,7 +41,7 @@ test('create, edit, confirm, remember, enter, export and reimport', async ({page
   await page.getByLabel('Projekto pavadinimas 2', {exact:true}).click();
   await page.getByLabel('Patvirtinamas SISTELA kodas', {exact:true}).fill('TEST-N50');
   await page.getByLabel('Originalus normatyvo pavadinimas', {exact:true}).fill('Demonstracinis normatyvas');
-  await page.getByRole('button', {name:'Patvirtinti pasirinkimą'}).click();
+  await page.getByRole('button', {name:'Išsaugoti kodą'}).click();
   await expect(page.locator('.status.confirmed')).toHaveCount(1);
   mkdirSync(resolve('../docs/screenshots'), {recursive:true});
   await page.screenshot({path:resolve('../docs/screenshots/estimate-grid.png'), fullPage:true, style:'.suggestion:has(details) { display: none; }'});
@@ -67,7 +67,7 @@ test('create, edit, confirm, remember, enter, export and reimport', async ({page
   await expect(page.getByText('4 eilučių', {exact:true})).toBeVisible();
   await page.getByLabel('Projekto pavadinimas 3', {exact:true}).click();
   // Select imported work (source position 3 in the XLSX).
-  await expect(page.locator('.suggestion').filter({hasText:'TEST-N50'}).getByRole('button', {name:'Pritaikyti pasiūlymą'})).toBeVisible();
+  await expect(page.locator('.suggestion').filter({hasText:'TEST-N50'}).getByRole('button', {name:'Pasirinkti kodą'})).toBeVisible();
   const rows = await (await request.get(`/projects/${pid}/lines`)).json();
   expect(rows[0].quantity).toBe('651.123456');
 });

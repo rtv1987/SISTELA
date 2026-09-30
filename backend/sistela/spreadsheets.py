@@ -229,6 +229,9 @@ def import_xlsx(session, directory, project_id, filename, data, sheet, header_ro
         run.warnings = warnings
         run.completed_at = utc_now()
         run.elapsed_ms = int((time.perf_counter()-started)*1000)
+        session.flush()
+        from .auto_mapping import populate_automatic
+        populate_automatic(session, project_id)
         project.status = "IMPORTED"
         project.updated_at = utc_now()
         session.commit()

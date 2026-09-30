@@ -19,6 +19,11 @@ def render_item(kind, obj, autogen_context):
     return False
 
 
+def include_object(obj, name, kind, reflected, compare_to):
+    # FTS5 virtual tables and their SQLite-maintained shadow tables are explicit DDL.
+    return not (kind == 'table' and (name == 'normative_fts' or name.startswith('normative_fts_')))
+
+
 if context.is_offline_mode():
     context.configure(
         url=url, target_metadata=Base.metadata, literal_binds=True, render_item=render_item
@@ -33,6 +38,7 @@ else:
             target_metadata=Base.metadata,
             render_item=render_item,
             compare_type=True,
+            include_object=include_object,
         )
         with context.begin_transaction():
             context.run_migrations()

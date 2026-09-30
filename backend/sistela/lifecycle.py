@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from .models import (
     EstimateLine,
     EstimateSection,
+    ExportSettings,
     GridChange,
     ImportRun,
     MappingConfirmation,
@@ -58,6 +59,7 @@ def permanent_delete(session, directory, project_id, confirmation):
     for model in (MappingConfirmation, Requirement, GridChange, ImportRun, EstimateLine,
                   EstimateSection, SourceDocument):
         session.execute(delete(model).where(model.project_id == project_id))
+    session.execute(delete(ExportSettings).where(ExportSettings.key == 'project:' + project_id))
     session.delete(project)
     session.commit()
     failed = 0

@@ -68,6 +68,10 @@ def apply_grid(session: Session, project_id: str, command: GridCommand):
             invalidate_review(line, values)
             values["entered_at"] = None
             update_versioned(session, line, edit.version, values)
+            if "sistela_code" in edit.values and before[line.id]["sistela_code"] != line.sistela_code:
+                from .auto_mapping import learn_code_edit
+                learn_code_edit(session,line,before[line.id]["sistela_code"],
+                    (before[line.id].get('review_data') or {}).get('suggestion'))
             versions[line.id] = line.version
         for deletion in command.deletes:
             line = owned_line(session, project_id, deletion.id)

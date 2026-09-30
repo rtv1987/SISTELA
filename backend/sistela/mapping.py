@@ -34,10 +34,11 @@ class EntryUpdate(InputModel):
 
 
 def suggestions(session, line):
-    if line.line_type != "Work":
+    if line.line_type not in {"Work", "Material"}:
         return []
     normalized = normalize_text(line.project_description)
     mappings = session.scalars(select(SistelaMapping).where(SistelaMapping.system_type == line.system_type,
+        SistelaMapping.line_type == line.line_type,
         SistelaMapping.confirmed_count > 0)).all()
     latest = {}
     for item in mappings:
@@ -63,7 +64,10 @@ def suggestions(session, line):
             "method": method, "confirmed_count": item.confirmed_count, "compatible": compatible,
             "last_used_at": item.last_used_at, "origin": "user", "unit_compatibility": compatibility,
             "priority": 0 if method == "exact" else 1})
-    result.extend(historical_suggestions(session, line))
+    if line.line_type == 'Work':
+        result.extend(historical_suggestions(session, line))
+    from .auto_mapping import catalog_candidates
+    result.extend(catalog_candidates(session, line))
     # Preserve correction recency within each tier; explicit exact confirmations rank first.
     result.sort(key=lambda x: (Decimal(x["confidence"]), x["last_used_at"] or "", x["confirmed_count"]), reverse=True)
     result.sort(key=lambda x: (not x["compatible"], x["priority"]))
@@ -76,15 +80,20 @@ def suggestions(session, line):
     return [r for r in result if r["mapping_id"] not in review.get("rejected_ids", [])][:5]
 
 
-def apply_suggestion(session, project_id, line_id, request: ApplyMapping):
+def apply_suggestion(session, project_id, line_id, request: ApplyMapping, *, learn=False):
     line = owned_line(session, project_id, line_id)
     candidate = next((s for s in suggestions(session, line) if s["mapping_id"] == request.mapping_id), None)
     if not candidate or not candidate["compatible"]:
         raise ServiceError(422, "Pasiūlymas nebetinka arba nesutampa normatyvinis vienetas.")
+    previous = line.sistela_code
     update_versioned(session, line, request.version, {
         "sistela_code": candidate["sistela_code"], "sistela_original_description": candidate["sistela_description"],
         "confidence": Decimal(candidate["confidence"]), "mapping_status": "suggested", "entered_at": None,
         "review_data": {**(line.review_data or {}), "suggestion": candidate, "suggestion_offered": True, "manual": False}})
+    if learn:
+        from .auto_mapping import learn_code_edit
+        learn_code_edit(session, line, previous)
+        line.review_data = {**line.review_data, 'suggestion': candidate}
     session.commit()
     session.refresh(line)
     return line
@@ -116,6 +125,7 @@ def confirm_mapping(session, project_id, line_id, request: ConfirmMapping):
             "confidence": line.confidence if previous == request.sistela_code else None, "review_data": review})
         normalized = normalize_text(line.project_description)
         item = session.scalar(select(SistelaMapping).where(SistelaMapping.system_type == line.system_type,
+            SistelaMapping.line_type == 'Work',
             SistelaMapping.normalized_source_text == normalized, SistelaMapping.source_unit == unit,
             SistelaMapping.sistela_code == request.sistela_code))
         if not item:
@@ -141,8 +151,8 @@ def confirm_mapping(session, project_id, line_id, request: ConfirmMapping):
 def mark_entry(session, project_id, line_id, request: EntryUpdate):
     line = owned_line(session, project_id, line_id)
     if request.entered and (not target(line)[2] or line.quantity <= 0 or not line.unit or (line.line_type == "Work" and
-            (line.mapping_status != "confirmed" or not line.sistela_code))):
-        raise ServiceError(422, "Prieš suvedimą patikrinkite vienetą ir patvirtinkite darbo normatyvą.")
+            (not line.sistela_code))):
+        raise ServiceError(422, "Prieš suvedimą patikrinkite vienetą ir įrašykite darbo kodą.")
     from .workflow import validate_project_for_sistela
     if request.entered:
         row = next(r for r in validate_project_for_sistela(session, project_id)["rows"] if r["id"] == line_id)

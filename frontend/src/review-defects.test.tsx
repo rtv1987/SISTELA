@@ -49,7 +49,7 @@ it('Review Queue refetches confirmed historical knowledge after returning from h
     if(url.endsWith('/validation'))return {status:'NEEDS_REVIEW',blocking:1,warnings:0,summary:{},statistics:{},rows:[{id:'line',category:'MISSING_SISTELA_CODE',issues:[{severity:'BLOCKING',message:'Confirm mapping'}],target_quantity:'28',target_unit:'vnt.',duplicates:[],price_status:'MISSING'}]};
     throw new Error(`Unexpected ${url}`);
   });
-  mocks.post.mockImplementation(async(url:string)=>{if(url==='/history/review'){reviewed=true;return {updated:1};}throw new Error(url);});
+  mocks.post.mockImplementation(async(url:string)=>{if(url.endsWith('/automatic'))return [line];if(url==='/history/review'){reviewed=true;return {updated:1};}throw new Error(url);});
   const {container}=render(<App/>);
   await screen.findByRole('heading',{name:'Current GSS'});
   fireEvent.mouseDown(screen.getByRole('tab',{name:'Peržiūra'}),{button:0,ctrlKey:false});

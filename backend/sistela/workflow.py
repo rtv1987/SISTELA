@@ -69,17 +69,16 @@ def validate_project_for_sistela(session, project_id):
             issue("INVALID_ROW_STATE", "BLOCKING", "Patikrinkite eilutės tipą ir pavadinimą.")
         candidates = suggestions(session, line) if line.line_type == "Work" else []
         evidence = review.get("suggestion", {})
+        from .auto_mapping import lookup_code
+        reference = lookup_code(session, line.sistela_code, line.line_type) if line.sistela_code else None
+        normative_unit = reference.unit if reference else review.get('normative_unit')
+        if reference and not normative_unit:
+            issue('UNKNOWN_UNIT', 'BLOCKING', 'Katalogo vienetas neaiškus; patikrinkite jo šaltinius.')
+        if line.sistela_code and normative_unit and normalize_unit(normative_unit) != normalize_unit(unit):
+            issue("UNIT_MISMATCH", "BLOCKING", "Pasirinkto kodo vienetas nesutampa su tiksliniu vienetu. Patikrinkite konversiją.")
         if line.line_type == "Work":
             if not line.sistela_code.strip():
                 issue("MISSING_SISTELA_CODE", "BLOCKING", "Pasirinkite SISTELA darbų kodą.")
-            if line.mapping_status != "confirmed":
-                issue(
-                    "UNCONFIRMED_HISTORICAL_MAPPING"
-                    if evidence.get("origin") == "historical"
-                    else "UNCONFIRMED_MAPPING",
-                    "BLOCKING",
-                    "Reikalingas vartotojo patvirtinimas.",
-                )
             if evidence.get("source_unit") and normalize_unit(
                 evidence["source_unit"]
             ) != normalize_unit(unit):
@@ -88,23 +87,13 @@ def validate_project_for_sistela(session, project_id):
                     "BLOCKING",
                     "Pasirinkto pasiūlymo ir tikslinis vienetai nesutampa.",
                 )
-            if (
-                candidates
-                and not candidates[0]["compatible"]
-                and line.mapping_status != "confirmed"
-            ):
-                issue(
-                    "UNIT_MISMATCH",
-                    "BLOCKING",
-                    "Pasiūlymo vienetą reikia patikrinti ir aiškiai patvirtinti konversiją.",
-                )
             if line.confidence is not None and line.confidence < Decimal("0.7"):
                 issue(
                     "LOW_CONFIDENCE_MAPPING",
                     "WARNING",
                     "Silpnas teksto atitikimas; patikrinkite įrodymus.",
                 )
-            if evidence.get("origin") == "historical":
+            if evidence.get("origin") == "historical" and not evidence.get('catalog_verified'):
                 issue(
                     "HISTORICAL_ONLY",
                     "WARNING",
@@ -192,6 +181,8 @@ def validate_project_for_sistela(session, project_id):
         else ("MAPPING_IN_PROGRESS" if any(r.sistela_code for r in works) else "NEEDS_REVIEW")
     )
     statistics = dict(
+        automatic_code_count=sum(bool((r.review_data or {}).get('automatic')) for r in lines),
+        corrected_code_count=sum(bool((r.review_data or {}).get('correction')) for r in lines),
         imported_line_count=sum(bool(r.source_document_id) for r in lines),
         auto_suggested_mapping_count=sum(
             (line.review_data or {}).get(
@@ -227,7 +218,7 @@ def validate_project_for_sistela(session, project_id):
             works=len(works),
             mapped=sum(bool(r.sistela_code) for r in works),
             confirmed=confirmed,
-            unresolved=len(works) - confirmed,
+            unresolved=sum(not r.sistela_code for r in works),
             needs_review=sum(bool(r["issues"]) for r in rows),
             entered=statistics["entry_mode_completed_count"],
             missing_prices=sum(

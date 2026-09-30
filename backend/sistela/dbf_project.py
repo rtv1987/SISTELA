@@ -5,8 +5,8 @@ from hashlib import sha256
 from sqlalchemy import select
 
 from .dbf_export import DbfExportBlocked, encode_field
+from .export_model import normalized_estimate
 from .grid import active_lines
-from .handoff import target
 from .models import EstimateSection, HistoricalEstimate
 from .parsers.dbf import DbfField
 from .services import get_project
@@ -44,6 +44,9 @@ def allocate_identifiers(project_id, section_rows, reserved_complexes=()):
 
 def project_export_plan(session, project_id):
     project = get_project(session, project_id)
+    model = normalized_estimate(session, project_id)
+    normalized_rows = {r["id"]: r for section in model["sections"] for r in section["rows"]}
+    normalized_sections = {section['id']:section for section in model['sections']}
     lines = active_lines(session, project_id)
     report = validate_project_for_sistela(session, project_id)
     blockers = list(PROJECT_BLOCKERS)
@@ -66,15 +69,16 @@ def project_export_plan(session, project_id):
             if issue["severity"] == "BLOCKING":
                 blockers.append(f"{item['id']}: {issue['category']}")
     for line in lines:
-        quantity, unit, valid = target(line)
+        normalized = normalized_rows[line.id]
+        quantity, unit, valid = (normalized["target_quantity"], normalized["target_unit"], normalized["conversion_valid"])
         section_id = line.section_id or ("manual-" + line.line_type)
-        section_name = sections[line.section_id].name if line.section_id in sections else {"Work": "Darbai", "Material": "Medžiagos"}.get(line.line_type, "")
+        section_name = normalized_sections[section_id]['name']
         if not section_name or (line.section_id and line.section_id not in sections):
             blockers.append(f"{line.id}: SECTION_MISSING")
         grouped.setdefault(section_id, []).append(line.id)
         for field, value in ((DbfField("KIEKIS", "N", 13, 6), Decimal(quantity)),
-                             (DbfField("IKAINIS", "C", 18, 0), line.sistela_code),
-                             (DbfField("PAVADIN", "C", 240, 0), line.output_description),
+                             (DbfField("IKAINIS", "C", 18, 0), normalized['selected_code']),
+                             (DbfField("PAVADIN", "C", 240, 0), normalized['output_description']),
                              (DbfField("MATO_PAV", "C", 20, 0), unit),
                              (DbfField("SECTION_NAME", "C", 180, 0), section_name)):
             fits(field, value, line.id)
@@ -82,13 +86,13 @@ def project_export_plan(session, project_id):
             fits(DbfField("KAINA", "N", 12, 4), price, line.id)
         rows.append({"source_line_id": line.id, "source_section_id": section_id,
                      "section_name": section_name, "line_type": line.line_type,
-                     "project_description": line.project_description, "sistela_code": line.sistela_code,
-                     "output_description": line.output_description,
-                     "source_quantity": str(line.quantity), "source_unit": line.unit,
+                     "project_description": normalized['source_description'], "sistela_code": normalized['selected_code'],
+                     "output_description": normalized['output_description'],
+                     "source_quantity": normalized['source_quantity'], "source_unit": normalized['source_unit'],
                      "target_quantity": str(quantity), "target_unit": unit,
                      "conversion_valid": valid, "mapping_status": line.mapping_status,
-                     "material_price": str(line.material_price) if line.material_price is not None else None,
-                     "work_price": str(line.work_price) if line.work_price is not None else None})
+                     "material_price": normalized['material_price'],
+                     "work_price": normalized['work_price']})
     try:
         reserved = [estimate.external_key.get("KOMPLEKSAS") for estimate in session.scalars(select(HistoricalEstimate))]
         identifiers = allocate_identifiers(project_id, list(grouped.items()), reserved)
@@ -96,6 +100,6 @@ def project_export_plan(session, project_id):
         blockers.extend(exc.errors)
         identifiers = []
     return {"mode": "PROJECT_EXPORT", "status": "BLOCKED", "production": False,
-            "project_id": project.id, "project_name": project.name, "estimate_name": project.name,
+            "normalized_estimate": model, "project_id": project.id, "project_name": project.name, "estimate_name": project.name,
             "blockers": blockers, "rows": rows, "proposed_identifiers": identifiers,
             "warnings": ["Plan only: no financial values or normative resources generated."]}

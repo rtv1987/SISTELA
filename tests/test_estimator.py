@@ -51,7 +51,6 @@ def test_review_blocking_warning_and_empty_project(client):
         "MISSING_SISTELA_CODE",
         "MISSING_QUANTITY",
         "UNKNOWN_UNIT",
-        "UNCONFIRMED_MAPPING",
     } <= categories
 
 
@@ -239,7 +238,7 @@ def test_conversion_unlocks_suggestion_without_confirming_or_changing_source(cli
         json={"version": row["version"], "mapping_id": suggestion["mapping_id"]},
     ).json()
     assert row["quantity"] == "650" and row["unit"] == "m" and row["mapping_status"] == "suggested"
-    assert report(client, pid)["blocking"] > 0
+    assert report(client, pid)["blocking"] == 0  # Phase 10: selected code needs no second confirmation.
     row = confirm(client, row, code="CHANGED", unit="100m").json()
     assert report(client, pid)["statistics"]["changed_mapping_count"] == 1
     assert report(client, pid)["blocking"] == 0

@@ -82,3 +82,13 @@ Historical DBF import remains **SUPPORTED / READ ONLY**. Generated archive expor
 **EXPERIMENTAL**, with no live-directory access. Both TEST_A and TEST_B acceptance by
 Darius is necessary for promotion; it is not sufficient for new-project pricing or
 ID rules. No user-editable switch or automatic capability promotion exists.
+
+
+## Phase 10 shared projection
+
+The project planner now consumes `export_model.normalized_estimate`, also used by
+the TXT exporter. Catalog data does not prove dd/pd financial formulas or td/od
+totals. These remain explicit blockers. The UI option is **DBF eksportas**.
+Existing TEST_A/TEST_B artifacts and original golden DBFs remain unchanged.
+No new-project DBF acceptance artifact is claimed while those mandatory values
+are unknown.

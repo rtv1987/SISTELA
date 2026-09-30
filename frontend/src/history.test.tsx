@@ -65,7 +65,7 @@ it('historical suggestion opens evidence and convertible units block applying',a
   mocks.api.mockImplementation(async(url:string)=>url.endsWith('/suggestions')?[{mapping_id:'history:historical',sistela_code:'TEST-270',sistela_description:'',source_unit:'100m',confidence:'.49',method:'exact',confirmed_count:0,compatible:false,origin:'historical',usage_count:14,project_count:6,estimate_count:6,evidence_ids:['historical'],evidence_quality:['DERIVED'],unit_compatibility:{status:'CONVERTIBLE',source:'m',target:'100m',factor:'.01'}}]:{...candidate,imported_at:'2026-09-29',evidence:{header:{file:'dd-demo.dbf',record:42}},reviews:[]});
   render(<MappingPanel line={line} busy={false} onApply={vi.fn()} onConfirm={vi.fn()}/>);
   await screen.findByText(/14 panaudojimai/);
-  expect(screen.getByRole('button',{name:'Pritaikyti pasiūlymą'})).toBeDisabled();
+  expect(screen.getByRole('button',{name:'Pasirinkti kodą'})).toBeDisabled();
   fireEvent.click(screen.getByText(/Istoriniai įrodymai/));
   fireEvent.click(screen.getByRole('button',{name:'Atverti šaltinį 1'}));
   await screen.findByRole('dialog',{name:'Istorinio pasiūlymo įrodymai'});

@@ -308,9 +308,11 @@ def test_unknown_classification_uses_only_unambiguous_compatible_confirmed_histo
         assert imported["rows_detected"] == 5, imported
         lines = client.get(f"/projects/{pid}/lines").json()
         assert all(line["line_type"] == expected for line in lines)
-        assert all(
-            line["mapping_status"] == "unmapped" and not line["sistela_code"] for line in lines
-        )
+        assert all(line["mapping_status"] != "confirmed" for line in lines)
+        if variant == "confirmed":
+            assert all(line["sistela_code"] == "TEST-42" for line in lines)
+        else:
+            assert all(not line["sistela_code"] for line in lines)
         if variant == "confirmed":
             assert (
                 json.loads(lines[0]["source_raw_text"])["type_evidence"]["origin"]

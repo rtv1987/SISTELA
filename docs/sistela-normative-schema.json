@@ -1,0 +1,1863 @@
+[
+  {
+    "file": "antkain.dbf",
+    "rows": 5797,
+    "schema": [
+      {
+        "name": "KODAS",
+        "type": "C",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "ANTK1",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "MVNT",
+        "type": "C",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 80,
+        "decimals": 0
+      }
+    ],
+    "hash": "48bdf5126b12c4a92cbbe74998c5dd0e0134dc3aea2a980c21b320675fc06a32"
+  },
+  {
+    "file": "eremazom.dbf",
+    "rows": 27825,
+    "schema": [
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 120,
+        "decimals": 0
+      },
+      {
+        "name": "KORDATA",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      }
+    ],
+    "hash": "cf52239b44e5a002d7dc9ad106542738b741a0dc2a44ecfcd92f189710b037d4"
+  },
+  {
+    "file": "erer.dbf",
+    "rows": 35035,
+    "schema": [
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MATO_VNT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "IMLUMAS",
+        "type": "N",
+        "length": 7,
+        "decimals": 2
+      },
+      {
+        "name": "ATLYGIS",
+        "type": "N",
+        "length": 8,
+        "decimals": 3
+      },
+      {
+        "name": "R",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 210,
+        "decimals": 0
+      },
+      {
+        "name": "KORDATA",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "KATEG",
+        "type": "N",
+        "length": 4,
+        "decimals": 2
+      },
+      {
+        "name": "PKOR",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINISR",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "TABR",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KALBPOZ",
+        "type": "C",
+        "length": 3,
+        "decimals": 0
+      }
+    ],
+    "hash": "af1eed2850d0a34b5534df7a14c8b9582e784a1fe268edf9fddcd652aa5b696a"
+  },
+  {
+    "file": "fonddarb.dbf",
+    "rows": 15084,
+    "schema": [
+      {
+        "name": "KOMPLEKSAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "OBJEKTAS",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "RANGOVAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SAMATA",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SKYRIUS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SAM_EILUTE",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "DET_EILUTE",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "GRUP",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "K1",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K2",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K3",
+        "type": "N",
+        "length": 6,
+        "decimals": 3
+      },
+      {
+        "name": "K4",
+        "type": "N",
+        "length": 7,
+        "decimals": 3
+      },
+      {
+        "name": "KODAS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MATO_PAV",
+        "type": "C",
+        "length": 15,
+        "decimals": 0
+      },
+      {
+        "name": "KIEKIS",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA",
+        "type": "N",
+        "length": 11,
+        "decimals": 6
+      },
+      {
+        "name": "KAINA",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "VERTE",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 240,
+        "decimals": 0
+      },
+      {
+        "name": "NGR4",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "KODSUS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "MVNTSUS",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEFSUS",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "K5",
+        "type": "N",
+        "length": 9,
+        "decimals": 5
+      },
+      {
+        "name": "KAINBEK5",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      }
+    ],
+    "hash": "d9f7cd52d26482a30da772566bdab3e2c42086ec47c975d1fed3aa46439f2f0a"
+  },
+  {
+    "file": "gaminiai.dbf",
+    "rows": 8237,
+    "schema": [
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "MVNT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "MVNTP1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEF1",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "MVNTP2",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEF2",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "SV",
+        "type": "N",
+        "length": 9,
+        "decimals": 3
+      },
+      {
+        "name": "KMSV",
+        "type": "N",
+        "length": 8,
+        "decimals": 3
+      },
+      {
+        "name": "PL",
+        "type": "N",
+        "length": 5,
+        "decimals": 0
+      },
+      {
+        "name": "IL",
+        "type": "C",
+        "length": 6,
+        "decimals": 0
+      },
+      {
+        "name": "AU",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "KODSUS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "NSUS",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 23,
+        "decimals": 0
+      },
+      {
+        "name": "MARKE",
+        "type": "C",
+        "length": 30,
+        "decimals": 0
+      },
+      {
+        "name": "SERIJA",
+        "type": "C",
+        "length": 11,
+        "decimals": 0
+      },
+      {
+        "name": "KAT",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "BUHGRUPE",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "NBUH",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "PK",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KABAZINE",
+        "type": "N",
+        "length": 8,
+        "decimals": 2
+      },
+      {
+        "name": "KARINKOS",
+        "type": "N",
+        "length": 8,
+        "decimals": 2
+      }
+    ],
+    "hash": "fc7e66d2faafdd267436eb00483b2055ba3c6a80599bd5ea6d119e40c9b43ee2"
+  },
+  {
+    "file": "ik_teksw.dbf",
+    "rows": 7628,
+    "schema": [
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "NUO",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS2",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "IKI",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "RINK1",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "POZPRIR",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "RINKINYS",
+        "type": "M",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SKYRIUS",
+        "type": "M",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "POSKYRIS",
+        "type": "M",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "GRUPE",
+        "type": "M",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "POGRUPIS",
+        "type": "M",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUDETIS",
+        "type": "M",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "OBJEKTAS",
+        "type": "M",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "PKOR",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      }
+    ],
+    "hash": "4cabbb616c6b915c7050ec3631841ad76b26adc8b6c2b25d3eaece4566e3257c"
+  },
+  {
+    "file": "ikaimedz.dbf",
+    "rows": 20759,
+    "schema": [
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MEDZIAGA",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "R",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KORDATA",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      }
+    ],
+    "hash": "a2c1b9d522cc36507375bba975211c47a4270e73826feb5610d94e1bc5101e98"
+  },
+  {
+    "file": "koef.dbf",
+    "rows": 1923,
+    "schema": [
+      {
+        "name": "IKAINIS1",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "NUO",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS2",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "IKI",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "PROCENTAS",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "POZYMIS",
+        "type": "C",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "PKOR",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      }
+    ],
+    "hash": "3ab981c5182470b570ce97ad241365f6870ff6d797e81e032a81147facf778e0"
+  },
+  {
+    "file": "koefkoef.dbf",
+    "rows": 3213,
+    "schema": [
+      {
+        "name": "IKAINIS1",
+        "type": "C",
+        "length": 15,
+        "decimals": 0
+      },
+      {
+        "name": "NUO",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS2",
+        "type": "C",
+        "length": 15,
+        "decimals": 0
+      },
+      {
+        "name": "IKI",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "K1",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K2",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K3",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 180,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "PKOR",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      }
+    ],
+    "hash": "654431f3acfdd3b2660ea2b56fd25e17b30e98936ebdd8317b8afcc61e69a014"
+  },
+  {
+    "file": "mechnorm.dbf",
+    "rows": 16653,
+    "schema": [
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MASINA",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "NORMA",
+        "type": "N",
+        "length": 11,
+        "decimals": 6
+      },
+      {
+        "name": "KORDATA",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      }
+    ],
+    "hash": "5a33d1af8769c2908672c1fccf20cdb89bca2312b7c6578ca6b27fb0622f37d3"
+  },
+  {
+    "file": "med.dbf",
+    "rows": 2907,
+    "schema": [
+      {
+        "name": "IKAINIS1",
+        "type": "C",
+        "length": 15,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS2",
+        "type": "C",
+        "length": 15,
+        "decimals": 0
+      },
+      {
+        "name": "MEDZIAGA",
+        "type": "C",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "MATOVNT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "NORMA",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NUO",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "IKI",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "NORMA1",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "POZY",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 60,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "PKOR",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      }
+    ],
+    "hash": "caef402aaad4aafd482faf4f7e29c0fcd92b7fbd8e17978eb50d1b382ded75bb"
+  },
+  {
+    "file": "medznorm.dbf",
+    "rows": 29120,
+    "schema": [
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MEDZIAGA1",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "NORMA1",
+        "type": "N",
+        "length": 11,
+        "decimals": 6
+      },
+      {
+        "name": "MEDZIAGA2",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "NORMA2",
+        "type": "N",
+        "length": 11,
+        "decimals": 6
+      },
+      {
+        "name": "KORDATA",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      }
+    ],
+    "hash": "e639eaec1fe91fef5a39e2de14a9c6ee4d5dbaa201a5f427ae92b18fb0285707"
+  },
+  {
+    "file": "nturinys.dbf",
+    "rows": 3824,
+    "schema": [
+      {
+        "name": "RINK",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 15,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS2",
+        "type": "C",
+        "length": 15,
+        "decimals": 0
+      },
+      {
+        "name": "POZ",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "LYGIS",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 240,
+        "decimals": 0
+      },
+      {
+        "name": "EILNUM",
+        "type": "N",
+        "length": 5,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINISR",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      }
+    ],
+    "hash": "ddfc86ff936f4a6b10068f6838a88a0b52893f15f8dae44b16cc09148308705d"
+  },
+  {
+    "file": "nuoroda.dbf",
+    "rows": 13959,
+    "schema": [
+      {
+        "name": "RINKINYS",
+        "type": "C",
+        "length": 5,
+        "decimals": 0
+      },
+      {
+        "name": "NUO",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS1",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "IKI",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS2",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "POZ",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "POZ1",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "POZ2",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "DYDIS1",
+        "type": "N",
+        "length": 10,
+        "decimals": 3
+      },
+      {
+        "name": "BAZINIS",
+        "type": "N",
+        "length": 10,
+        "decimals": 3
+      },
+      {
+        "name": "ZENKL",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "SKIR1",
+        "type": "C",
+        "length": 6,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 120,
+        "decimals": 0
+      },
+      {
+        "name": "MVNTP",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "SKIR2",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN1",
+        "type": "C",
+        "length": 120,
+        "decimals": 0
+      },
+      {
+        "name": "MVNT1P",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "SKIR3",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "TABR",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KORDATA",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      }
+    ],
+    "hash": "80eb295013d6ebd1869bac36d05f203add85771f9e956e201a46e39a12b64c95"
+  },
+  {
+    "file": "orkainos.dbf",
+    "rows": 18231,
+    "schema": [
+      {
+        "name": "IMONE",
+        "type": "C",
+        "length": 30,
+        "decimals": 0
+      },
+      {
+        "name": "NGR",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "MEDZIAGA",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MATOVNT",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "MVNT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KAINA",
+        "type": "N",
+        "length": 10,
+        "decimals": 2
+      },
+      {
+        "name": "TIEKANT",
+        "type": "N",
+        "length": 10,
+        "decimals": 2
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 90,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "POZY",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "IDATA",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "VYKDYTOJAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "POZP",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      }
+    ],
+    "hash": "1787dbf610b4fc2ea23f59c3338d433fa2b3bab68eef2a0b4e2e9c7f10a2762a"
+  },
+  {
+    "file": "orkvisos.dbf",
+    "rows": 18185,
+    "schema": [
+      {
+        "name": "IMONE",
+        "type": "C",
+        "length": 30,
+        "decimals": 0
+      },
+      {
+        "name": "NGR",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "MEDZIAGA",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MATOVNT",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "MVNT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KAINA",
+        "type": "N",
+        "length": 10,
+        "decimals": 2
+      },
+      {
+        "name": "TIEKANT",
+        "type": "N",
+        "length": 10,
+        "decimals": 2
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 90,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "POZY",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "IDATA",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "VYKDYTOJAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "POZP",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      }
+    ],
+    "hash": "8c6bfb884a83bd444909f4312475f50266d83d5e92f53ea46ee909c174d41e6e"
+  },
+  {
+    "file": "pokyciai.dbf",
+    "rows": 23130,
+    "schema": [
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "POZ",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "RESKODAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "NORMA",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA1",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA2",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA3",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA4",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA5",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA6",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA7",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA8",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA9",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA10",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA11",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "KORDATA",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      }
+    ],
+    "hash": "297f3ef4abb0b28e0b87cea1de1ce6198b7fdad36652fe76423e94393ea362ee"
+  },
+  {
+    "file": "resursai.dbf",
+    "rows": 22748,
+    "schema": [
+      {
+        "name": "MEDZIAGA",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "MVNT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "MVNTP1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEF1",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "MVNTP2",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEF2",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "NGR4",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KODSUS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "NSUS",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "BUHGRUPE",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "NBUH",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 180,
+        "decimals": 0
+      },
+      {
+        "name": "MARKE",
+        "type": "C",
+        "length": 30,
+        "decimals": 0
+      },
+      {
+        "name": "KABAZINE",
+        "type": "N",
+        "length": 8,
+        "decimals": 2
+      },
+      {
+        "name": "PK",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "SV",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KARINKOS",
+        "type": "N",
+        "length": 8,
+        "decimals": 2
+      },
+      {
+        "name": "PKOR",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      }
+    ],
+    "hash": "15216c8d2c660da5b2649c925fd18c32896a5ec1de44684e0f8d3baae83ff23a"
+  },
+  {
+    "file": "samkainw.dbf",
+    "rows": 22027,
+    "schema": [
+      {
+        "name": "NGR4",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "KOD1",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "KODAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "MATOVNT",
+        "type": "C",
+        "length": 12,
+        "decimals": 0
+      },
+      {
+        "name": "KODMAT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 80,
+        "decimals": 0
+      },
+      {
+        "name": "KDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "KAINBT",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KABAZINE",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "GALIOJA",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "KAI9307",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9401",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9404",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9407",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9501",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9507",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9601",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9607",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9701",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9801",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9807",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI9901",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0001",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0101",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0201",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI02",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI03",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI04",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0407",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI05",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI06",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0610",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0703",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0710",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0802",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0803",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0810",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0903",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI0910",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1003",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1010",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1103",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1110",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1203",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1210",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1303",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1310",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1403",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1410",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1503",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1510",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1603",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1610",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1703",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1710",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1803",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1810",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1903",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI1910",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2004",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2010",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2104",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2110",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2204",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2210",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2304",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2310",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2404",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2410",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2504",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "KAI2510",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      }
+    ],
+    "hash": "7045e132adef830ebbc3a9b668931a6d3b9ec89e9f728f2fc8317771db482042"
+  }
+]

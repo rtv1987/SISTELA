@@ -31,12 +31,12 @@ test('real GSS → human review → explicit conversion → ready → persisted 
       await expect(page.getByLabel('Normatyvo vienetas',{exact:true})).toHaveValue('100m');
     }
     // Operator choices supplied by the test; these are not verified normative codes.
-    const apply=page.locator('.suggestion button:enabled').filter({hasText:'Pritaikyti pasiūlymą'});
+    const apply=page.locator('.suggestion button:enabled').filter({hasText:'Pasirinkti kodą'});
     if(i===0 && await apply.count()) {
       await apply.first().click();
       await expect(page.getByLabel('Patvirtinamas SISTELA kodas',{exact:true})).not.toHaveValue('');
     } else await page.getByLabel('Patvirtinamas SISTELA kodas',{exact:true}).fill(`TEST-GSS-${i}`);
-    await page.getByRole('button',{name:'Patvirtinti pasirinkimą',exact:true}).click();
+    await page.getByRole('button',{name:'Išsaugoti kodą',exact:true}).click();
     await expect(page.locator('.confirmation-note')).toBeVisible();
   }
   await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();
@@ -71,7 +71,7 @@ test('review and ready screenshots with synthetic data; Entry Mode fits half a s
   await expect(page.getByText('Išsaugota lokaliai',{exact:true})).toBeVisible();
   await expect(page.getByLabel('Normatyvo vienetas',{exact:true})).toHaveValue('100m');
   await page.getByLabel('Patvirtinamas SISTELA kodas').fill('DEMO-N50');
-  await page.getByRole('button',{name:'Patvirtinti pasirinkimą',exact:true}).click();
+  await page.getByRole('button',{name:'Išsaugoti kodą',exact:true}).click();
   await expect(page.locator('.confirmation-note')).toBeVisible();
   await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();
   await page.getByRole('button',{name:'Patikrinti parengtį'}).click();

@@ -8,7 +8,7 @@ test('experimental six-DBF clone downloads; current project export remains block
   const project=await(await request.post('/projects',{data:{name:'DBF export experiment',system_type:'GSS'}})).json();
   await page.goto('/');await page.getByRole('button',{name:/DBF export experiment GSS/}).click();
   await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();
-  await page.getByRole('button',{name:'Eksperimentinis DBF eksportas'}).click();
+  await page.getByRole('button',{name:'DBF eksportas'}).click();
   await expect(page.getByText('Naudokite tik bandomai SISTELA sąmatai.',{exact:true})).toBeVisible();
   await page.getByLabel('Šeši originalaus archyvo DBF failai',{exact:true}).setInputFiles(files as string[]);
   const downloaded=page.waitForEvent('download');await page.getByRole('button',{name:'Atsisiųsti bandomąjį kloną ZIP'}).click();

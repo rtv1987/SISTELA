@@ -54,9 +54,57 @@ class Identity:
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
 
 
+class NormativeCatalogSource(Identity, Base):
+    __tablename__ = "normative_sources"
+    fingerprint: Mapped[str] = mapped_column(unique=True)
+    label: Mapped[str]
+    imported_at: Mapped[str] = mapped_column(default=utc_now)
+    encoding: Mapped[str]
+    active: Mapped[bool] = mapped_column(default=True)
+    manifest: Mapped[list] = mapped_column(JSON)
+    diagnostics: Mapped[dict] = mapped_column(JSON)
+
+
+class NormEntry(Identity, Base):
+    """Normalized catalog projection; source payload retains unknown field meanings."""
+    __tablename__ = "normative_entries"
+    __table_args__ = (UniqueConstraint("source_id", "filename", "record_number"),
+                     Index("ix_normative_lookup", "source_id", "kind", "code"))
+    source_id: Mapped[str] = mapped_column(ForeignKey("normative_sources.id"))
+    kind: Mapped[str]
+    code: Mapped[str]
+    description: Mapped[str] = mapped_column(Text)
+    normalized_description: Mapped[str] = mapped_column(Text)
+    unit: Mapped[str]
+    unit_id: Mapped[str]
+    category: Mapped[str]
+    filename: Mapped[str]
+    record_number: Mapped[int]
+    payload: Mapped[dict] = mapped_column(JSON)
+
+
+class NormRelation(Identity, Base):
+    __tablename__ = "normative_relations"
+    __table_args__ = (Index("ix_normative_relation", "source_id", "rate_code"),)
+    source_id: Mapped[str] = mapped_column(ForeignKey("normative_sources.id"))
+    rate_code: Mapped[str]
+    resource_code: Mapped[str]
+    kind: Mapped[str]
+    amount: Mapped[str | None]
+    resolved: Mapped[bool]
+    filename: Mapped[str]
+    record_number: Mapped[int]
+
+
 class Timestamps:
     created_at: Mapped[str] = mapped_column(default=utc_now)
     updated_at: Mapped[str] = mapped_column(default=utc_now, onupdate=utc_now)
+
+
+class ExportSettings(Base):
+    __tablename__ = "export_settings"
+    key: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[dict] = mapped_column(JSON)
 
 
 class Project(Identity, Timestamps, Base):
@@ -138,11 +186,12 @@ class EstimateLine(Identity, Timestamps, Base):
 class SistelaMapping(Identity, Timestamps, Base):
     __tablename__ = "sistela_mappings"
     __table_args__ = (
-        UniqueConstraint("system_type", "normalized_source_text", "source_unit", "sistela_code", name="uq_mapping_source_unit_code"),
+        UniqueConstraint("system_type", "line_type", "normalized_source_text", "source_unit", "sistela_code", name="uq_mapping_source_unit_code"),
         CheckConstraint("usage_count >= 0 AND confirmed_count >= 0", name="ck_mapping_counts"),
     )
     system_type: Mapped[str]
     source_text: Mapped[str]
+    line_type: Mapped[str] = mapped_column(default='Work', server_default='Work')
     source_unit: Mapped[str] = mapped_column(default="")
     normalized_source_text: Mapped[str]
     sistela_code: Mapped[str]

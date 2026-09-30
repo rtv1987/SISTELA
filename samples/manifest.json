@@ -1496,5 +1496,13 @@
         "decimals": 0
       }
     ]
+  },
+  {
+    "filename": "2024.07-616SR-BCB-AG.pdf",
+    "sha256": "7a9808a55c1d65e5dfaf1d4a50265245b1d29a3bcf4eb0460cd2638ae02897b6",
+    "size": 6366434,
+    "expected_rows": 12,
+    "materials": 11,
+    "works": 1
   }
 ]

@@ -1,0 +1,52 @@
+import { expect, test } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
+import { mkdirSync } from 'node:fs';
+
+test('local normative ZIP → PDF auto codes → correction persists → catalog selection → TXT download and DBF gate',async({page,request},info)=>{
+  const folder=info.outputPath('catalog');mkdirSync(folder,{recursive:true});
+  const zip=info.outputPath('normative.zip'),pdf=info.outputPath('schedule.pdf');
+  execFileSync(resolve('../.venv/Scripts/python.exe'),['-c',
+    "import sys,zipfile;from pathlib import Path;sys.path.insert(0,'tests');from catalog_factory import catalog;from pdf_factory import make_pdf,items;p=catalog(Path(sys.argv[1]));z=zipfile.ZipFile(sys.argv[2],'w');[z.write(f,f.name) for f in p.iterdir()];z.close();rows=items(work=True);[r.__setitem__(3,'m') for r in rows];make_pdf(Path(sys.argv[3]),[rows])",folder,zip,pdf],{cwd:resolve('..')});
+  // A separate system keeps prior historical regression selections out of this synthetic scenario.
+  const project=await(await request.post('/projects',{data:{name:'Phase 10 local catalog',system_type:'VS'}})).json();
+  await page.goto('/');await page.getByRole('button',{name:/Phase 10 local catalog VS/}).click();
+  await page.getByRole('button',{name:'Nustatymai · Normatyvinė bazė'}).click();
+  await page.getByLabel('Normatyvų ZIP').setInputFiles(zip);
+  await expect(page.getByText(/rate: 3/)).toBeVisible();
+  await page.getByLabel('Ieškoti normatyvų').fill('TEST-1');
+  await expect(page.locator('tbody tr').first()).toContainText('TEST-1');
+  await page.getByRole('button',{name:/Phase 10 local catalog VS/}).click();
+  await page.getByLabel('PDF failas').setInputFiles(pdf);
+  await expect(page.getByText('5 eilučių',{exact:true})).toBeVisible();
+  let rows=await(await request.get(`/projects/${project.id}/lines`)).json();
+  expect(rows.every((r:{sistela_code:string})=>r.sistela_code==='TEST-1')).toBe(true);
+  expect(rows.every((r:{mapping_status:string})=>r.mapping_status!=='confirmed')).toBe(true);
+  await page.getByLabel('SISTELA kodas 1',{exact:true}).fill('CUSTOM9');
+  await page.getByLabel('SISTELA kodas 1',{exact:true}).press('Tab');
+  await expect(page.getByText('Išsaugota lokaliai',{exact:true})).toBeVisible();
+  await page.reload();await expect(page.getByLabel('SISTELA kodas 1',{exact:true})).toHaveValue('CUSTOM9');
+  await page.getByLabel('SISTELA kodas 1',{exact:true}).click();
+  await page.getByRole('button',{name:'Nustatymai · Normatyvinė bazė'}).click();
+  await page.getByLabel('Ieškoti normatyvų').fill('TEST-1');
+  await expect(page.locator('tbody tr').first()).toContainText('TEST-1');
+  await page.screenshot({path:resolve('../docs/screenshots/phase10-catalog.png'),fullPage:true,style:'.project-list button:not(.current){display:none}'});
+  await page.locator('tbody tr').first().getByRole('button',{name:'Naudoti projekte'}).click();
+  await expect(page.getByLabel('SISTELA kodas 1',{exact:true})).toHaveValue('TEST-1');
+  rows=await(await request.get(`/projects/${project.id}/lines`)).json();
+  expect(rows[0].review_data.correction.previous_code).toBe('CUSTOM9');
+  await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();
+  await page.getByText('TXT eksportas · Informacija pakete',{exact:true}).click();
+  await page.getByLabel('complex kodas',{exact:true}).fill('TEST');
+  await page.getByLabel('object kodas',{exact:true}).fill('1');
+  await page.getByLabel('estimate kodas',{exact:true}).fill('1');
+  await page.getByLabel('Paketo laikotarpis').fill('202609');
+  await page.getByLabel('Parametras 89').selectOption('0');
+  const download=page.waitForEvent('download');await page.getByRole('button',{name:'Atsisiųsti TXT',exact:true}).click();
+  expect((await download).suggestedFilename()).toBe('TESTTXT.TXT');
+  await expect(page.getByRole('button',{name:'Kopijuoti paketo tekstą'})).toBeVisible();
+  await page.screenshot({path:resolve('../docs/screenshots/phase10-export.png'),fullPage:true,style:'.project-list button:not(.current){display:none}'});
+  await page.getByRole('button',{name:'DBF eksportas',exact:true}).click();
+  await page.getByRole('button',{name:'Tikrinti projekto DBF kliūtis'}).click();
+  await expect(page.getByText(/Projekto eksportas blokuojamas:/)).toBeVisible();
+});

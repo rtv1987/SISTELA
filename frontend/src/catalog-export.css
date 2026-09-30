@@ -1,0 +1,16 @@
+.catalog-panel>label,.export-panel label{display:inline-flex;flex-direction:column;gap:7px;margin:8px 12px 12px 0;vertical-align:top;color:#59695e}
+.catalog-panel>label input{min-width:260px}.catalog-panel>.toolbar{margin:20px 0;gap:10px;flex-wrap:wrap}
+.catalog-panel table{width:100%;border-collapse:collapse;margin-top:18px;text-align:left}
+.catalog-panel th{padding:12px;background:#f5f8f3;color:#60705f;font-size:11px;letter-spacing:.3px}
+.catalog-panel td{padding:14px 12px;border-bottom:1px solid #e5eae2;line-height:1.6;vertical-align:top}
+.catalog-panel td:first-child{white-space:nowrap;font-weight:600}.catalog-panel td small{display:block;color:#85917e;margin-top:4px}
+.catalog-panel td:last-child{min-width:250px}.catalog-panel td button{margin:0 6px 6px 0}
+.catalog-panel summary,.export-panel summary{cursor:pointer;font-weight:600;padding:10px 0}
+.catalog-panel pre,.export-panel pre{padding:16px;background:#f4f7f1;border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:360px;overflow:auto}
+.export-panel fieldset{border:1px solid #dde5d9;border-radius:8px;padding:14px 18px;margin:16px 0;background:#fcfdfb}
+.export-panel legend{font-weight:600;color:#366b47;padding:0 8px}.export-panel fieldset label:first-of-type input{width:150px}
+.export-panel fieldset label:nth-of-type(2) input{width:320px;max-width:100%}.export-panel fieldset>div{padding:10px 0;border-bottom:1px solid #e8ece4;line-height:1.8}
+.export-panel fieldset>div:last-child{border-bottom:0}.export-panel fieldset>input{margin:6px 10px 10px 0}
+.export-panel fieldset small{color:#788770;margin-left:8px}.export-panel button{margin:5px 8px 5px 0}
+.export-panel p{line-height:1.7}.estimate-table td>small{display:block;font-size:9px;color:#7d8e79;margin-top:3px}
+@media(max-width:900px){.catalog-panel{overflow-x:auto}.export-panel fieldset label:nth-of-type(2) input{width:230px}.catalog-panel td:last-child{min-width:180px}}

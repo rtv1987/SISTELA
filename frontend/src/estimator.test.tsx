@@ -34,7 +34,7 @@ describe('Estimator handoff',()=>{
     fireEvent.keyDown(window,{key:'Escape'});expect(exit).toHaveBeenCalledOnce();
   });
   it('navigates and filters reviewed works without changing entered flags',()=>{
-    render(<EntryMode worksOnly lines={[row({id:'a',project_description:'First'}),row({id:'b',project_description:'Second',mapping_status:'needs_review'})]} busy={false} onMark={vi.fn()} onReview={vi.fn()}/>);
+    render(<EntryMode worksOnly lines={[row({id:'a',project_description:'First'}),row({id:'b',project_description:'Second',sistela_code:'',mapping_status:'needs_review'})]} busy={false} onMark={vi.fn()} onReview={vi.fn()}/>);
     fireEvent.keyDown(window,{key:'ArrowRight'});expect(screen.getByRole('heading',{name:'Second'})).toBeInTheDocument();
     fireEvent.keyDown(window,{key:'ArrowLeft'});expect(screen.getByRole('heading',{name:'First'})).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Suvedimo filtras'),{target:{value:'review'}});expect(screen.getByRole('heading',{name:'Second'})).toBeInTheDocument();

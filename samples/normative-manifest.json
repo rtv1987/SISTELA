@@ -1,0 +1,207 @@
+[
+  {
+    "filename": "antkain.dbf",
+    "size": 603050,
+    "sha256": "48bdf5126b12c4a92cbbe74998c5dd0e0134dc3aea2a980c21b320675fc06a32"
+  },
+  {
+    "filename": "eremazom.dbf",
+    "size": 4090668,
+    "sha256": "cf52239b44e5a002d7dc9ad106542738b741a0dc2a44ecfcd92f189710b037d4"
+  },
+  {
+    "filename": "ereMAZOM.idx",
+    "size": 696832,
+    "sha256": "182d027f376c22c81370f2c112bc1201b49efa7b1404fac2ed23dd63365deee2"
+  },
+  {
+    "filename": "erer.dbf",
+    "size": 10055726,
+    "sha256": "af1eed2850d0a34b5534df7a14c8b9582e784a1fe268edf9fddcd652aa5b696a"
+  },
+  {
+    "filename": "erer.idx",
+    "size": 876544,
+    "sha256": "d940092ba7af13c67cd9e09106db4e16b2a7981f227b52992f8e3e55fd50c7dc"
+  },
+  {
+    "filename": "ererkit.idx",
+    "size": 971264,
+    "sha256": "4cd632421918b6f5bdbea6b763429d029c7069b980f319eeb0815c8f043da6ce"
+  },
+  {
+    "filename": "fonddarb.dbf",
+    "size": 6844777,
+    "sha256": "d9f7cd52d26482a30da772566bdab3e2c42086ec47c975d1fed3aa46439f2f0a"
+  },
+  {
+    "filename": "gaminiai.dbf",
+    "size": 1500167,
+    "sha256": "fc7e66d2faafdd267436eb00483b2055ba3c6a80599bd5ea6d119e40c9b43ee2"
+  },
+  {
+    "filename": "ik_teksw.dbf",
+    "size": 1015301,
+    "sha256": "4cabbb616c6b915c7050ec3631841ad76b26adc8b6c2b25d3eaece4566e3257c"
+  },
+  {
+    "filename": "ik_teksw.fpt",
+    "size": 5404288,
+    "sha256": "1ac7750e50a6085fd7a1d81ef598fd96760ae406611d3257dc0b2b7df0289bfe"
+  },
+  {
+    "filename": "ik_teksw.idx",
+    "size": 211968,
+    "sha256": "43a5bff1af5d851d9d77fd86c058504a0c947fd92d492fcd64a61dd5e01bb5b2"
+  },
+  {
+    "filename": "ikaimedz.dbf",
+    "size": 726727,
+    "sha256": "a2c1b9d522cc36507375bba975211c47a4270e73826feb5610d94e1bc5101e98"
+  },
+  {
+    "filename": "IKAIMEDZ.idx",
+    "size": 520192,
+    "sha256": "f752344b875c074b2afdfd0ce1ba2482914a8e69e2e99eeac2d38876b1c927cd"
+  },
+  {
+    "filename": "IKAIMEIK.idx",
+    "size": 418816,
+    "sha256": "152a1df3edba006897838c9ee675d4aa21884d0e87b7fe24bd4387d18e11d074"
+  },
+  {
+    "filename": "IKAINIS.idx",
+    "size": 705024,
+    "sha256": "0776c0741574900e5298f65dbd91efab050031581ddea87558102aad9db0c03b"
+  },
+  {
+    "filename": "koef.dbf",
+    "size": 181315,
+    "sha256": "3ab981c5182470b570ce97ad241365f6870ff6d797e81e032a81147facf778e0"
+  },
+  {
+    "filename": "koefkoef.dbf",
+    "size": 884192,
+    "sha256": "654431f3acfdd3b2660ea2b56fd25e17b30e98936ebdd8317b8afcc61e69a014"
+  },
+  {
+    "filename": "KOEFKOEF.IDX",
+    "size": 174592,
+    "sha256": "c8a2c092056377c4782dcac7b0fb5664d6f508ffb8c30a67fe2d23e150065dea"
+  },
+  {
+    "filename": "MECHKER.idx",
+    "size": 335360,
+    "sha256": "4869155f9a3552ac1c21623602524b8afd15f6d3262730ca0f1d24e7fae216db"
+  },
+  {
+    "filename": "mechnorm.dbf",
+    "size": 749810,
+    "sha256": "5a33d1af8769c2908672c1fccf20cdb89bca2312b7c6578ca6b27fb0622f37d3"
+  },
+  {
+    "filename": "MECHNORM.idx",
+    "size": 417280,
+    "sha256": "615a83b07de6dec342121ef97913b5cf792b2350b5c6defe03f2ff45f6ac90ab"
+  },
+  {
+    "filename": "med.dbf",
+    "size": 515220,
+    "sha256": "caef402aaad4aafd482faf4f7e29c0fcd92b7fbd8e17978eb50d1b382ded75bb"
+  },
+  {
+    "filename": "MEDZKER.idx",
+    "size": 586240,
+    "sha256": "78f84342e1b26171ff5cff032f711c6220b30cc89f4da0969d3badbf48710e9e"
+  },
+  {
+    "filename": "medznorm.dbf",
+    "size": 2475689,
+    "sha256": "e639eaec1fe91fef5a39e2de14a9c6ee4d5dbaa201a5f427ae92b18fb0285707"
+  },
+  {
+    "filename": "MEDZNORM.idx",
+    "size": 729088,
+    "sha256": "2a2261d9c955b5af05132273008fc576e6df7cbb0d282eb84c9f18616a8778e1"
+  },
+  {
+    "filename": "nturinys.dbf",
+    "size": 1155401,
+    "sha256": "ddfc86ff936f4a6b10068f6838a88a0b52893f15f8dae44b16cc09148308705d"
+  },
+  {
+    "filename": "nuorkit.idx",
+    "size": 388096,
+    "sha256": "873165669b8800649f3cb5fe857649a7af6ea460a2f95d9645629c81debd2bf9"
+  },
+  {
+    "filename": "nuoroda.dbf",
+    "size": 5319316,
+    "sha256": "80eb295013d6ebd1869bac36d05f203add85771f9e956e201a46e39a12b64c95"
+  },
+  {
+    "filename": "nuoroda.idx",
+    "size": 388096,
+    "sha256": "27df0fcac9bbadd8e07a8805b71be44fcdb480c3e4c2c878bd5a43f16881f8e9"
+  },
+  {
+    "filename": "orkainos.dbf",
+    "size": 3719837,
+    "sha256": "1787dbf610b4fc2ea23f59c3338d433fa2b3bab68eef2a0b4e2e9c7f10a2762a"
+  },
+  {
+    "filename": "orkainos.idx",
+    "size": 3113984,
+    "sha256": "6e6bb206af44e17e38d5c10c36c01fd597319704f513da9d4e220f248a63c5fd"
+  },
+  {
+    "filename": "orkvisos.dbf",
+    "size": 3710452,
+    "sha256": "8c6bfb884a83bd444909f4312475f50266d83d5e92f53ea46ee909c174d41e6e"
+  },
+  {
+    "filename": "orkvisos.idx",
+    "size": 3106816,
+    "sha256": "5e8e8c540e979f2149eb662f487d99c4dd2d8c44b28f333c3ea7299ff552c298"
+  },
+  {
+    "filename": "pokyciai.dbf",
+    "size": 4511159,
+    "sha256": "297f3ef4abb0b28e0b87cea1de1ce6198b7fdad36652fe76423e94393ea362ee"
+  },
+  {
+    "filename": "pokyciai.idx",
+    "size": 579072,
+    "sha256": "e0329ca08200d075e73cc453cf00260e6d9044f37f4ae8a1da9d2faa431e10e9"
+  },
+  {
+    "filename": "pokyckit.idx",
+    "size": 948736,
+    "sha256": "ff381a0086983a0b11ca764bb2e1ec67def2a4b02cf9434271eeaccdd44b902a"
+  },
+  {
+    "filename": "resursai.dbf",
+    "size": 6734313,
+    "sha256": "15216c8d2c660da5b2649c925fd18c32896a5ec1de44684e0f8d3baae83ff23a"
+  },
+  {
+    "filename": "RESURSAI.idx",
+    "size": 295936,
+    "sha256": "e90368df0125bbaab4c6c34ebf788c9bd82f9a17d4584c84eb94f819455c4571"
+  },
+  {
+    "filename": "samkainw.dbf",
+    "size": 15355388,
+    "sha256": "7045e132adef830ebbc3a9b668931a6d3b9ec89e9f728f2fc8317771db482042"
+  },
+  {
+    "filename": "SAMKAINW.idx",
+    "size": 337920,
+    "sha256": "c58c494e4ae8580b9660ff89b6857b92896ae9463d8809d4b8f32771c5d23b00"
+  },
+  {
+    "filename": "SAMKKITW.IDX",
+    "size": 481792,
+    "sha256": "00ae1187e0d1eb630be7efa7c66e42140487e7ddf482fe15ea5c9c64c9c319f0"
+  }
+]

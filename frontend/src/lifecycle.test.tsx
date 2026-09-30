@@ -12,12 +12,12 @@ afterEach(cleanup);
 it('moves a project only after dialog confirmation and removes it from active projects',async()=>{
   let trashed=false;
   mocks.api.mockImplementation(async(url:string)=>url==='/projects'?(trashed?[]:[project]):url==='/trash'?(trashed?[project]:[]):[]);
-  mocks.post.mockImplementation(async()=>{trashed=true;return project;});
+  mocks.post.mockImplementation(async(url:string)=>{if(url.endsWith("/automatic"))return [];trashed=true;return project;});
   render(<App/>);
   await screen.findByRole('heading',{name:project.name});
   fireEvent.click(screen.getByRole('button',{name:'Į šiukšlinę'}));
   expect(screen.getByRole('dialog',{name:'Perkelti projektą į šiukšlinę'})).toBeVisible();
-  expect(mocks.post).not.toHaveBeenCalled();
+  expect(mocks.post).not.toHaveBeenCalledWith("/projects/project/trash");
   fireEvent.click(screen.getByRole('button',{name:'Atšaukti'}));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button',{name:'Į šiukšlinę'}));

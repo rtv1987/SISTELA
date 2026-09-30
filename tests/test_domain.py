@@ -20,7 +20,8 @@ def engine(tmp_path):
 def test_migration_is_repeatable_and_complete(engine, tmp_path):
     migrate(tmp_path)
     assert set(inspect(engine).get_table_names()) == {
-        "alembic_version",
+        "alembic_version", "export_settings", "normative_sources", "normative_entries", "normative_relations",
+        "normative_fts", "normative_fts_data", "normative_fts_idx", "normative_fts_content", "normative_fts_docsize", "normative_fts_config",
         "projects",
         "source_documents",
         "estimate_sections",

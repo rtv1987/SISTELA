@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "artifacts": [
+    {
+      "path": "C:\\Users\\rtv19\\Documents\\GitHub\\SISTELA\\dist\\windows\\SISTELA-Assistant-Setup-0.2.0.exe",
+      "size_bytes": 51855292,
+      "sha256": "34eccd8c44ff0009a17e6360aba4d84f13135885e18769a5b9514585d58b8d75"
+    },
+    {
+      "path": "C:\\Users\\rtv19\\Documents\\GitHub\\SISTELA\\dist\\windows\\SISTELA-Assistant-Portable-0.2.0.zip",
+      "size_bytes": 67628735,
+      "sha256": "5daba92209f0392e89ac27c7af6d829e4762bec5cb5f8c71f264596f27fe9c5e"
+    }
+  ],
+  "tests": {
+    "backend": 221,
+    "frontend": 56,
+    "playwright": 13,
+    "total": 290
+  },
+  "migration": "011_mapping_row_type",
+  "frozen_smoke": "PASSED",
+  "installer_smoke": "PASSED",
+  "real_sistela_acceptance": "PENDING",
+  "licensed_files_bundled": false
+}

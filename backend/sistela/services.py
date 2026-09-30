@@ -96,6 +96,8 @@ def edit_line(session: Session, project_id: str, line_id: str, data: LineEdit) -
     line = session.get(EstimateLine, line_id)
     if not line or line.project_id != project_id or line.deleted_at:
         raise ServiceError(404, "Eilutė nerasta.")
+    previous_code = line.sistela_code
+    previous_candidate = (line.review_data or {}).get("suggestion")
     values = data.model_dump(exclude={"version"})
     # Any semantic edit invalidates a future mapping confirmation without changing its code.
     if any(
@@ -117,6 +119,11 @@ def edit_line(session: Session, project_id: str, line_id: str, data: LineEdit) -
     if result.rowcount != 1:
         session.rollback()
         raise ServiceError(409, "Eilutė jau pakeista. Atnaujinkite duomenis prieš išsaugodami.")
+    if previous_code != values["sistela_code"]:
+        session.flush()
+        session.refresh(line)
+        from .auto_mapping import learn_code_edit
+        learn_code_edit(session, line, previous_code, previous_candidate)
     session.execute(update(Project).where(Project.id == project_id).values(updated_at=utc_now(), status="NEEDS_REVIEW"))
     session.commit()
     session.refresh(line)
@@ -232,6 +239,9 @@ def import_pdf(
             # The same boundary applies to automatic and manual data.
             LineCreate.model_validate({k: getattr(line, k) for k in LineCreate.model_fields})
             session.add(line)
+        session.flush()
+        from .auto_mapping import populate_automatic
+        populate_automatic(session, project_id)
         run.status = "needs_review"
         run.rows_detected = len(result.lines)
         run.pages = result.pages

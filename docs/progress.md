@@ -284,3 +284,24 @@ Next: obtain the exact missing PDF in repository root or samples/input, record
 its SHA-256 in samples/manifest.json, run strict full regressions, fix any actual
 structural discrepancy, then explicitly set VERSION=0.1.1 and build/verify both
 Windows artifacts. See ADR 0009 for algorithm and known layout limitations.
+
+
+## Phase 10 — 0.2.0 completed implementation, real SISTELA acceptance pending
+
+Continued the existing working tree. Both supplied PDFs passed (21/11/10 and
+12/11/1). Added the read-only licensed catalog, offline search, automatic code
+selection and correction learning, migrations 009–011, shared TXT/DBF projection,
+experimental documented TXT with explicit parameter 89, and unified export UI.
+Existing XLSX, Entry Mode, historical knowledge, trash, packaging and DBF clone
+remain working. New-project DBF export remains explicitly blocked on unknown
+mandatory financial/identifier rules.
+
+221 backend + 56 frontend + 13 browser tests = 290 passing; lint, TypeScript,
+production build and migration checks passed. Actual frozen runtime and installer
+install/reinstall/uninstall tests passed. Setup and Portable 0.2.0 were generated;
+0.1.0 artifacts remain byte-identical. No raw licensed sources ship.
+
+See [full Phase 10 report](phase10-results.md), [release metadata](release-0.2.0.json),
+and `data/exports/TEST_TXT` for the minimal N50-270 / 1 vnt. / 89=0 test. Darius's
+next task is the isolated real SISTELA paste/validate/form-information test. No
+following phase has been started.

@@ -215,7 +215,7 @@ def test_invalid_xlsx_is_controlled(data):
 def test_capabilities_keep_unverified_writes_blocked(client):
     items = {item['id']: item for item in client.get('/integration/capabilities').json()}
     assert items['manual_entry']['production']
-    assert items['package_text_export']['status'] == 'blocked'
+    assert items['package_text_export']['status'] == 'analysis_only'
     assert items['dbf_write']['status'] == 'analysis_only'
     assert not items['dbf_write']['production']
     assert all(not item['writes_to_sistela'] for item in items.values())

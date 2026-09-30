@@ -17,6 +17,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .db import data_dir, make_engine
 from .dbf_export_api import dbf_export_router
+from .export_api import export_router
 from .grid import active_lines, apply_grid, duplicate_project, owned_line, undo_grid
 from .history_api import history_router
 from .integration import capabilities
@@ -31,6 +32,7 @@ from .mapping import (
     suggestions,
 )
 from .models import EstimateSection, ImportRun, Project, SourceDocument, utc_now
+from .normative_api import normative_router
 from .paths import resource_root
 from .schemas import (
     GridCommand,
@@ -73,7 +75,8 @@ class BodyLimitMiddleware:
             nonlocal received
             message = await receive()
             received += len(message.get("body", b""))
-            if received > MAX_FILE_BYTES + 1024 * 1024:  # bounded multipart overhead
+            limit = 150 * 1024 * 1024 if scope.get('path') == '/normative/zip' else MAX_FILE_BYTES
+            if received > limit + 1024 * 1024:  # bounded multipart overhead
                 raise BodyTooLarge()
             return message
 
@@ -144,6 +147,8 @@ def create_app(directory: Path | None = None, *, runtime_origin=None, shutdown=N
 
     app.include_router(lifecycle_router(session_dependency, directory))
     app.include_router(dbf_export_router(session_dependency, directory))
+    app.include_router(normative_router(session_dependency))
+    app.include_router(export_router(session_dependency, directory))
     app.include_router(history_router(session_dependency))
     app.include_router(workflow_router(session_dependency))
 
@@ -186,6 +191,10 @@ def create_app(directory: Path | None = None, *, runtime_origin=None, shutdown=N
     @app.post("/projects/{project_id}/lines/{line_id}/mapping/apply", response_model=LineOut)
     def mapping_apply(project_id: str, line_id: str, data: ApplyMapping, session: Session = Depends(session_dependency)):
         return apply_suggestion(session, project_id, line_id, data)
+
+    @app.post("/projects/{project_id}/lines/{line_id}/mapping/select", response_model=LineOut)
+    def mapping_select(project_id: str, line_id: str, data: ApplyMapping, session: Session = Depends(session_dependency)):
+        return apply_suggestion(session, project_id, line_id, data, learn=True)
 
     @app.post("/projects/{project_id}/lines/{line_id}/mapping/confirm", response_model=LineOut)
     def mapping_confirm(project_id: str, line_id: str, data: ConfirmMapping, session: Session = Depends(session_dependency)):

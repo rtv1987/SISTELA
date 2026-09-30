@@ -34,7 +34,7 @@ test('DBF archive → candidate evidence → confirmation → current estimate s
   await page.locator('.suggestion').first().getByRole('button',{name:'Atverti šaltinį 1'}).click();
   await expect(page.getByRole('dialog')).toContainText('Patvirtinta');
   await page.getByLabel('Uždaryti įrodymus').click();
-  await page.locator('.suggestion').first().getByRole('button',{name:'Pritaikyti pasiūlymą'}).click();
+  await page.locator('.suggestion').first().getByRole('button',{name:'Pasirinkti kodą'}).click();
   await expect(page.locator('.status.suggested')).toHaveCount(1);
   const current=(await (await request.get(`/projects/${project.id}/lines`)).json())[0];
   expect(current.output_description).toBe('Dabartinio projekto tekstas');
@@ -57,7 +57,7 @@ test('confirmed N50-270 is preferred for detector wording; no unrelated conversi
   await page.goto('/');
   await page.getByRole('button',{name:/Detector review regression GSS/}).click();
   await page.getByRole('tab',{name:'Peržiūra',exact:true}).click();
-  await expect(page.locator('.review-layout article')).toContainText('Būsena: unmapped');
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: suggested');
   await page.getByRole('button',{name:'Istorinės SISTELA sąmatos',exact:true}).click();
   await page.getByLabel('DBF archyvo failai').setInputFiles(files as string[]);
   await expect(page.getByRole('status')).toContainText(/39 darbų kandidatų|nesidubliavo/);
@@ -74,15 +74,15 @@ test('confirmed N50-270 is preferred for detector wording; no unrelated conversi
   await expect(page.locator('.suggestion').first()).toContainText('Patvirtinta istorinė patirtis');
   await expect(page.locator('.conversion-review')).toHaveCount(0);
   await expect(page.getByLabel('Tikslinis konversijos vienetas')).toHaveCount(0);
-  await expect(page.locator('.review-layout article')).toContainText('Būsena: unmapped');
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: suggested');
   await page.locator('.suggestion').first().getByText(/Istoriniai įrodymai/).click();
   await page.locator('.suggestion').first().getByRole('button',{name:'Atverti šaltinį 1'}).click();
   await expect(page.getByRole('dialog')).toContainText('dd25-04-14.dbf');
   await page.getByLabel('Uždaryti įrodymus').click();
-  await page.locator('.suggestion').first().getByRole('button',{name:'Pritaikyti pasiūlymą'}).click();
+  await page.locator('.suggestion').first().getByRole('button',{name:'Pasirinkti kodą'}).click();
   await expect(page.locator('.review-layout article')).toContainText('Būsena: suggested');
   expect((await(await request.get(`/projects/${project.id}/lines`)).json())[0].mapping_status).toBe('suggested');
-  await page.getByRole('button',{name:'Patvirtinti pasirinkimą',exact:true}).click();
+  await page.getByRole('button',{name:'Išsaugoti kodą',exact:true}).click();
   await expect(page.locator('.confirmation-note')).toBeVisible();
   const saved=(await(await request.get(`/projects/${project.id}/lines`)).json())[0];
   expect(saved.mapping_status).toBe('confirmed');expect(saved.sistela_code).toBe('N50-270');

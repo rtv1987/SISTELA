@@ -70,8 +70,8 @@ $installerPath = Join-Path $outputPath "SISTELA-Assistant-Setup-$version.exe"
 & $Python scripts/verify_windows_release.py $installerPath $portablePath
 if ($LASTEXITCODE -ne 0) { throw 'Installer, portable and packaged runtime version verification failed.' }
 $checksums = Get-ChildItem -LiteralPath $outputPath -File | Where-Object { $_.Name -match '^SISTELA-Assistant-(Setup-.*\.exe|Portable-.*\.zip)$' } | ForEach-Object {
-    $hash = Get-FileHash -LiteralPath $_ -Algorithm SHA256
-    $hash.Hash.ToLower() + '  ' + [IO.Path]::GetFileName($_)
+    $hash = Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256
+    $hash.Hash.ToLower() + '  ' + $_.Name
 }
 $checksums | Set-Content -LiteralPath (Join-Path $outputPath 'SHA256SUMS.txt') -Encoding ASCII
 $checksums | Set-Content -LiteralPath (Join-Path $outputPath "SHA256SUMS-$version.txt") -Encoding ASCII

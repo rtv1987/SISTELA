@@ -23,17 +23,17 @@ export function EstimateGrid({ lines, active, onActive, onEdit, selection, setSe
 }) {
   const [search, setSearch] = useState(''); const [type, setType] = useState('');
   const [group, setGroup] = useState('line_type'); const [sorting, setSorting] = useState<SortingState>([]);
-  const data = useMemo(() => lines.filter(l => !type || (type === 'review' ? l.line_type === 'Work' && l.mapping_status !== 'confirmed' : l.line_type === type)), [lines, type]);
+  const data = useMemo(() => lines.filter(l => !type || (type === 'review' ? l.line_type === 'Work' && !l.sistela_code : l.line_type === type)), [lines, type]);
   const columns = useMemo<ColumnDef<Line>[]>(() => {
     const edit = (key: keyof Line, title: string, width: number, options?: string[]): ColumnDef<Line> => ({
       accessorKey: key, header: title, size: width,
       sortingFn: ['quantity','material_price','work_price'].includes(key) ? (a, b) => new Decimal(String(a.original[key] ?? 0)).cmp(String(b.original[key] ?? 0)) : 'alphanumeric',
-      cell: ({ row }) => <Cell value={String(row.original[key] ?? '')} label={`${title} ${row.original.source_position || row.index + 1}`} options={options} onSave={v => onEdit(row.original.id, key, ['material_price','work_price'].includes(key) && !v ? null : ['quantity','material_price','work_price'].includes(key) ? v.replace(',', '.') : v)} />,
+      cell: ({ row }) => <><Cell value={String(row.original[key] ?? '')} label={`${title} ${row.original.source_position || row.index + 1}`} options={options} onSave={v => onEdit(row.original.id, key, ['material_price','work_price'].includes(key) && !v ? null : ['quantity','material_price','work_price'].includes(key) ? v.replace(',', '.') : v)} />{key==='sistela_code'&&row.original.sistela_code&&<small>{row.original.review_data?.suggestion?.origin==='catalog'?'Normatyvų katalogas':row.original.review_data?.suggestion?.catalog_verified?'Istorija + katalogas':row.original.review_data?.code_type==='custom'?'Vartotojo kodas':row.original.review_data?.automatic?'Istorinis atitikmuo':'Vartotojo pasirinkimas'}</small>}</>,
     });
     return [
       { id: 'select', size: 38, header: ({ table }) => <input type="checkbox" aria-label="Pažymėti matomas eilutes" checked={table.getIsAllRowsSelected()} onChange={table.getToggleAllRowsSelectedHandler()} />, cell: ({ row }) => <input type="checkbox" aria-label={`Pažymėti eilutę ${row.index + 1}`} checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()} /> },
       { accessorKey: 'source_position', header: '#', size: 42 },
-      { accessorKey: 'mapping_status', header: 'Būsena', size: 120, cell: ({ row }) => <span className={`status ${row.original.mapping_status}`}>{row.original.mapping_status === 'confirmed' ? 'Patvirtinta' : row.original.mapping_status === 'suggested' ? 'Pasiūlyta' : row.original.line_type === 'Work' ? 'Reikia kodo' : 'Peržiūrėti'}</span> },
+      { accessorKey: 'mapping_status', header: 'Būsena', size: 120, cell: ({ row }) => <span className={`status ${row.original.mapping_status}`}>{row.original.mapping_status === 'confirmed' ? 'Patvirtinta' : row.original.mapping_status === 'suggested' ? 'Pasiūlyta' : row.original.sistela_code ? 'Su kodu' : row.original.line_type === 'Work' ? 'Reikia kodo' : 'Peržiūrėti'}</span> },
       edit('project_description', 'Projekto pavadinimas', 310), edit('technical_reference', 'Modelis / žymuo', 145),
       edit('unit', 'Vnt.', 80), edit('quantity', 'Kiekis', 90), edit('sistela_code', 'SISTELA kodas', 135),
       edit('output_description', 'Galutinis pavadinimas', 290), edit('system_type', 'Sistema', 90),
@@ -49,7 +49,7 @@ export function EstimateGrid({ lines, active, onActive, onEdit, selection, setSe
   for (const row of rows) { const key = group === 'line_type' ? typeLabel[row.original.line_type] : group === 'system_type' ? row.original.system_type : ''; groups.set(key, [...(groups.get(key) || []), row]); }
   return <section className="grid-section">
     <div className="filterbar"><div className="search"><Search size={16}/><input aria-label="Ieškoti lentelėje" placeholder="Ieškoti pavadinimo, modelio, kodo…" value={search} onChange={e => setSearch(e.target.value)}/></div>
-      <select aria-label="Eilučių filtras" value={type} onChange={e => setType(e.target.value)}><option value="">Visos eilutės</option><option value="Material">Medžiagos</option><option value="Work">Darbai</option><option value="review">Nepatvirtinti darbai</option></select>
+      <select aria-label="Eilučių filtras" value={type} onChange={e => setType(e.target.value)}><option value="">Visos eilutės</option><option value="Material">Medžiagos</option><option value="Work">Darbai</option><option value="review">Darbai be kodo</option></select>
       <select aria-label="Grupavimas" value={group} onChange={e => setGroup(e.target.value)}><option value="line_type">Grupuoti pagal tipą</option><option value="system_type">Grupuoti pagal sistemą</option><option value="">Negrupuoti</option></select><span>{rows.length} eilučių</span>
     </div>
     <div className="table-scroll"><table className="estimate-table" style={{ width: table.getTotalSize() }}>

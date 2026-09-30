@@ -27,6 +27,8 @@ def verify(installer: Path, portable: Path):
             raise ValueError("Installer version resource differs from canonical version")
     executable = installer.parent / "SISTELA-Assistant/SISTELA-Assistant.exe"
     with zipfile.ZipFile(portable) as archive:
+        if any(Path(name).suffix.lower() in {'.dbf','.fpt','.idx','.pdf','.sqlite3'} for name in archive.namelist()):
+            raise ValueError('Licensed source or personal data must never ship in a release')
         packaged = archive.read("SISTELA-Assistant/SISTELA-Assistant.exe")
     if hashlib.sha256(packaged).digest() != hashlib.sha256(executable.read_bytes()).digest():
         raise ValueError("Portable executable differs from frozen runtime")

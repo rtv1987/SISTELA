@@ -45,7 +45,7 @@ def main():
     try:
         state = wait_state(directory, process)
         assert state["url"].startswith("http://127.0.0.1:")
-        with httpx.Client(base_url=state["url"], trust_env=False, timeout=60) as client:
+        with httpx.Client(base_url=state["url"], trust_env=False, timeout=120) as client:
             assert client.get("/").status_code == 200
             assert client.get("/app/info").json()["version"] == VERSION
             second = subprocess.run([str(EXE), "--no-browser"], **options, timeout=30)
@@ -76,6 +76,26 @@ def main():
             client.post("/history/imports", files=[("files", (p.name, p.read_bytes())) for p in files], data={"encoding": "cp1257"}).raise_for_status()
             historical = client.get("/history/lines", params={"system": "GSS", "code": "N50-270"}).json()["items"][0]
             client.post("/history/review", json={"items": [{"id": historical["id"], "version": historical["version"]}], "status": "CONFIRMED"}).raise_for_status()
+            normative=ROOT/'data/fixtures/normative'
+            catalog=client.post('/normative/folder',json={'path':str(normative)})
+            catalog.raise_for_status()
+            assert catalog.json()['diagnostics']['counts']['rate']==35035
+            known=client.get('/normative/search',params={'q':'N50-270'}).json()[0]
+            assert known['code']=='N50-270' and known['unit']=='vnt.'
+            acceptance=client.post('/projects',json={'name':'Frozen TXT test','system_type':'GSS'}).json()['id']
+            row=client.post(f'/projects/{acceptance}/lines',json={'project_description':known['description'],
+                'output_description':known['description'],'quantity':'1','unit':known['unit'],
+                'line_type':'Work','system_type':'GSS'}).json()
+            selected=client.post(f'/projects/{acceptance}/automatic').json()[0]
+            assert selected['sistela_code']=='N50-270' and selected['mapping_status']!='confirmed'
+            client.put('/settings/sistela',json={'parameter89':0}).raise_for_status()
+            client.put(f'/projects/{acceptance}/export/profile',json={
+                'complex':{'code':'TEST','name':'Test'},'object':{'code':'1','name':'Test'},
+                'estimate':{'code':'1','name':'Test'},'period':'202609','filename':'TESTTXT'}).raise_for_status()
+            exported=client.post(f'/projects/{acceptance}/export/txt')
+            exported.raise_for_status()
+            assert b'6,N50-270,1' in exported.content
+            assert client.get(f'/projects/{acceptance}/lines').json()[0]['source_raw_text']==row['source_raw_text']
             client.post("/app/quit", headers={"X-Sistela-Token": state["token"]}).raise_for_status()
         assert process.wait(timeout=30) == 0
         process = subprocess.Popen([str(EXE), "--no-browser"], **options)
@@ -84,9 +104,11 @@ def main():
             assert len(client.get(f"/projects/{pid}/lines").json()) == 21
             assert client.get("/history/lines?status=CONFIRMED").json()["total"] == 1
             client.post(f"/projects/{pid}/trash").raise_for_status()
-            assert client.get("/projects").json() == []
+            assert pid not in [p['id'] for p in client.get('/projects').json()]
             client.post(f"/projects/{pid}/restore").raise_for_status()
-            assert client.get("/projects").json()[0]["id"] == pid
+            assert pid in [p['id'] for p in client.get('/projects').json()]
+            assert client.get('/settings/sistela').json()['parameter89']==0
+            assert client.get('/normative/search?q=N50-270').json()[0]['code']=='N50-270'
             client.post(f"/projects/{pid}/trash").raise_for_status()
             client.post(f"/projects/{pid}/delete", json={"confirmation": "Packaged GSS"}).raise_for_status()
             assert client.get("/history/lines?status=CONFIRMED").json()["total"] == 1

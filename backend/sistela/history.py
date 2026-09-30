@@ -350,7 +350,7 @@ def historical_suggestions(session, current):
             for line, _, _ in members
         }
         projects = {
-            json.dumps({k: e.external_key[k] for k in ("KOMPLEKSAS", "OBJEKTAS")}, sort_keys=True)
+            json.dumps({k: e.external_key.get(k, e.id) for k in ("KOMPLEKSAS", "OBJEKTAS")}, sort_keys=True)
             for _, e, _ in members
         }
         dates = [e.source_date for _, e, _ in members if e.source_date]

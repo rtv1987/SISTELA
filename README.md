@@ -1,3 +1,22 @@
+# Phase 10 / 0.2.0 workflow
+
+Local PDF/XLSX import → automatic codes → edit exceptions → required-data checks
+→ experimental TXT or DBF handoff. Entry Mode remains available. Original DBFs,
+PDFs and licensed normative sources remain read-only and are never bundled.
+
+- [Structural PDF detection](docs/pdf-schedule-detection.md)
+- [Local normative catalog and schema evidence](docs/sistela-normative-catalog.md)
+- [Automatic mapping and corrections](docs/sistela-auto-mapping.md)
+- [TXT grammar, parameter 89 and acceptance](docs/sistela-package-txt.md)
+- [Shared export model and explicit DBF blockers](docs/sistela-export-architecture.md)
+
+In Settings, import your licensed normative folder or ZIP locally. No external AI
+is used. Codes stay editable; no per-row mapping confirmation is required.
+Explicit unit conversion still requires review. TXT and DBF remain EXPERIMENTAL
+until real SISTELA acceptance; project DBF output is blocked where mandatory
+financial/identifier semantics remain unknown. Do not use a test clone against
+live estimates.
+
 # SISTELA Assistant
 
 Lokalus įrankis sąnaudų žiniaraščio paruošimui prieš suvedimą į SISTELA.
