@@ -162,3 +162,125 @@ paprasto vartotojo paskyroje. Diegiklis kol kas nepasirašytas; nėra online upd
 Realiame update teste perinstaliuojama ta pati 0.1.0, nes ankstesnio išleisto Setup
 nėra; schemos 007 → 008 backup atskirai patikrintas backend testu. Kita produkto
 fazė nepradėta.
+
+## PHASE 9 — isolated DBF round-trip experiments (2026-09-29)
+
+Started from clean git status and a green 172-test baseline (116 backend, 46
+frontend, 10 Playwright). The customer now verifies that the original six-file
+archive is valid SISTELA interchange. AGENTS' prior blanket writer prohibition
+was updated to reflect this explicit authorization; original/live files stay protected.
+
+Implemented:
+
+- `dbf_archive.py`: independent, read-only physical FoxPro C/N/D model, strict cp1257,
+  Decimal/date/blanks, deleted flags, metadata and row order, schema analysis,
+  established sd/dd/nd validation and exact semantic difference locations.
+- `dbf_export.py`: separate SistelaDbfExporter, explicit fixed-width serialization,
+  pre-publication reparse/comparison, new isolated export folder, SHA-256 manifest;
+  six-table ROUND_TRIP_CLONE and bounded developer-only text mutation.
+- `dbf_project.py`: source/target-aware project preparation, review/width/precision
+  checks, separate descriptions/code, deterministic **proposed** identifiers with
+  known historical complex collision checks. Actual PROJECT_EXPORT remains BLOCKED.
+- `dbf_export_api.py`: six-file clone ZIP endpoint, project plan and explicit 409
+  for unproven project generation. `DbfExport.tsx`: experimental warning, file
+  selection/download and readable blocking explanation. Entry Mode unchanged.
+- `scripts/compare_dbf_archives.py`, `scripts/dbf_roundtrip.py`, plus frozen-runtime
+  smoke extended to exercise clone and the project-export gate.
+
+Generated `data/exports/TEST_A_CLONE` and `TEST_B_ONE_CHANGE`, and ZIPs for Darius.
+A is SAME, including all six original SHA-256 hashes. B has exactly one normalized
+difference: dd physical record 174 PAVADIN gains ` [TEST_B]`. All numeric values,
+keys and the other five DBFs remain identical. Original files retain golden hashes.
+Both packages include manifest, schema/classification analysis, comparison and instructions.
+
+The requested preferred quantity mutation is **not implemented**: dependent
+resource/pd/td calculations are UNKNOWN. The numeric mutation utility fails closed.
+No project DBFs are synthesized with guessed totals, unit IDs or identifiers. A
+project input plan is not a working project serializer. These explicit remaining
+limitations require SISTELA evidence; see `docs/sistela-dbf-export.md` and the
+before/after quantity experiment in `docs/sistela-dbf-roundtrip.md`.
+
+Tests added: 40 backend cases, 3 frontend and 1 real-fixture Playwright. Total:
+**156 backend + 49 frontend + 11 Playwright = 216 passing**. Ruff, TypeScript,
+ESLint, production frontend build, migration check pass. No migration added.
+Starlette/httpx deprecation warning remains. New screenshot:
+`docs/screenshots/phase9-dbf-experiment.png`.
+
+Other changed files: `api.py`, `integration.py`, `ports.py`, `Workflow.tsx`,
+`workflow.css`, capability regression assertions in `test_package.py` and
+`test_workflow.py`; README, architecture, historical import, analysis and progress
+documentation; ADR 0008 and the full 232-field golden schema JSON. Existing
+demonstration screenshots are refreshed by Playwright.
+
+Release gate: generated DBF **EXPERIMENTAL**; source historical import **SUPPORTED /
+READ ONLY**; Package Text export still blocked. Actual SISTELA A/B acceptance is
+PENDING. Next real action: Darius imports A and B in separate safe test contexts,
+then supplies before/after archives for a quantity change made inside SISTELA.
+
+Windows build regenerated successfully. Final EXE smoke passed actual PDF/DBF,
+clone ZIP (six hashes identical), project-export 409 gate, restart and lifecycle.
+Actual install/reinstall/uninstall smoke also passed with retained DB and unrelated
+files. Setup: 37,063,280 bytes, SHA-256
+`c8a72afebb80b9af32ca76a07b6aa8e3ac13de5ce6807a946d611bafffaf8147`.
+Portable package contains no private DBF/PDF/XLSX/SQLite files. The existing
+clean-machine limitation remains; real SISTELA itself was not run in this session.
+
+
+## Structure-first PDF importer — 2026-09-30
+
+Implemented the architectural refactor without overwriting the interrupted PHASE 9
+work. Removed the exact-heading early gate, mandatory recognized-header dependency,
+native-first-only fallback coupling and default-to-Material classification.
+
+New parser modules: `backend/sistela/parsers/pdf_candidates.py`, `pdf_pipeline.py`,
+`schedule.py`; `pdf.py` is now an application compatibility adapter. Updated unit
+normalization in `common.py`. Three extractors (pdfplumber/native, PyMuPDF/geometry,
+loose repeated rows), data-led columns, signed diagnostics, overlap deduplication,
+wrapped rows, adjacent-page continuation and explicit selection are implemented.
+Unknown types remain review-blocking; compatible confirmed historical knowledge
+can classify them without confirming a SISTELA mapping.
+
+Persistence/UI changes: `services.py`, `schemas.py`, `api.py`,
+`frontend/src/App.tsx`, `types.ts`, new `PdfDiagnostics.tsx`. Existing ImportRun.options
+holds previews/diagnostics and pending selection, so no migration was added.
+Selection is project-scoped, source-hash checked and claimed atomically; repeat or
+stale-parser selection is rejected. Source geometry and classification provenance
+are retained per line.
+
+Tests: new `tests/pdf_factory.py`, `tests/test_pdf_structure.py`,
+`frontend/src/pdf-diagnostics.test.tsx`, `frontend/e2e/zz_pdf_structure.spec.ts`;
+legacy mocked PDF tests in `tests/test_pdf.py` now create real PDF bytes. Coverage
+includes all A–P presentation families, eight negative table categories, optional
+index hints, independent loose extraction, unknown/conflicting historical types,
+selection reload/ownership/source integrity and duplicate-submission rejection.
+
+Validation: **190 backend passed, 2 skipped; 52 frontend passed; 12 Playwright
+passed = 254 passing**. Ruff, frontend lint/TypeScript/build, Alembic check and
+PowerShell build-script syntax passed. Earlier focused PDF/API rerun: 57 passed,
+2 explicit missing-fixture skips. The strict PDF fixture run reports the two
+missing-file failures rather than silently accepting them. Existing dependency
+Starlette/httpx and PyMuPDF SWIG deprecation warnings remain.
+
+The original real GSS remains **21 / 11 Material / 10 Work**, including a test that
+removes heading/index evidence. Screenshot:
+`docs/screenshots/pdf-schedule-selection.png` (synthetic data, visually reviewed).
+
+Release preparation: pinned PyMuPDF in pyproject/requirements-lock, bundled it in
+`packaging/windows.spec`, added immutable versioned-artifact guards and real PDF
+regressions to `scripts/build-windows.ps1`, created `verify_windows_release.py`,
+and extended `smoke_windows.py` to both real PDFs. The gate checks canonical
+version against installer filename/resource, portable bytes and actual runtime.
+
+**NOT DONE / external blocker:** `2024.07-616SR-BCB-AG.pdf` is still not supplied.
+Its permanent tests expect 12 / 11 / 1, exact quantities/units and heading-independent
+selection, but have not been executed against the original. No original fixture
+or manifest hash has been fabricated. Version remains **0.1.0** until both real
+regressions pass, per the release instruction. No new 0.1.1 installer/portable or
+SHA exists yet. Old 0.1.0 artifacts were verified unchanged:
+Setup c8a72afebb80b9af32ca76a07b6aa8e3ac13de5ce6807a946d611bafffaf8147;
+Portable 29e08cf599866dc499049a8953a9d7f1fe914c7af3f9bd617dada12ff0982abb.
+
+Next: obtain the exact missing PDF in repository root or samples/input, record
+its SHA-256 in samples/manifest.json, run strict full regressions, fix any actual
+structural discrepancy, then explicitly set VERSION=0.1.1 and build/verify both
+Windows artifacts. See ADR 0009 for algorithm and known layout limitations.

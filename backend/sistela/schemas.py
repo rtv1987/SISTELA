@@ -110,3 +110,4 @@ class ImportOut(BaseModel):
     warnings: list[dict]
     pages: list[int]
     elapsed_ms: int | None
+    options: dict = Field(default_factory=dict)

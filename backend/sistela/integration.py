@@ -31,6 +31,6 @@ def capabilities() -> list[dict]:
         IntegrationCapability("package_text_export", "Package Text eksportas", "blocked", False, False,
                               "No verified grammar or SISTELA round-trip.",
                               "Experimental adapter fails closed; absent from production export routes."),
-        IntegrationCapability("dbf_write", "DBF archyvo rašymas", "blocked", False, False,
-                              "No verified SISTELA round-trip.", "No writer implemented."),
+        IntegrationCapability("dbf_write", "Eksperimentinis DBF eksportas (EXPERIMENTAL)", "analysis_only", False, False,
+                              "Golden archive accepted by SISTELA (customer report); regenerated clone still unverified.", "Clone experiments only. Project export blocked on real acceptance and unknown calculations/IDs."),
     )]

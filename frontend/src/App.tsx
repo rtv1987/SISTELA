@@ -1,3 +1,4 @@
+import { PdfDiagnostics } from './PdfDiagnostics';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Plus, Upload, Copy, Trash2, Undo2, FolderOpen, Check, ShieldCheck, ChevronRight, FileText, X, ArrowRight, Download } from 'lucide-react';
@@ -94,7 +95,12 @@ export function App() {
   return rows.map(l => l.id === result.id ? result : l);
 }, false)}/></Tabs.Content></Tabs.Root>
       </>}
-      {panel === 'imports' && <section className="info-panel"><div className="panel-heading"><h3>Importo informacija</h3><button onClick={() => setPanel('')} aria-label="Uždaryti importo informaciją"><X size={17}/></button></div>{!imports.length && <p>Importų dar nėra.</p>}{imports.map(run => <div key={run.id} className="import-row"><strong>{run.status === 'failed' ? 'Nepavyko importuoti' : 'Importuota – reikia peržiūros'}</strong><span>{run.rows_detected} eilučių · puslapiai {run.pages.join(', ') || '—'}</span>{run.error_message && <p className="error-text">{run.error_message}</p>}{run.warnings.map((w, i) => <p key={i}>{w.page ? `${w.page} p.: ` : ''}{w.message}</p>)}</div>)}</section>}
+      {panel === 'imports' && <section className="info-panel"><div className="panel-heading"><h3>Importo informacija</h3><button onClick={() => setPanel('')} aria-label="Uždaryti importo informaciją"><X size={17}/></button></div>{!imports.length && <p>Importų dar nėra.</p>}{imports.map(run => <div key={run.id} className="import-row"><strong>{run.status === 'failed' ? 'Nepavyko importuoti' : run.options?.needs_selection ? 'Reikia pasirinkti lentelę' : 'Importuota – reikia peržiūros'}</strong><span>{run.rows_detected} eilučių · puslapiai {run.pages.join(', ') || '—'}</span>{run.error_message && <p className="error-text">{run.error_message}</p>}<PdfDiagnostics options={run.options} busy={!!pending} onSelect={id => act(async () => {
+  const selectedRun = await post<ImportRun>(`/projects/${projectId}/imports/${run.id}/select/${id}`);
+  setImports(await api<ImportRun[]>(`/projects/${projectId}/imports`));
+  if(selectedRun.status === 'failed') throw new Error(selectedRun.error_message || 'Importas nepavyko.');
+  return api<Line[]>(`/projects/${projectId}/lines`);
+}, false)}/>{run.warnings.map((w, i) => <p key={i}>{w.page ? `${w.page} p.: ` : ''}{w.message}</p>)}</div>)}</section>}
       {panel === 'capabilities' && <section className="info-panel"><div className="panel-heading"><h3>Integracijos galimybės</h3><button onClick={() => setPanel('')}><X size={17}/></button></div>{capabilities.map(c => <div className="capability" key={c.id}><strong>{c.name}</strong><span className={`status ${c.status === 'available' ? 'confirmed' : ''}`}>{c.status === 'available' ? 'Veikia' : c.status === 'blocked' ? 'Nepatvirtinta' : 'Tik analizė'}</span><p>{c.limitation}</p></div>)}</section>}
       {panel === 'excel' && current && <ExcelPanel system={current.system_type} busy={!!pending} onClose={() => setPanel('')} onImport={form => enqueue(async () => {
   const run = await api<ImportRun>(`/projects/${projectId}/imports/xlsx`, { method:'POST', body:form });

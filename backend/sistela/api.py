@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import os
@@ -15,6 +16,7 @@ from starlette.concurrency import run_in_threadpool
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .db import data_dir, make_engine
+from .dbf_export_api import dbf_export_router
 from .grid import active_lines, apply_grid, duplicate_project, owned_line, undo_grid
 from .history_api import history_router
 from .integration import capabilities
@@ -141,6 +143,7 @@ def create_app(directory: Path | None = None, *, runtime_origin=None, shutdown=N
             yield session
 
     app.include_router(lifecycle_router(session_dependency, directory))
+    app.include_router(dbf_export_router(session_dependency, directory))
     app.include_router(history_router(session_dependency))
     app.include_router(workflow_router(session_dependency))
 
@@ -291,6 +294,25 @@ def create_app(directory: Path | None = None, *, runtime_origin=None, shutdown=N
             )
         finally:
             await file.close()
+
+    @app.post("/projects/{project_id}/imports/{run_id}/select/{candidate_id}", response_model=ImportOut)
+    def pdf_select(project_id: str, run_id: str, candidate_id: str,
+                   session: Session = Depends(session_dependency)):
+        get_project(session, project_id)
+        run = session.get(ImportRun, run_id)
+        if not run or run.project_id != project_id:
+            raise HTTPException(404, "Importas nerastas.")
+        document = session.get(SourceDocument, run.source_document_id)
+        if not document or document.file_type != "pdf":
+            raise HTTPException(422, "Tai ne PDF importas.")
+        source = directory / "documents" / f"{document.checksum}.pdf"
+        if not source.is_file():
+            raise HTTPException(409, "Importo šaltinis nepasiekiamas.")
+        data = source.read_bytes()
+        if hashlib.sha256(data).hexdigest() != document.checksum:
+            raise HTTPException(409, "Importo šaltinio kontrolinė suma nesutampa.")
+        return import_pdf(session, directory, project_id, document.filename,
+                          data, run_id, candidate_id)
 
     @app.get("/projects/{project_id}/imports", response_model=list[ImportOut])
     def imports_list(project_id: str, session: Session = Depends(session_dependency)):

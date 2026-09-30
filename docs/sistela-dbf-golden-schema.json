@@ -1,0 +1,1770 @@
+{
+  "dd": {
+    "filename": "dd25-04-14.dbf",
+    "sha256": "30c0ea73fa3839b15d3239116b413f62d45e2b8be11537e601965092a0421a96",
+    "version": 48,
+    "language_driver": 3,
+    "encoding": "cp1257",
+    "header_date_bytes": [
+      26,
+      9,
+      24
+    ],
+    "header_length": 1896,
+    "record_length": 617,
+    "records": 391,
+    "deleted": 0,
+    "table_flags": 0,
+    "descriptor_flags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "backlink_bytes": 263,
+    "backlink_nonzero": false,
+    "eof_hex": "1a",
+    "fields": [
+      {
+        "name": "KOMPLEKSAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "OBJEKTAS",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "RANGOVAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SAMATA",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SKYRIUS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SAM_EILUTE",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "DET_EILUTE",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "GRUP",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "K1",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K2",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K3",
+        "type": "N",
+        "length": 6,
+        "decimals": 3
+      },
+      {
+        "name": "K4",
+        "type": "N",
+        "length": 7,
+        "decimals": 3
+      },
+      {
+        "name": "KODAS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MATO_PAV",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "KIEKIS",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "NORMA",
+        "type": "N",
+        "length": 11,
+        "decimals": 6
+      },
+      {
+        "name": "KAINA",
+        "type": "N",
+        "length": 12,
+        "decimals": 4
+      },
+      {
+        "name": "VERTE",
+        "type": "N",
+        "length": 9,
+        "decimals": 2
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 240,
+        "decimals": 0
+      },
+      {
+        "name": "NGR4",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "KODSUS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "MVNTSUS",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEFSUS",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "K5",
+        "type": "N",
+        "length": 9,
+        "decimals": 5
+      },
+      {
+        "name": "KAINBEK5",
+        "type": "N",
+        "length": 12,
+        "decimals": 4
+      },
+      {
+        "name": "VNTKAIN",
+        "type": "N",
+        "length": 12,
+        "decimals": 4
+      },
+      {
+        "name": "DETEIL1",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUS1",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "MVNTS1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEF1",
+        "type": "N",
+        "length": 11,
+        "decimals": 5
+      },
+      {
+        "name": "FIZKIE1",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "SUS2",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "KOEF2",
+        "type": "N",
+        "length": 11,
+        "decimals": 5
+      },
+      {
+        "name": "FIZKIE2",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "POZYS",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "POSU",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "VYKDYTOJAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SDET_EIL",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SDET_EI1",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "XSAMATA",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "XSKYRIUS",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "K6",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "PRIDPOZ",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "FIKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "FKIEKIS",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "TABR",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "PGRAFA",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "PSTORIS",
+        "type": "N",
+        "length": 10,
+        "decimals": 3
+      }
+    ]
+  },
+  "nd": {
+    "filename": "nd25-04-14.dbf",
+    "sha256": "738c57f1fbc168732bfb3cd54df3a2d8d8a788f60222b968d2d2021b8e6a0471",
+    "version": 48,
+    "language_driver": 3,
+    "encoding": "cp1257",
+    "header_date_bytes": [
+      26,
+      9,
+      24
+    ],
+    "header_length": 2056,
+    "record_length": 449,
+    "records": 11,
+    "deleted": 0,
+    "table_flags": 0,
+    "descriptor_flags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "backlink_bytes": 263,
+    "backlink_nonzero": false,
+    "eof_hex": "1a",
+    "fields": [
+      {
+        "name": "KOMPLEKSAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "OBJEKTAS",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "SAMATA",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SKYRIUS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB2",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "RANGOVAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "VYKDYTOJAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "K11",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K21",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K31",
+        "type": "N",
+        "length": 6,
+        "decimals": 3
+      },
+      {
+        "name": "K41",
+        "type": "N",
+        "length": 7,
+        "decimals": 3
+      },
+      {
+        "name": "K6",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "SKDATANS",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "POZATL",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KOEFTARI",
+        "type": "N",
+        "length": 6,
+        "decimals": 3
+      },
+      {
+        "name": "POZFOND",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 180,
+        "decimals": 0
+      },
+      {
+        "name": "M29SAM",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "PERIOD",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "FAKRANG",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "FAKVYKD",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "FAKPOZ",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "PAR1PAV",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "PAR1POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR2POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR5POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR6PAV",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "PAR6POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR7POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR10POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR14POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR19POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR70POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR97PAV",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "PAR97POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR115POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR114POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PARXXPOZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PARXXXPOZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KAUPPOZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "XSAMATA",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "XSKYRIUS",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "STAMOBK",
+        "type": "C",
+        "length": 6,
+        "decimals": 0
+      },
+      {
+        "name": "IVDAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "KODAT",
+        "type": "D",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "SK5MEDZ",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "SK5MECH",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "PARISV",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "PARIV",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "PARVKOEF",
+        "type": "N",
+        "length": 16,
+        "decimals": 8
+      },
+      {
+        "name": "PARPOZV",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PAR47POZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PARYPOZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PARYYPOZ",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      }
+    ]
+  },
+  "od": {
+    "filename": "od25-04-14.dbf",
+    "sha256": "c2fc450b8203c7264e4bf09c3faa3534b789e71983372bac929ca4ac19f7cf0f",
+    "version": 48,
+    "language_driver": 3,
+    "encoding": "cp1257",
+    "header_date_bytes": [
+      26,
+      9,
+      24
+    ],
+    "header_length": 808,
+    "record_length": 439,
+    "records": 0,
+    "deleted": 0,
+    "table_flags": 0,
+    "descriptor_flags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "backlink_bytes": 263,
+    "backlink_nonzero": false,
+    "eof_hex": "",
+    "fields": [
+      {
+        "name": "KOMPLEKSAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "OBJEKTAS",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "POZYMIS",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SKYRIUS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "GRAFA4",
+        "type": "N",
+        "length": 13,
+        "decimals": 3
+      },
+      {
+        "name": "GRAFA41",
+        "type": "N",
+        "length": 13,
+        "decimals": 3
+      },
+      {
+        "name": "GRAFA5",
+        "type": "N",
+        "length": 13,
+        "decimals": 3
+      },
+      {
+        "name": "GRAFA51",
+        "type": "N",
+        "length": 13,
+        "decimals": 3
+      },
+      {
+        "name": "GRAFA6",
+        "type": "N",
+        "length": 13,
+        "decimals": 3
+      },
+      {
+        "name": "GRAFA61",
+        "type": "N",
+        "length": 13,
+        "decimals": 3
+      },
+      {
+        "name": "GRAFA7",
+        "type": "N",
+        "length": 13,
+        "decimals": 3
+      },
+      {
+        "name": "GRAFA71",
+        "type": "N",
+        "length": 13,
+        "decimals": 3
+      },
+      {
+        "name": "PROCENTAS",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "GRAFA",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 180,
+        "decimals": 0
+      },
+      {
+        "name": "PAVADIN1",
+        "type": "C",
+        "length": 120,
+        "decimals": 0
+      }
+    ]
+  },
+  "pd": {
+    "filename": "pd25-04-14.dbf",
+    "sha256": "781186cf94cbf4c1d28e76d2e5f55c1dadbcdbfe6f06b635121fe9717e9d58fe",
+    "version": 48,
+    "language_driver": 3,
+    "encoding": "cp1257",
+    "header_date_bytes": [
+      26,
+      9,
+      24
+    ],
+    "header_length": 1064,
+    "record_length": 401,
+    "records": 143,
+    "deleted": 0,
+    "table_flags": 0,
+    "descriptor_flags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "backlink_bytes": 263,
+    "backlink_nonzero": false,
+    "eof_hex": "1a",
+    "fields": [
+      {
+        "name": "KOMPLEKSAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "OBJEKTAS",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "RANGOVAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SAMATA",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SKYRIUS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB2",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "POZYMIS",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KODAS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MATOVNT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KIEKIS",
+        "type": "N",
+        "length": 14,
+        "decimals": 6
+      },
+      {
+        "name": "KAINA",
+        "type": "N",
+        "length": 12,
+        "decimals": 4
+      },
+      {
+        "name": "NGR4",
+        "type": "N",
+        "length": 2,
+        "decimals": 0
+      },
+      {
+        "name": "KODSUS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "MVNTSUS",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEFSUS",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 60,
+        "decimals": 0
+      },
+      {
+        "name": "MARKE",
+        "type": "C",
+        "length": 180,
+        "decimals": 0
+      },
+      {
+        "name": "K5",
+        "type": "N",
+        "length": 9,
+        "decimals": 5
+      },
+      {
+        "name": "KAINBEK5",
+        "type": "N",
+        "length": 12,
+        "decimals": 4
+      },
+      {
+        "name": "SUS1",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "SUS2",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "XSAMATA",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "XSKYRIUS",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      }
+    ]
+  },
+  "sd": {
+    "filename": "sd25-04-14.dbf",
+    "sha256": "1bd6c83d8a1915f3b2f0f54f906d416d098ed1d8674a43b1e2e9c940b44d1f1b",
+    "version": 48,
+    "language_driver": 3,
+    "encoding": "cp1257",
+    "header_date_bytes": [
+      26,
+      9,
+      24
+    ],
+    "header_length": 1736,
+    "record_length": 320,
+    "records": 104,
+    "deleted": 0,
+    "table_flags": 0,
+    "descriptor_flags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "backlink_bytes": 263,
+    "backlink_nonzero": false,
+    "eof_hex": "1a",
+    "fields": [
+      {
+        "name": "KOMPLEKSAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "OBJEKTAS",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "RANGOVAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SAMATA",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SKYRIUS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB2",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SAM_EILUTE",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "DET_EILUTE",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "POZYMIS",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "IKAINIS",
+        "type": "C",
+        "length": 18,
+        "decimals": 0
+      },
+      {
+        "name": "MATOVNT",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "IMLUMAS",
+        "type": "N",
+        "length": 12,
+        "decimals": 6
+      },
+      {
+        "name": "KIEKIS",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "KATEG",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "UZMOKEST",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "MEDZIAG",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "MECHANIZ",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "K1",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K2",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "K3",
+        "type": "N",
+        "length": 6,
+        "decimals": 3
+      },
+      {
+        "name": "K4",
+        "type": "N",
+        "length": 7,
+        "decimals": 3
+      },
+      {
+        "name": "K6",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "K8",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "K9",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "VYKDYTOJAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "KIEKIS1",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "KIEKIS2",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "KIEKIS3",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "METAI",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "KOEFPERV",
+        "type": "N",
+        "length": 10,
+        "decimals": 5
+      },
+      {
+        "name": "DETEIL1",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUS1",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "MVNTS1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "KOEF1",
+        "type": "N",
+        "length": 11,
+        "decimals": 5
+      },
+      {
+        "name": "FIZKIE1",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "SUS2",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "KOEF2",
+        "type": "N",
+        "length": 11,
+        "decimals": 5
+      },
+      {
+        "name": "FIZKIE2",
+        "type": "N",
+        "length": 13,
+        "decimals": 6
+      },
+      {
+        "name": "POZYS",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "POSU",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "MEDZPOZS",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "XSAMATA",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "XSKYRIUS",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "PRIDPOZ",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      }
+    ]
+  },
+  "td": {
+    "filename": "td25-04-14.dbf",
+    "sha256": "16944d33280c4ede6091a02c85ced293031a568ebd620bf9c3d35f14ae0872af",
+    "version": 48,
+    "language_driver": 3,
+    "encoding": "cp1257",
+    "header_date_bytes": [
+      26,
+      9,
+      24
+    ],
+    "header_length": 1640,
+    "record_length": 342,
+    "records": 48,
+    "deleted": 0,
+    "table_flags": 0,
+    "descriptor_flags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "backlink_bytes": 263,
+    "backlink_nonzero": false,
+    "eof_hex": "1a",
+    "fields": [
+      {
+        "name": "KOMPLEKSAS",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "OBJEKTAS",
+        "type": "N",
+        "length": 7,
+        "decimals": 0
+      },
+      {
+        "name": "RANGOVAS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SAMATA",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SKYRIUS",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB1",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB2",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "SUSDARB3",
+        "type": "N",
+        "length": 3,
+        "decimals": 0
+      },
+      {
+        "name": "DIML",
+        "type": "N",
+        "length": 8,
+        "decimals": 2
+      },
+      {
+        "name": "DUZM",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "ISLMEDZ",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "ISLMEX",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "TIESISL",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "PPROC",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "K5",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "MATOVNT",
+        "type": "C",
+        "length": 10,
+        "decimals": 0
+      },
+      {
+        "name": "KIEKIS",
+        "type": "N",
+        "length": 10,
+        "decimals": 3
+      },
+      {
+        "name": "PAVADIN",
+        "type": "C",
+        "length": 60,
+        "decimals": 0
+      },
+      {
+        "name": "POZYMIS",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KATEG",
+        "type": "N",
+        "length": 5,
+        "decimals": 2
+      },
+      {
+        "name": "ATLYG",
+        "type": "N",
+        "length": 6,
+        "decimals": 2
+      },
+      {
+        "name": "POZY",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "FAKRANG",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "FAKVYKD",
+        "type": "N",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "METAI",
+        "type": "C",
+        "length": 4,
+        "decimals": 0
+      },
+      {
+        "name": "ISLMEDZ3",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "ISLMECH3",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "UZMOKES3",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "TIESISL3",
+        "type": "N",
+        "length": 12,
+        "decimals": 2
+      },
+      {
+        "name": "XSAMATA",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "XSKYRIUS",
+        "type": "C",
+        "length": 8,
+        "decimals": 0
+      },
+      {
+        "name": "STAMOBK",
+        "type": "C",
+        "length": 6,
+        "decimals": 0
+      },
+      {
+        "name": "NUOKO",
+        "type": "C",
+        "length": 20,
+        "decimals": 0
+      },
+      {
+        "name": "KURSP",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "POZYMIS2",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "SUMOSPAV",
+        "type": "C",
+        "length": 30,
+        "decimals": 0
+      },
+      {
+        "name": "KOKIAISL",
+        "type": "C",
+        "length": 5,
+        "decimals": 0
+      },
+      {
+        "name": "KURSPSP",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "KAIPSPSP",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "ZENKSK",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "ARSUMSP",
+        "type": "N",
+        "length": 1,
+        "decimals": 0
+      },
+      {
+        "name": "PRIDPOZ",
+        "type": "C",
+        "length": 1,
+        "decimals": 0
+      }
+    ]
+  }
+}

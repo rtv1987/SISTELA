@@ -2,7 +2,10 @@
 
 - Local Windows application. Keep the domain independent from SISTELA integration.
 - Never modify original PDF/XLSX/DBF fixtures, including those currently in the repo root.
-- No DBF writer, SISTELA folder writes, unverified package formats, or UI automation.
+- PHASE 9 permits an isolated EXPERIMENTAL DBF archive writer. Never write into SISTELA
+  working folders or overwrite golden archives. Production project DBF handoff stays
+  blocked until real clone/mutation acceptance and calculation semantics are proven.
+- No unverified Package Text formats or SISTELA UI automation.
 - Distinguish FACT, INFERENCE and UNKNOWN in reverse-engineering documents.
 - Project description, normative code, original normative description and output description
   are separate fields. Historical renamed text is not an original catalogue description.

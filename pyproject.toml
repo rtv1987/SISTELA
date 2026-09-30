@@ -9,7 +9,7 @@ description = "Local estimate preparation assistant"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi==0.141.1", "uvicorn==0.54.0", "sqlalchemy==2.1.1",
-  "alembic==1.20.0", "pdfplumber==0.11.10", "openpyxl==3.1.5",
+  "alembic==1.20.0", "pdfplumber==0.11.10", "PyMuPDF==1.26.4", "openpyxl==3.1.5",
   "dbfread==2.0.7", "python-multipart==0.0.32", "rapidfuzz==3.14.6",
 ]
 

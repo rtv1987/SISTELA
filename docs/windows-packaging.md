@@ -115,15 +115,36 @@ Schema 007 → 008 kopijavimas ir migracija tikrinami automatiniu backend testu.
 
 ## Sukurtas ir patikrintas artefaktas (2026-09-29)
 
-`dist/windows/SISTELA-Assistant-Setup-0.1.0.exe`: **37 047 152 baitai**.
-SHA-256: `93de6a5fb64ad589fb5305ef0c80eb14290f4d70669509a97262420567966e77`.
+`dist/windows/SISTELA-Assistant-Setup-0.1.0.exe`: **37 063 280 baitai**.
+SHA-256: `c8a72afebb80b9af32ca76a07b6aa8e3ac13de5ce6807a946d611bafffaf8147`.
 
-`dist/windows/SISTELA-Assistant-Portable-0.1.0.zip`: **47 417 475 baitai**.
-SHA-256: `e9bdeeaa8e44521a00cc25d904a4c374bf2c62ec82bb9e3e0ca73d2e03d9dd33`.
+`dist/windows/SISTELA-Assistant-Portable-0.1.0.zip`: **47 441 787 baitai**.
+SHA-256: `29e08cf599866dc499049a8953a9d7f1fe914c7af3f9bd617dada12ff0982abb`.
 
 Patikrinta Windows 11 kūrėjo kompiuteryje: abu smoke scenarijai praėjo su galutiniu
 paketu; diegimas, perinstaliavimas veikiant programai, pašalinimas, DB ir svetimo
 failo diegimo aplanke išsaugojimas. EXE PE antraštė: AMD64 (`0x8664`), GUI subsystem
 (`2`, be konsolės). Portable archyve 449 įrašai; nėra PDF/XLSX/DBF/SQLite duomenų ar
-development katalogų. Galutinė regresija: 116 backend, 46 frontend, 10 Playwright;
+development katalogų. Galutinė regresija: 156 backend, 49 frontend, 11 Playwright;
 lint, typecheck, build, Alembic check — PASS.
+
+PHASE 9 paketas papildomai patikrintas per realų EXE: eksperimentinis šešių DBF
+klonas sutampa su šaltiniu, o projekto DBF generavimas grąžina 409. Originalūs
+archyvai ir TEST_A / TEST_B paketai į diegiklį neįtraukti.
+
+
+## Kito PDF parserio leidimo vartai
+
+Struktūrinio parserio pakeitimai dar nėra šiame 0.1.0 diegiklyje. Planuojamas
+0.1.1 leidimas laukia originalaus `2024.07-616SR-BCB-AG.pdf` ir abiejų realių
+regresijų patvirtinimo. Versija keičiama tik `backend/sistela/version.py`.
+
+Atnaujintas build skriptas atsisako perrašyti jau esančius Setup/Portable failus.
+Jis reikalauja PDF testų su `--require-fixtures`, tikrina diegiklio vardo ir PE
+versijos atitikimą, portable EXE sutapimą su surinktu EXE, paleidžia tikrą EXE ir
+patikrina `/app/info` bei abu PDF. Po sėkmės rašo bendrą ir versijos SHA256 sąrašą.
+Šie nauji leidimo vartai dar nepatikrinti pilnu naujo Windows build, nes antras
+realus PDF nepateiktas. Esami 0.1.0 artefaktai liko nepakeisti.
+
+PATCH taikomas klaidoms ir parserio pataisoms; MINOR reikalauja atskiro aiškaus
+leidimo sprendimo. Automatinio major/minor didinimo nėra.

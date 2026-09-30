@@ -3,7 +3,7 @@
 ## Sprendimas
 
 Viena lokali aplikacija: React/TypeScript/Vite lentelė → FastAPI → SQLAlchemy → SQLite.
-Python 3.12+, pdfplumber teksto ir struktūrinių lentelių ištraukimui, openpyxl Excel,
+Python 3.12+, pdfplumber lentelėms ir PyMuPDF teksto geometrijai, openpyxl Excel,
 dbfread skaitymui su Decimal skaitinių laukų parseriu, RapidFuzz istoriniams ir patvirtintiems pasiūlymams.
 Veikia React lentelė, Entry Mode, XLSX mainai ir istorinių DBF žinių peržiūra.
 Jokių Tauri, mikroservisų ar debesies priklausomybių.
@@ -16,7 +16,11 @@ Jokių Tauri, mikroservisų ar debesies priklausomybių.
 - `api`: validuoti HTTP kontraktai; dešimtainiai skaičiai JSON eilutėmis.
 - `ports`: SistelaExporter, AiMappingProvider. Nepatvirtinti eksportai išmeta
   aiškią NotImplementedError, nieko nerašo.
-- `scripts`: read-only šaltinių analizė ir Windows paleidimas.
+- `dbf_archive`: read-only fizinis FoxPro modelis, schemų analizė ir semantinis palyginimas.
+- `dbf_export`: atskiras EXPERIMENTAL serializeris; izoliuoti clone / teksto mutacijos
+  archyvai, failų pločių ir jungčių patikra, atominis naujo aplanko publikavimas.
+- `dbf_project`: projekto įvesties planas ir aiškūs blokatoriai; nekuria spėjamų finansinių įrašų.
+- `scripts`: šaltinių analizė, izoliuoti DBF bandymai ir Windows paleidimas.
 
 ## Importo eiga
 
@@ -25,6 +29,13 @@ SourceDocument + ImportRun(running) → parseris → viena transakcija skyriams 
 ImportRun(completed/needs_review/failed). Nepavykęs importas palieka audito įrašą,
 bet ne dalinę sąmatą. Pakartotinis to paties failo importas į tą patį projektą
 atmetamas, kad eilutės netyčia nesidubliuotų.
+
+PDF parserio struktūrinė eiga: puslapių tekstas/geometrija → nepriklausomi native,
+geometry ir loose kandidatai → reikšmėmis ir antraščių užuominomis paremta stulpelių
+analizė → paaiškinamas vertinimas → dublių/tęsinių sujungimas → NormalizedSchedule.
+Antraštės nėra privalomos. `SCHEDULE_NEEDS_SELECTION` išsaugo kandidatus
+ImportRun.options, neįterpia eilučių ir laukia aiškaus pasirinkimo. Diagnostika bei
+pasirinkimas išlieka perkrovus programą. Daugiau – ADR 0009 ir pdf-import-diagnostics.md.
 
 Originalūs langeliai saugomi `source_raw_text` kaip JSON, visas ištrauktas dokumento
 tekstas – SourceDocument. Puslapiai 1-based. Klasifikavimo įspėjimai nesutampa su
@@ -70,3 +81,15 @@ conversion acceptance, readiness summary and local statistics. Entry Mode V2
 uses Decimal-safe clipboard values and persisted `entered_at`. Excel export keeps
 source columns intact and appends separate target/review columns. No verified
 automatic SISTELA import exists. See [estimator workflow](estimator-workflow.md).
+
+## PHASE 9 integracijos galimybės
+
+Istorinis DBF importas **SUPPORTED / READ ONLY** (`dbf_read: available`).
+Naujų archyvų klonavimas **EXPERIMENTAL** (`dbf_write: analysis_only`, production=false),
+SistelaDbfExporter atskirtas nuo importerių. Production DbfArchiveExporter port lieka
+uždaras. `/dbf/clone` gauna šešių failų baitus ir grąžina ZIP; serverio kelių iš kliento
+nepriima. `/projects/{id}/dbf/plan` pateikia normalizuotą įvestį ir kliūtis, projekto
+DBF eksportas grąžina 409. Package Text eksporto statusas lieka blocked. Joks kelias
+nerašo į SISTELA darbo katalogus. Duomenų migracijų šiam etapui nereikia.
+
+[DBF eksporto faktai](sistela-dbf-export.md), [realaus round-trip vartai](sistela-dbf-roundtrip.md).

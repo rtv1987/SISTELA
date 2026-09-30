@@ -141,6 +141,8 @@ Palaikomas dokumentuotas sd/dd/nd profilis, iki 10000 sd ir 100000 dd įrašų.
 ZIP, indeksų ar memo failų importas neįgyvendintas; jų reikalaujančios DBF versijos
 atmetamos. pd/td/od perskaitomi ir tikrinami, tačiau jų išteklių eilutės nekuria
 darbų kandidatų. Patvirtinimas nėra normatyvo egzistavimo SISTELA kataloge validacija.
-Package Text išlieka EXPERIMENTAL, jo eksportas ir DBF rašymas blokuoti.
+Package Text išlieka EXPERIMENTAL ir jo eksportas blokuotas. PHASE 9 leidžia tik
+atskirą eksperimentinį DBF klonavimo rašytoją; istorinis importas lieka read-only.
+Žr. [DBF round-trip](sistela-dbf-roundtrip.md).
 
 Patikros rezultatai ir failai: [iteration-03.md](iteration-03.md).

@@ -3,7 +3,7 @@
 Lokalus įrankis sąnaudų žiniaraščio paruošimui prieš suvedimą į SISTELA.
 Tai nėra SISTELA skaičiavimo variklis ar jos kopija.
 
-**Dabartinis etapas: PHASE 8 – Windows diegiklis ir projektų šiukšlinė.** PDF importas, redaguojama
+**Dabartinis etapas: PHASE 9 – eksperimentinis DBF round-trip.** PDF importas, redaguojama
 lentelė, masiniai pakeitimai, vieno veiksmo undo, eilučių ir projektų kopijos,
 patvirtintų normatyvų istorija ir pasiūlymai, SISTELA Entry Mode, XLSX importas ir
 eksportas. DBF analizė read-only. Package Text – EXPERIMENTAL leksinė analizė;
@@ -15,6 +15,12 @@ patvirtinimas nekeičiant projekto kiekio, parengties santrauka, Entry Mode V2
 klavišai ir išsaugoma suvedimo eiga, darbinis XLSX su atskirais tiksliniais kiekiais
 bei vietinė darbo statistika. Automatinis importas į SISTELA dar nepatvirtintas.
 [Darbo eiga ir bandymas su Dariumi](docs/estimator-workflow.md).
+
+Istorinis DBF importas: **SUPPORTED / READ ONLY**. Veikia izoliuotas šešių DBF
+klonavimo eksportas (**EXPERIMENTAL**) su schema, jungčių patikra ir manifestu.
+Naujo projekto DBF ir kiekio mutacija blokuojami dėl neįrodytų skaičiavimų / ID taisyklių.
+Entry Mode išlieka. [TEST_A / TEST_B ir Dariaus instrukcija](docs/sistela-dbf-roundtrip.md)
+· [Formato faktai ir UNKNOWN](docs/sistela-dbf-export.md).
 
 ## END USER INSTALLATION — diegimas vartotojui
 
@@ -125,7 +131,10 @@ Originalūs fixtures nenaudojami kaip darbinis katalogas.
 - Pinigai ir kiekiai: Decimal, SQLite tekstas, be float skaičiavimų.
 - Vietinis AI provider išjungtas; niekas į išorę nesiunčiama.
 - DBF/package writer blokuoti; jokio tiesioginio SISTELA keitimo.
-- Parseris palaiko antraštėmis atpažįstamas lenteles; ne visus PDF maketus.
+- PDF parseris remiasi lentelės struktūra ir reikšmių profiliais; antraštė nėra būtina.
+  Dviprasmišką rezultatą pasirinkite importo informacijoje. Žr.
+  [PDF diagnostiką](docs/pdf-import-diagnostics.md) ir [ADR 0009](docs/decisions/0009-structure-first-pdf.md).
+  Antrojo realaus PDF regresija ir Windows 0.1.1 leidimas laukia originalaus failo.
   Neaiškios eilutės ir numanomas tipas matomi importo diagnostikoje.
 
 Daugiau: [šaltiniai](docs/source-analysis.md), [DBF analizė](docs/sistela-dbf-analysis.md),

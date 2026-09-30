@@ -21,6 +21,9 @@ class SistelaExporter(Protocol):
 
 
 class DbfArchiveExporter:
+    """Production port remains closed; experimental clones use SistelaDbfExporter."""
+    status = "EXPERIMENTAL"
+
     def export(self, project, lines, destination):
         raise NotImplementedError("DBF writing requires a verified SISTELA round-trip test")
 

@@ -54,6 +54,6 @@ def test_invalid_package_rejected(data):
 def test_unverified_capabilities_are_not_production():
     by_id = {c["id"]: c for c in capabilities()}
     for name in ("dbf_write", "package_text_export"):
-        assert by_id[name]["status"] == "blocked"
+        assert by_id[name]["status"] == ("analysis_only" if name == "dbf_write" else "blocked")
         assert not by_id[name]["production"]
     assert not any(c["writes_to_sistela"] for c in by_id.values())

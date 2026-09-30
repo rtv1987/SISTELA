@@ -1,18 +1,14 @@
-"""Heading + header driven extraction. No page number, item or model constants."""
+"""Compatibility adapter from normalized schedules to application estimate lines."""
 
 import json
-import logging
-import re
 from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
 
-import pdfplumber
+from .common import clean_text
+from .schedule import NormalizedSchedule
 
-from .common import clean_text, compact, normalize_text, normalize_unit, parse_decimal
-
-PARSER_VERSION = "pdf-table-1.0"
-logger = logging.getLogger(__name__)
+PARSER_VERSION = "pdf-structure-2.0"
 
 
 class PdfImportError(ValueError):
@@ -41,185 +37,107 @@ class PdfResult:
     lines: list[ParsedLine] = field(default_factory=list)
     pages: list[int] = field(default_factory=list)
     warnings: list[dict] = field(default_factory=list)
+    diagnostics: list[dict] = field(default_factory=list)
+    needs_selection: bool = False
+    schedule: NormalizedSchedule | None = None
 
 
-def header_columns(row: list[str | None]) -> dict[str, int]:
-    columns = {}
-    for i, cell in enumerate(row):
-        name = compact(cell or "")
-        if "pavadin" in name or "aprasym" in name:
-            columns["description"] = i
-        elif "kiek" in name:
-            columns["quantity"] = i
-        elif "matovnt" in name or "matovien" in name or name in {"vnt", "vienetas"}:
-            columns["unit"] = i
-        elif "zymuo" in name or "model" in name:
-            columns["reference"] = i
-        elif "pastab" in name:
-            columns["notes"] = i
-        elif "pozic" in name or "eilnr" in name or name in {"nr", "poz"}:
-            columns["position"] = i
-    return columns
+def parse_table(rows, page, initial_type=None):
+    """Compatibility entry point; uses the same semantic engine as PDF imports."""
+    from .schedule import Cell, TableCandidate, header_roles, infer_columns, normalize
+
+    candidate = TableCandidate(
+        "table", [page], [], [[Cell(clean_text(c)) for c in row] for row in rows], "cells"
+    )
+    candidate.inferred_columns = infer_columns(candidate.rows)
+    for row in rows:
+        for role, index in header_roles([clean_text(c) for c in row]).items():
+            candidate.inferred_columns.setdefault(role, {"index": index, "confidence": 0.2})
+    result = normalize(candidate, initial_type)
+    return [
+        ParsedLine(
+            r.item_no,
+            r.description,
+            r.reference,
+            r.unit,
+            r.quantity,
+            r.notes,
+            "Other" if r.row_type == "UNKNOWN" else r.row_type,
+            r.source_page,
+            json.dumps(r.raw_text, ensure_ascii=False),
+        )
+        for r in result.rows
+    ], result.warnings
 
 
-def parse_table(
-    rows: list[list[str | None]], page: int, initial_type: str | None = None
-) -> tuple[list[ParsedLine], list[dict]]:
-    """Works with merged/null columns, arbitrary column order and multiline cells."""
-    lines, warnings = [], []
-    columns = {}
-    category = initial_type
-    inferred_warning = False
-    for index, row in enumerate(rows, 1):
-        header = header_columns(row)
-        if {"description", "quantity", "unit"} <= header.keys():
-            columns = header
-            continue
-        nonempty = [clean_text(c) for c in row if clean_text(c)]
-        label = normalize_text(" ".join(nonempty))
-        if len(nonempty) == 1:
-            if label in {"medziagos", "iranga ir medziagos", "irenginiai ir medziagos"}:
-                category = "Material"
-                continue
-            if label in {"montavimo darbai", "darbai", "montavimo ir derinimo darbai"}:
-                category = "Work"
-                continue
-        if not columns:
-            continue
+def parse_pdf(path: Path, selected_id: str | None = None) -> PdfResult:
+    from .pdf_pipeline import analyze
 
-        def cell(name):
-            at = columns.get(name)
-            return clean_text(row[at]) if at is not None and at < len(row) else ""
-
-        description, unit, quantity = cell("description"), cell("unit"), cell("quantity")
-        position = cell("position")
-        if not description:
-            continue  # Title blocks, blank rows, section labels and table captions.
-        if not (unit or quantity) and not re.fullmatch(r"\d+[.)]?", position):
-            continue
-        if position and not re.fullmatch(r"\d+(?:[.\-]\d+)*[.)]?", position):
-            continue
-        try:
-            parsed_quantity = parse_decimal(quantity)
-            if parsed_quantity < 0:
-                raise ValueError("Negative quantity")
-            if not unit:
-                raise ValueError("Missing unit")
-        except ValueError:
-            warnings.append(
-                {
-                    "code": "ROW_REJECTED",
-                    "page": page,
-                    "table_row": index,
-                    "message": "Eilutės kiekis arba vienetas neįskaitomas; tikrinkite šaltinį.",
-                }
+    try:
+        doc, schedule, diagnostics, credible = analyze(path, selected_id)
+        result = PdfResult(
+            len(doc.pages), "\n\n".join(f"--- Page {p.number} ---\n{p.text}" for p in doc.pages)
+        )
+        result.diagnostics = diagnostics
+        if not any(p.text.strip() for p in doc.pages):
+            raise PdfImportError(
+                "OCR_REQUIRED", "PDF neturi teksto sluoksnio. OCR dar nepalaikomas."
             )
-            continue
-        line_type = category
-        if line_type is None:
-            line_type = (
-                "Work"
-                if re.search(r"montav|tiesim|derinim|programav", normalize_text(description))
-                else "Material"
-            )
-            if not inferred_warning:
-                warnings.append(
+        for page in doc.pages:
+            if not page.text.strip():
+                result.warnings.append(
                     {
-                        "code": "TYPE_INFERRED",
-                        "page": page,
-                        "message": "Blokas be tipo antraštės: medžiagų / darbų tipą patikrinkite.",
+                        "code": "PAGE_WITHOUT_TEXT",
+                        "page": page.number,
+                        "message": "Puslapis be teksto sluoksnio; OCR neatliekamas.",
                     }
                 )
-                inferred_warning = True
-        reference = cell("reference")
-        if re.fullmatch(r"T\s*S\s*[\d\s.]+", reference, re.IGNORECASE):
-            reference = re.sub(r"\s+", "", reference)
-        lines.append(
-            ParsedLine(
-                position.rstrip(".)"),
-                description,
-                reference,
-                normalize_unit(unit),
-                parsed_quantity,
-                cell("notes"),
-                line_type,
-                page,
-                json.dumps(row, ensure_ascii=False),
+        if schedule is None:
+            if not credible:
+                error = PdfImportError(
+                    "SCHEDULE_NOT_FOUND", "Nerasta struktūriškai tinkama kiekių lentelė."
+                )
+                error.result = result
+                raise error
+            result.needs_selection = True
+            result.warnings.append(
+                {
+                    "code": "SCHEDULE_NEEDS_SELECTION",
+                    "message": "Radome galimą sąnaudų lentelę. Patvirtinkite arba pasirinkite lentelę.",
+                }
             )
-        )
-    return lines, warnings
-
-
-def is_schedule_heading(text: str) -> bool:
-    text = normalize_text(text)
-    return bool(re.search(r"(?:sanaudu\s+)?kiekiu\s+ziniarast", text))
-
-
-def parse_pdf(path: Path) -> PdfResult:
-    try:
-        with pdfplumber.open(path) as pdf:
-            if len(pdf.pages) > 300:
-                raise PdfImportError("PAGE_LIMIT", "PDF viršija 300 puslapių ribą.")
-            result = PdfResult(len(pdf.pages), "")
-            texts = []
-            previous_matched = False
-            previous_type = None
-            any_text = False
-            for number, original_page in enumerate(pdf.pages, 1):
-                page = original_page.dedupe_chars()
-                text = page.extract_text() or ""
-                texts.append(f"--- Page {number} ---\n{text}")
-                any_text = any_text or bool(text.strip())
-                if not text.strip():
-                    result.warnings.append(
-                        {
-                            "code": "PAGE_WITHOUT_TEXT",
-                            "page": number,
-                            "message": "Puslapis be teksto sluoksnio; OCR neatliekamas.",
-                        }
-                    )
-                heading = is_schedule_heading(text)
-                if not heading and not previous_matched:
-                    continue
-                page_lines, page_warnings = [], []
-                for settings in ({}, {"vertical_strategy": "text", "horizontal_strategy": "text"}):
-                    for table in page.extract_tables(table_settings=settings):
-                        found, warnings = parse_table(
-                            table,
-                            number,
-                            previous_type if previous_matched and not heading else None,
-                        )
-                        page_lines.extend(found)
-                        page_warnings.extend(warnings)
-                    if page_lines:
-                        break
-                previous_matched = bool(page_lines)
-                previous_type = page_lines[-1].line_type if page_lines else None
-                result.warnings.extend(page_warnings)
-                if page_lines:
-                    result.pages.append(number)
-                    result.lines.extend(page_lines)
-                    logger.info(
-                        "parser=%s page=%s rows=%s warnings=%s",
-                        PARSER_VERSION,
-                        number,
-                        len(page_lines),
-                        len(page_warnings),
-                    )
-            result.extracted_text = "\n\n".join(texts)
-            if not any_text:
-                raise PdfImportError(
-                    "OCR_REQUIRED", "PDF neturi teksto sluoksnio. OCR dar nepalaikomas."
-                )
-            if not result.lines:
-                raise PdfImportError(
-                    "SCHEDULE_NOT_FOUND", "Nerasta skaitoma sąnaudų kiekių lentelė."
-                )
             return result
+        result.schedule = schedule
+        result.warnings.extend(schedule.warnings)
+        for row in schedule.rows:
+            result.lines.append(
+                ParsedLine(
+                    row.item_no,
+                    row.description,
+                    row.reference,
+                    row.unit,
+                    row.quantity,
+                    row.notes,
+                    "Other" if row.row_type == "UNKNOWN" else row.row_type,
+                    row.source_page,
+                    json.dumps(
+                        {
+                            "cells": row.raw_text,
+                            "bounds": row.source_bounds,
+                            "candidate_id": schedule.candidate_id,
+                            "confidence": row.extraction_confidence,
+                            "row_type": row.row_type,
+                        },
+                        ensure_ascii=False,
+                    ),
+                )
+            )
+        result.pages = sorted({r.source_page for r in schedule.rows})
+        return result
     except PdfImportError:
         raise
     except Exception as exc:
-        # Library errors may contain confidential document fragments.
+        code = str(exc) if str(exc) in {"PAGE_LIMIT", "INVALID_SELECTION"} else "INVALID_PDF"
         raise PdfImportError(
-            "INVALID_PDF", "PDF nepavyko perskaityti; patikrinkite failą arba slaptažodį."
+            code, "PDF nepavyko perskaityti arba lentelės pasirinkimas netinkamas."
         ) from exc

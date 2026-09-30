@@ -8,7 +8,7 @@ datas = [(str(root / 'frontend/dist'), 'frontend/dist'),
          (str(root / 'alembic.ini'), '.'),
          (str(root / 'packaging/END-USER.txt'), '.')]
 binaries, hiddenimports = [], []
-for package in ('pypdfium2', 'rapidfuzz'):
+for package in ('pypdfium2', 'pymupdf', 'rapidfuzz'):
     d, b, h = collect_all(package)
     datas += d
     binaries += b

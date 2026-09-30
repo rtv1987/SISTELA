@@ -4,6 +4,16 @@ $repoRoot = (Resolve-Path -LiteralPath (Split-Path -Parent $PSScriptRoot)).Path
 Set-Location -LiteralPath $repoRoot
 if (-not $Python) { $Python = Join-Path $repoRoot '.venv\Scripts\python.exe' }
 if (-not (Test-Path -LiteralPath $Python)) { throw 'Run developer setup first or specify -Python.' }
+$version = (& $Python -c "from sistela.version import VERSION; print(VERSION)").Trim()
+if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid application version.' }
+$releaseInstaller = Join-Path $repoRoot "dist\windows\SISTELA-Assistant-Setup-$version.exe"
+$releasePortable = Join-Path $repoRoot "dist\windows\SISTELA-Assistant-Portable-$version.zip"
+if ((Test-Path -LiteralPath $releaseInstaller) -or (Test-Path -LiteralPath $releasePortable)) {
+    throw 'This release already exists. Preserve it and make an explicit version decision before building.'
+}
+# A release cannot silently omit either private production regression fixture.
+& $Python -m pytest tests/test_pdf.py tests/test_pdf_structure.py --require-fixtures -q
+if ($LASTEXITCODE -ne 0) { throw 'PDF release regressions failed or a required real fixture is missing.' }
 $outputPath = [IO.Path]::GetFullPath((Join-Path $repoRoot 'dist\windows'))
 $buildPath = [IO.Path]::GetFullPath((Join-Path $repoRoot 'tmp\windows-build'))
 foreach ($targetPath in @($outputPath, $buildPath)) {
@@ -24,8 +34,6 @@ try {
     & pnpm build
     if ($LASTEXITCODE -ne 0) { throw 'Frontend build failed.' }
 } finally { Pop-Location }
-$version = (& $Python -c "from sistela.version import VERSION; print(VERSION)").Trim()
-if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid application version.' }
 if (-not $Makensis) {
     $toolsPath = Join-Path $repoRoot 'tmp\build-tools'
     New-Item -ItemType Directory -Force -Path $toolsPath | Out-Null
@@ -59,10 +67,13 @@ if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed.' }
 $portablePath = Join-Path $outputPath "SISTELA-Assistant-Portable-$version.zip"
 Compress-Archive -LiteralPath $bundlePath -DestinationPath $portablePath -Force
 $installerPath = Join-Path $outputPath "SISTELA-Assistant-Setup-$version.exe"
-$checksums = @($installerPath, $portablePath) | ForEach-Object {
+& $Python scripts/verify_windows_release.py $installerPath $portablePath
+if ($LASTEXITCODE -ne 0) { throw 'Installer, portable and packaged runtime version verification failed.' }
+$checksums = Get-ChildItem -LiteralPath $outputPath -File | Where-Object { $_.Name -match '^SISTELA-Assistant-(Setup-.*\.exe|Portable-.*\.zip)$' } | ForEach-Object {
     $hash = Get-FileHash -LiteralPath $_ -Algorithm SHA256
     $hash.Hash.ToLower() + '  ' + [IO.Path]::GetFileName($_)
 }
 $checksums | Set-Content -LiteralPath (Join-Path $outputPath 'SHA256SUMS.txt') -Encoding ASCII
+$checksums | Set-Content -LiteralPath (Join-Path $outputPath "SHA256SUMS-$version.txt") -Encoding ASCII
 Write-Output "Installer: $installerPath"
 Write-Output $checksums

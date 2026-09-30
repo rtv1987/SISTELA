@@ -1,4 +1,5 @@
 import hashlib
+import json
 import logging
 import os
 import tempfile
@@ -10,7 +11,16 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .handoff import invalidate_review
-from .models import EstimateLine, EstimateSection, ImportRun, Project, SourceDocument, utc_now
+from .models import (
+    EstimateLine,
+    EstimateSection,
+    HistoricalLine,
+    ImportRun,
+    Project,
+    SourceDocument,
+    utc_now,
+)
+from .parsers.common import normalize_text, normalize_unit
 from .parsers.pdf import PARSER_VERSION, PdfImportError, parse_pdf
 from .schemas import LineCreate, LineEdit, ProjectCreate
 
@@ -114,7 +124,8 @@ def edit_line(session: Session, project_id: str, line_id: str, data: LineEdit) -
 
 
 def import_pdf(
-    session: Session, directory: Path, project_id: str, filename: str, data: bytes
+    session: Session, directory: Path, project_id: str, filename: str, data: bytes,
+    run_id: str | None = None, selected_id: str | None = None,
 ) -> ImportRun:
     project = get_project(session, project_id)
     checksum = hashlib.sha256(data).hexdigest()
@@ -123,24 +134,41 @@ def import_pdf(
             SourceDocument.project_id == project_id, SourceDocument.checksum == checksum
         )
     )
-    if existing:
+    if existing and not run_id:
         raise ServiceError(409, "Šis failas jau įkeltas į projektą. Žiūrėkite importo informaciją.")
     destination = directory / "documents" / f"{checksum}.pdf"
     # Immutable content-addressed copy; never use an untrusted client filename as a path.
     store_document(destination, data, checksum)
-    document = SourceDocument(
+    document = existing or SourceDocument(
         project_id=project_id,
         filename=PureWindowsPath(filename).name,
         file_type="pdf",
         checksum=checksum,
         storage_path=destination.name,
     )
+    if run_id:
+        run = session.get(ImportRun, run_id)
+        if not run or run.project_id != project_id or not existing or run.source_document_id != existing.id:
+            raise ServiceError(404, "Importas nerastas.")
+        if not run.options.get("needs_selection") or run.status != "needs_review":
+            raise ServiceError(409, "Importo pasirinkimas jau atliktas arba nebegalimas.")
+        if run.parser_version != PARSER_VERSION:
+            raise ServiceError(409, "Pasikeitė PDF parserio versija. Šį dokumentą reikia analizuoti iš naujo.")
+        if selected_id not in {c['id'] for c in run.options.get('diagnostics', []) if c['outcome'] == 'CREDIBLE'}:
+            raise ServiceError(422, "Pasirinkite galimą lentelę iš šio importo.")
+        claimed = session.execute(update(ImportRun).where(ImportRun.id == run_id,
+            ImportRun.status == "needs_review").values(status="running"))
+        if claimed.rowcount != 1:
+            session.rollback()
+            raise ServiceError(409, "Pasirinkimas jau vykdomas.")
+        session.commit()
     session.add(document)
     try:
         session.flush()
-        run = ImportRun(
-            project_id=project_id, source_document_id=document.id, parser_version=PARSER_VERSION
-        )
+        if not run_id:
+            run = ImportRun(
+                project_id=project_id, source_document_id=document.id, parser_version=PARSER_VERSION
+            )
         session.add(run)
         session.commit()
     except IntegrityError:
@@ -150,9 +178,12 @@ def import_pdf(
     started = time.perf_counter()
     logger.info("import_start id=%s parser=%s", run_id, PARSER_VERSION)
     try:
-        result = parse_pdf(destination)
+        result = parse_pdf(destination, selected_id) if selected_id else parse_pdf(destination)
         document.page_count = result.page_count
         document.extracted_text = result.extracted_text
+        run.options = {"needs_selection": result.needs_selection,
+                       "diagnostics": result.diagnostics,
+                       "selected_candidate": result.schedule.candidate_id if result.schedule else None}
         order = next_order(session, project_id)
         last_section = session.scalar(
             select(func.max(EstimateSection.sort_order)).where(
@@ -161,11 +192,28 @@ def import_pdf(
         )
         section_order = last_section + 1 if last_section is not None else 0
         sections = {}
+        learned = {}
+        unknown_texts = {normalize_text(p.project_description) for p in result.lines if p.line_type == "Other"}
+        for history in session.scalars(select(HistoricalLine).where(
+            HistoricalLine.status == "CONFIRMED", HistoricalLine.system_type == project.system_type,
+            HistoricalLine.line_type.in_(["Material", "Work"]),
+            HistoricalLine.normalized_description.in_(unknown_texts),
+        )):
+            key = (history.normalized_description, normalize_unit(history.unit))
+            learned.setdefault(key, []).append(history)
         for i, parsed in enumerate(result.lines):
+            if parsed.line_type == "Other":
+                matches = learned.get((normalize_text(parsed.project_description), normalize_unit(parsed.unit)), [])
+                kinds = {h.line_type for h in matches}
+                if len(kinds) == 1:
+                    parsed.line_type = next(iter(kinds))
+                    provenance = json.loads(parsed.source_raw_text)
+                    provenance["type_evidence"] = {"origin": "confirmed_history", "ids": [h.id for h in matches]}
+                    parsed.source_raw_text = json.dumps(provenance, ensure_ascii=False)
             if parsed.line_type not in sections:
                 section = EstimateSection(
                     project_id=project_id,
-                    name="Medžiagos" if parsed.line_type == "Material" else "Montavimo darbai",
+                    name={"Material": "Medžiagos", "Work": "Montavimo darbai"}.get(parsed.line_type, "Nežinomas tipas – patikrinkite"),
                     sort_order=section_order + len(sections),
                 )
                 session.add(section)
@@ -197,6 +245,8 @@ def import_pdf(
         session.rollback()  # All parsed lines/sections are discarded together.
         run = session.get(ImportRun, run_id)
         run.status = "failed"
+        if isinstance(exc, PdfImportError) and hasattr(exc, 'result'):
+            run.options = {"needs_selection": False, "diagnostics": exc.result.diagnostics}
         run.error_message = (
             f"{exc.code}: {exc}"
             if isinstance(exc, PdfImportError)

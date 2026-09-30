@@ -526,3 +526,12 @@ pavadinimų, ne DBF sistemų klasifikatoriaus faktas.
 Šie faktai regresiškai tikrinami tests/test_history.py. Kitų archyvų kardinalumas
 perskaičiuojamas importuojant; neatitikimai pažymimi AMBIGUOUS. Pilnos nd/pd/td/od
 semantikos ir katalogo originalių pavadinimų ši patikra neįrodo.
+
+## PHASE 9 naujas įrodymas
+
+Klientas patvirtino sėkmingą šių šešių originalių DBF importą kitoje licencijuotoje
+SISTELA instaliacijoje. Tai atnaujina ankstesnį UNKNOWN dėl paties originalaus archyvo
+perdavimo. Naujas serializeris ir jo realus importas lieka EXPERIMENTAL; žr.
+[sistela-dbf-export.md](sistela-dbf-export.md) ir
+[sistela-dbf-roundtrip.md](sistela-dbf-roundtrip.md). Ankstesni kainodaros ir kitų
+archyvų semantikos UNKNOWN išlieka.

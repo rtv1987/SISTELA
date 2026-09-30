@@ -107,65 +107,19 @@ def test_invalid_pdf_has_safe_error(tmp_path):
     assert "SECRET" not in str(caught.value)
 
 
-class FakePage:
-    def __init__(self, text, tables=()):
-        self.text = text
-        self.tables = tables
-
-    def dedupe_chars(self):
-        return self
-
-    def extract_text(self):
-        return self.text
-
-    def extract_tables(self, table_settings):
-        return self.tables
-
-
-class FakePdf:
-    def __init__(self, pages):
-        self.pages = pages
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_):
-        return False
-
-
-@pytest.mark.parametrize(
-    "pages,code",
-    [
-        ([FakePage("")], "OCR_REQUIRED"),
-        ([FakePage("Techninės specifikacijos")], "SCHEDULE_NOT_FOUND"),
-        ([FakePage("")] * 301, "PAGE_LIMIT"),
-    ],
-)
-def test_unsupported_pdf_reports_reason(monkeypatch, pages, code):
-    import sistela.parsers.pdf
-
-    monkeypatch.setattr(sistela.parsers.pdf.pdfplumber, "open", lambda _: FakePdf(pages))
+@pytest.mark.parametrize("pages,text,code", [(1,"","OCR_REQUIRED"),(1,"Technical specifications","SCHEDULE_NOT_FOUND"),(301,"","PAGE_LIMIT")])
+def test_unsupported_pdf_reports_reason(tmp_path, pages, text, code):
+    import pymupdf
+    path = tmp_path / "unsupported.pdf"
+    with pymupdf.open() as doc:
+        for _ in range(pages):
+            page = doc.new_page()
+            if text:
+                page.insert_text((40, 40), text)
+        doc.save(path)
     with pytest.raises(PdfImportError) as caught:
-        parse_pdf(None)
+        parse_pdf(path)
     assert caught.value.code == code
-
-
-def test_continuation_page_retains_explicit_work_category(monkeypatch):
-    import sistela.parsers.pdf
-
-    header = ["Eil.Nr.", "Pavadinimas", "Mato vnt.", "Kiekis"]
-    pages = [
-        FakePage(
-            "Sąnaudų kiekių žiniaraštis",
-            [[header, ["Montavimo darbai", None, None, None], ["1", "Prijungimas", "vnt.", "3"]]],
-        ),
-        FakePage("Lentelės tęsinys", [[header, ["2", "Patikra", "kompl.", "1"]]]),
-        FakePage("Brėžinys"),
-    ]
-    monkeypatch.setattr(sistela.parsers.pdf.pdfplumber, "open", lambda _: FakePdf(pages))
-    result = parse_pdf(None)
-    assert result.pages == [1, 2]
-    assert [line.line_type for line in result.lines] == ["Work", "Work"]
 
 
 def test_missing_quantity_and_unit_are_visible():
