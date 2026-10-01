@@ -151,7 +151,7 @@ class EstimateLine(Identity, Timestamps, Base):
             ["project_id", "source_document_id"],
             ["source_documents.project_id", "source_documents.id"],
         ),
-        CheckConstraint("line_type IN ('Material','Work','Other')"),
+        CheckConstraint("line_type IN ('Material','Work','Equipment','Other')"),
         CheckConstraint("mapping_status IN ('unmapped','suggested','confirmed','rejected','needs_review')"),
         CheckConstraint("source_page IS NULL OR source_page > 0"),
         Index("ix_lines_project_order", "project_id", "sort_order"),

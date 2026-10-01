@@ -16,7 +16,7 @@ class IntegrationCapability:
 
 def capabilities() -> list[dict]:
     return [asdict(item) for item in (
-        IntegrationCapability("manual_entry", "SISTELA Entry Mode", "available", True, False,
+        IntegrationCapability("manual_entry", "Rankinis perkėlimas (atsarginis būdas)", "available", True, False,
                               "Local clipboard and user-confirmed progress.",
                               "The user enters values in SISTELA and verifies normative units."),
         IntegrationCapability("xlsx", "Excel darbo lentelė", "available", True, False,

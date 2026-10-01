@@ -43,7 +43,7 @@ SISTELA. **DERIVED conservative profile limits**, not documented package maxima:
 120 characters for row descriptions, price 7.4 and resource norm 5.6. Longer or
 more precise forms remain blocked until verified. Section/rate coefficient and
 resource adjustment options are exposed through the typed export profile API;
-the ordinary UI handles hierarchy, custom marks/NGR and G parameters.
+the work table exposes marks/NGR and G only in advanced row details. The normal export view has bulk TXT/DBF buttons; hierarchy settings are optional.
 
 Generation round-trips through `parse_generated_txt`, comparing record structure,
 codes and exact Decimal target quantities. This proves our format consistency,
@@ -67,3 +67,15 @@ Informacijos įvedimas → Informacija pakete → choose the editor → paste th
 → Tikrinti informaciją → Formuoti sąmatinę informaciją. Record diagnostics and
 verify the resulting rate, quantity and unit. Do not assume an undocumented
 direct-file-opening workflow. TXT remains EXPERIMENTAL until that real test passes.
+
+## 0.2.1 product workflow
+
+Custom codes, S/I marks, generic NGR 12, hierarchy, section codes, filename and month
+are prepared automatically and persisted. Parameter 89 is configured once under
+Nustatymai → SISTELA. No manual readiness or entered-progress step is needed.
+A full estimate is one TXT download. Rankinis perkėlimas is only a fallback.
+
+Missing custom prices remain real exceptions: the manual requires a price for
+that form, and zero/omitted-price placeholders are not established. Average-price
+catalog positions use the documented price-omitting form. See
+[product decision](decisions/0011-bulk-product-workflow.md) for facts and limits.

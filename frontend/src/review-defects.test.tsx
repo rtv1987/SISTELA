@@ -65,6 +65,6 @@ it('Review Queue refetches confirmed historical knowledge after returning from h
   expect(screen.getByText('Patvirtinta istorinė patirtis')).toBeInTheDocument();
   expect(screen.getByRole('button',{name:'Atverti šaltinį 1'})).toBeInTheDocument();
   expect(container.querySelector('.conversion-review')).toBeNull();
-  expect(screen.getByText('Būsena: unmapped')).toBeInTheDocument();
+  expect(screen.getByText('Būsena: Nepasirinkta')).toBeInTheDocument();
   expect(mocks.api.mock.calls.filter(([url])=>url.endsWith('/suggestions')).length).toBeGreaterThanOrEqual(3);
 });

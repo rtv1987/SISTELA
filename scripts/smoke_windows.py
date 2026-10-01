@@ -96,6 +96,21 @@ def main():
             exported.raise_for_status()
             assert b'6,N50-270,1' in exported.content
             assert client.get(f'/projects/{acceptance}/lines').json()[0]['source_raw_text']==row['source_raw_text']
+            # Product acceptance: a full fixture estimate, never manual Entry Mode.
+            # These are explicit synthetic prices, not prices for the real PDF.
+            bulk=client.post('/projects',json={'name':'Frozen bulk priced fixture','system_type':'BULK'}).json()['id']
+            creates=[{'project_description':f'Fixture ZX{i}','output_description':f'Fixture ZX{i}',
+                'quantity':'1','unit':'vnt.','line_type':'Material','system_type':'BULK',
+                'material_price':'12.50'} for i in range(11)]
+            creates.append({'project_description':known['description'],'output_description':known['description'],
+                'quantity':'1','unit':known['unit'],'line_type':'Work','system_type':'BULK',
+                'sistela_code':known['code']})
+            client.post(f'/projects/{bulk}/grid',json={'creates':creates}).raise_for_status()
+            package=client.post(f'/projects/{bulk}/export/txt')
+            package.raise_for_status()
+            assert sum(record.startswith(b'6,') for record in package.content.splitlines())==12
+            assert all(not r['entered_at'] and r['mapping_status']!='confirmed'
+                       for r in client.get(f'/projects/{bulk}/lines').json())
             client.post("/app/quit", headers={"X-Sistela-Token": state["token"]}).raise_for_status()
         assert process.wait(timeout=30) == 0
         process = subprocess.Popen([str(EXE), "--no-browser"], **options)
@@ -114,7 +129,7 @@ def main():
             assert client.get("/history/lines?status=CONFIRMED").json()["total"] == 1
             client.post("/app/quit", headers={"X-Sistela-Token": state["token"]}).raise_for_status()
         assert process.wait(timeout=30) == 0
-        print(f"PASS: frozen startup, static UI, single instance, real 21-row PDF, XLSX export, real DBF, experimental clone, project-export gate, restart, trash, restore, delete, retained history. Data: {directory}")
+        print(f"PASS: frozen startup, static UI, single instance, real 21/12-row PDFs, licensed catalog, 12-row bulk TXT without manual transfer, XLSX export, real DBF, experimental clone, project-export gate, restart, trash, restore, delete, retained history. Data: {directory}")
     finally:
         if process.poll() is None:
             process.terminate()

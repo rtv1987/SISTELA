@@ -7,17 +7,17 @@ from sqlalchemy import select
 from .dbf_export import DbfExportBlocked, encode_field
 from .export_model import normalized_estimate
 from .grid import active_lines
-from .models import EstimateSection, HistoricalEstimate
+from .models import EstimateSection, HistoricalEstimate, NormativeCatalogSource, NormEntry
+from .parsers.common import normalize_unit
 from .parsers.dbf import DbfField
 from .services import get_project
 from .workflow import validate_project_for_sistela
 
 PROJECT_BLOCKERS = [
-    "REAL_SISTELA_ACCEPTANCE_PENDING: TEST_A and TEST_B must be accepted by Darius.",
-    "CALCULATED_FIELDS_UNKNOWN: dd resources, pd quantities/prices and td/od totals cannot be synthesized.",
-    "IDENTIFIER_IMPORT_BEHAVIOR_UNKNOWN: global collisions/remapping cannot be established from one archive.",
-    "NEW_ARCHIVE_NAMING_AND_REQUIRED_FIELDS_UNKNOWN: no new-project profile proven.",
-    "UNIT_CATALOGUE_INCOMPLETE: MATOVNT codes for arbitrary target units are unproven.",
+    "REAL_SISTELA_ACCEPTANCE_PENDING: Darius turi patikrinti TEST_A / TEST_B importą bandomoje SISTELA.",
+    "CALCULATED_FIELDS_UNKNOWN: dd KIEKIS / NORMA / KAINA / VERTE, sd IMLUMAS / UZMOKEST / MEDZIAG / MECHANIZ, pd resursų kainos ir td / od sumų perskaičiavimas nepatvirtintas.",
+    "IDENTIFIER_IMPORT_BEHAVIOR_UNKNOWN: KOMPLEKSAS / OBJEKTAS / SAMATA identifikatorių konfliktų elgesys importuojant nepatikrintas.",
+    "NEW_ARCHIVE_NAMING_AND_REQUIRED_FIELDS_UNKNOWN: naujo projekto šešių failų privalomų laukų profilis nepatvirtintas.",
 ]
 
 
@@ -54,6 +54,15 @@ def project_export_plan(session, project_id):
         EstimateSection.project_id == project_id).order_by(EstimateSection.sort_order, EstimateSection.id))}
     grouped = {}
     rows = []
+
+    unit_resolution = {}
+    for unit in {r['target_unit'] for r in normalized_rows.values()}:
+        ids = sorted(set(session.scalars(select(NormEntry.unit_id).join(NormativeCatalogSource).where(
+            NormativeCatalogSource.active.is_(True), NormEntry.unit==normalize_unit(unit),
+            NormEntry.unit_id!=''))))
+        unit_resolution[unit] = {'catalog_ids':ids,'status':'CATALOG_EVIDENCE' if len(ids)==1 else 'UNRESOLVED'}
+        if len(ids)!=1:
+            blockers.append(f'UNIT_CATALOGUE_INCOMPLETE: {unit} — MATOVNT katalogo kodas neaiškus ({len(ids)} kandidatai).')
 
     def fits(field, value, source):
         try:
@@ -102,4 +111,5 @@ def project_export_plan(session, project_id):
     return {"mode": "PROJECT_EXPORT", "status": "BLOCKED", "production": False,
             "normalized_estimate": model, "project_id": project.id, "project_name": project.name, "estimate_name": project.name,
             "blockers": blockers, "rows": rows, "proposed_identifiers": identifiers,
+            "unit_resolution":unit_resolution,
             "warnings": ["Plan only: no financial values or normative resources generated."]}

@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 from .grid import active_lines
 from .handoff import target
-from .models import EstimateSection, ExportSettings, NormativeCatalogSource, NormEntry, NormRelation
+from .models import EstimateSection, ExportSettings, NormRelation
 from .services import get_project
 
 
@@ -27,8 +27,11 @@ def save_settings(session, key, value):
 def normalized_estimate(session, project_id):
     from .workflow import validate_project_for_sistela
     project = get_project(session, project_id)
+    from .auto_mapping import lookup_code
+    from .preparation import ensure_profile, row_options
+    stored_profile = ensure_profile(session, project)
     common = validate_project_for_sistela(session, project_id)
-    profile = settings(session, 'project:' + project_id)
+    profile = dict(stored_profile.value)
     sections = {s.id: s for s in session.scalars(select(EstimateSection).where(
         EstimateSection.project_id == project_id))}
     grouped = {}
@@ -36,14 +39,13 @@ def normalized_estimate(session, project_id):
         quantity, unit, valid = target(line)
         section_id = line.section_id or 'manual-' + line.line_type
         name = sections[line.section_id].name if line.section_id in sections else {
-            'Work': 'Darbai', 'Material': 'Medžiagos'}.get(line.line_type, '')
+            'Work': 'Darbai', 'Material': 'Medžiagos', 'Equipment':'Įrenginiai'}.get(line.line_type, '')
         section = grouped.setdefault(section_id, {'id': section_id, 'code': str(len(grouped)+1),
             'name': name, 'coefficients': {}, 'rows': []})
-        reference = session.scalar(select(NormEntry).join(NormativeCatalogSource).where(
-            NormativeCatalogSource.active.is_(True), NormEntry.code == line.sistela_code,
-            NormEntry.kind.in_(['rate'] if line.line_type == 'Work' else ['material', 'resource'])).limit(1))
+        reference = lookup_code(session,line.sistela_code,line.line_type)
         review = line.review_data or {}
-        extra = dict(profile.get('rows', {}).get(line.id, {}))
+        extra, ngr_evidence = row_options(line, reference)
+        extra.update(profile.get('rows', {}).get(line.id, {}))
         if extra.get('resources'):
             resources=[]
             for resource in extra['resources']:
@@ -62,21 +64,24 @@ def normalized_estimate(session, project_id):
             'mapping_status': line.mapping_status,
             'source_quantity': str(line.quantity), 'source_unit': line.unit,
             'target_quantity': str(quantity), 'target_unit': unit, 'conversion_valid': valid,
-            'price': str(line.material_price if line.line_type == 'Material' else line.work_price)
-                if (line.material_price if line.line_type == 'Material' else line.work_price) is not None else None,
+            'price': str(line.material_price if line.line_type in {'Material','Equipment'} else line.work_price)
+                if (line.material_price if line.line_type in {'Material','Equipment'} else line.work_price) is not None else None,
             'material_price': str(line.material_price) if line.material_price is not None else None,
             'work_price': str(line.work_price) if line.work_price is not None else None,
             'normative_reference': {'id': reference.id, 'source_id': reference.source_id,
                 'filename': reference.filename, 'record_number': reference.record_number,
-                'unit': reference.unit, 'description': reference.description} if reference else None,
+                'unit': reference.unit, 'kind':reference.kind, 'description': reference.description} if reference else None,
+            'ngr_evidence': ngr_evidence,
             'provenance': {'document_id': line.source_document_id, 'page': line.source_page,
                 'raw_text': line.source_raw_text, 'review': review},
-            'warnings': ['LOW_CONFIDENCE'] if line.confidence is not None and line.confidence < Decimal('.7') else [],
+            'warnings': (['LOW_CONFIDENCE'] if line.confidence is not None and line.confidence < Decimal('.7') else [])
+                + (['GENERIC_NGR_12'] if not reference and ngr_evidence=='documented_generic_material_group' else []),
             'options': extra,
         })
     for section in grouped.values():
         overrides = profile.get('sections', {}).get(section['id'], {})
         section.update({k: overrides[k] for k in ('code', 'name', 'coefficients') if k in overrides})
+    session.commit()
     return {'project_id': project_id,
         'common_issues': [{'context':row['id'],'message':issue['message']} for row in common['rows']
             for issue in row['issues'] if issue['severity']=='BLOCKING'],

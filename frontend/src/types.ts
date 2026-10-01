@@ -1,4 +1,4 @@
-export type LineType = 'Material' | 'Work' | 'Other';
+export type LineType = 'Material' | 'Work' | 'Equipment' | 'Other';
 export interface Project { id: string; name: string; customer: string; system_type: string; updated_at: string }
 export interface Line {
   id: string; project_id: string; system_type: string; line_type: LineType;
@@ -7,7 +7,7 @@ export interface Line {
   unit: string; quantity: string; sistela_code: string; sistela_original_description: string;
   material_price: string | null; work_price: string | null; confidence: string | null;
   mapping_status: 'unmapped' | 'suggested' | 'confirmed' | 'rejected' | 'needs_review'; notes: string;
-  review_data?: {automatic?:boolean; code_type?:string; normative_unit?:string; suggestion?:{origin?:string;catalog_verified?:boolean}; conversion?: {source_quantity:string;source_unit:string;target_quantity:string;target_unit:string;confirmed_by_user:boolean}; manual?:boolean; price_status?:string};
+  review_data?: {generated_code?:boolean;export_options?:{mark?:string;ngr?:number;parameters?:number[]};automatic?:boolean; code_type?:string; normative_unit?:string; suggestion?:{origin?:string;catalog_verified?:boolean}; conversion?: {source_quantity:string;source_unit:string;target_quantity:string;target_unit:string;confirmed_by_user:boolean}; manual?:boolean; price_status?:string};
   source_document_id?: string | null;
   version: number; sort_order: number; entered_at: string | null;
 }
@@ -17,4 +17,4 @@ export interface Suggestion { mapping_id: string; sistela_code: string; sistela_
 export const editableKeys = ['system_type','line_type','project_description','technical_reference','unit','quantity','output_description','material_price','work_price','notes','sistela_code','sistela_original_description'] as const;
 export const editable = (line: Line) => Object.fromEntries(editableKeys.map(k => [k, line[k]]));
 export const blankLine = (system: string) => ({ system_type: system, line_type: 'Other', project_description: 'Nauja eilutė', output_description: 'Nauja eilutė', quantity: '1', unit: 'vnt.', notes: '', technical_reference: '', material_price: null, work_price: null, sistela_code: '', sistela_original_description: '' });
-export const typeLabel: Record<LineType, string> = { Material: 'Medžiaga', Work: 'Darbas', Other: 'Kita' };
+export const typeLabel: Record<LineType, string> = { Material: 'Medžiaga', Work: 'Darbas', Other: 'Kita', Equipment: 'Įrenginys' };

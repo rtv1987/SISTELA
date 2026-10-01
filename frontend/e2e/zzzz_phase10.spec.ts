@@ -36,17 +36,14 @@ test('local normative ZIP → PDF auto codes → correction persists → catalog
   rows=await(await request.get(`/projects/${project.id}/lines`)).json();
   expect(rows[0].review_data.correction.previous_code).toBe('CUSTOM9');
   await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();
-  await page.getByText('TXT eksportas · Informacija pakete',{exact:true}).click();
-  await page.getByLabel('complex kodas',{exact:true}).fill('TEST');
-  await page.getByLabel('object kodas',{exact:true}).fill('1');
-  await page.getByLabel('estimate kodas',{exact:true}).fill('1');
-  await page.getByLabel('Paketo laikotarpis').fill('202609');
-  await page.getByLabel('Parametras 89').selectOption('0');
-  const download=page.waitForEvent('download');await page.getByRole('button',{name:'Atsisiųsti TXT',exact:true}).click();
-  expect((await download).suggestedFilename()).toBe('TESTTXT.TXT');
+  await request.put('/settings/sistela',{data:{parameter89:0}});
+  await page.getByRole('tab',{name:'Darbo lentelė',exact:true}).click();await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();
+  const download=page.waitForEvent('download');await page.getByRole('button',{name:'TXT eksportas',exact:true}).click();
+  expect((await download).suggestedFilename()).toMatch(/^A[A-F0-9]{7}\.TXT$/);
+  await page.getByText('Techninės detalės / TXT peržiūra',{exact:true}).click();
   await expect(page.getByRole('button',{name:'Kopijuoti paketo tekstą'})).toBeVisible();
   await page.screenshot({path:resolve('../docs/screenshots/phase10-export.png'),fullPage:true,style:'.project-list button:not(.current){display:none}'});
   await page.getByRole('button',{name:'DBF eksportas',exact:true}).click();
-  await page.getByRole('button',{name:'Tikrinti projekto DBF kliūtis'}).click();
-  await expect(page.getByText(/Projekto eksportas blokuojamas:/)).toBeVisible();
+
+  await expect(page.getByText(/Projekto DBF eksportui liko/)).toBeVisible();
 });

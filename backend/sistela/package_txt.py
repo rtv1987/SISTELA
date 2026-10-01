@@ -7,6 +7,8 @@ from decimal import Decimal, InvalidOperation
 
 from .parsers.common import normalize_unit
 
+PRICE_REQUIRED = 'Trūksta kainos: dokumentuotas vartotojo pozicijos formatas reikalauja kainos. Įveskite tikrą kainą darbo lentelėje; nulis automatiškai nepriskiriamas.'
+
 
 def number(value, decimals=6, integers=5, positive=True):
     try:
@@ -49,6 +51,8 @@ def row_record(row, parameter89):
         raise ValueError('Konversija nepatvirtinta arba nebegalioja.')
     field(row['target_unit'], 10)
     ref = row.get('normative_reference')
+    if ref and ref.get('kind') == 'resource':
+        raise ValueError('Resurso kodas nėra vidutinių kainų pozicija. Lentelėje pasirinkite kainyno arba vartotojo kodą; resurso tiesioginio 6 tipo įrašo semantika nepatvirtinta.')
     if ref and (not ref['unit'] or normalize_unit(ref['unit']) != normalize_unit(row['target_unit'])):
         raise ValueError('Nežinomas arba nesutampantis normatyvo vienetas; patikrinkite konversiją.')
     # We export already converted target quantities. Parameter 1 may convert them again.
@@ -71,7 +75,7 @@ def row_record(row, parameter89):
         if len(description)>120:
             raise ValueError('Ilgesnio kaip 120 ženklų eilutės teksto profilis dar nepatikrintas.')
         if row['price'] is None:
-            raise ValueError('Vartotojo kodui būtina įvesta kaina; jos negeneruojame.')
+            raise ValueError(PRICE_REQUIRED)
         price = number(row['price'], 4, 7, positive=False)
         result += [f"<{mark},{row['target_unit']}>", 'P='+description]
         if mark == 'I':
@@ -125,7 +129,9 @@ def validate_txt_export(model):
         try:
             return fn()
         except (ValueError, KeyError, TypeError) as exc:
-            errors.append({'context':context, 'message':str(exc)})
+            error = {'context':context, 'message':str(exc)}
+            if error not in errors:
+                errors.append(error)
             return None
     if model.get('parameter89') not in (0,1):
         errors.append({'context':'parameter89','message':'Nurodykite tikrą SISTELA parametro 89 reikšmę (0 arba 1).'} )
@@ -153,6 +159,8 @@ def validate_txt_export(model):
         if value:
             records.append(value)
         for row in section['rows']:
+            if row['code_type']=='custom' and row['price'] is None:
+                errors.append({'context':row['id'],'message':PRICE_REQUIRED})
             value=attempt(row['id'],lambda r=row:row_record(r,model.get('parameter89')))
             if value:
                 records.append(value)
@@ -160,6 +168,8 @@ def validate_txt_export(model):
                 if resources:
                     records.extend(resources)
     return {'status':'BLOCKED' if errors else 'EXPERIMENTAL', 'production':False,
+            'ready_rows':sum(r['id'] not in {e['context'] for e in errors} for s in model.get('sections',[]) for r in s['rows']),
+            'total_rows':sum(len(s['rows']) for s in model.get('sections',[])),
             'errors':errors, 'records':records if not errors else [],
             'warnings':['Tik eksperimentinis perdavimas. Priėmimas tikroje SISTELA dar nepatvirtintas.',
                 'cp1257 ir 120 ženklų eilutės teksto profilis turi būti patikrintas realiame teste.']}

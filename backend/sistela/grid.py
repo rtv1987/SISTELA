@@ -99,9 +99,21 @@ def apply_grid(session: Session, project_id: str, command: GridCommand):
             session.flush()
             before[line.id] = None
             versions[line.id] = line.version
+        # Prepare within the same grid transaction so undo includes generated values.
+        from .auto_mapping import automatic_values
+        for line_id in list(versions):
+            row = session.get(EstimateLine,line_id)
+            if row.deleted_at:
+                continue
+            prepared = automatic_values(session,row)
+            if prepared:
+                update_versioned(session,row,row.version,prepared)
+                versions[line_id] = row.version
         if versions:
             session.add(GridChange(project_id=project_id, before=before, after_versions=versions))
             session.execute(update(Project).where(Project.id == project_id).values(updated_at=utc_now(), status="NEEDS_REVIEW"))
+        from .preparation import ensure_profile
+        ensure_profile(session,get_project(session,project_id))
         session.commit()
     except ValidationError as exc:
         session.rollback()

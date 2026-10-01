@@ -305,3 +305,30 @@ See [full Phase 10 report](phase10-results.md), [release metadata](release-0.2.0
 and `data/exports/TEST_TXT` for the minimal N50-270 / 1 vnt. / 89=0 test. Darius's
 next task is the isolated real SISTELA paste/validate/form-information test. No
 following phase has been started.
+
+## 0.2.1 — bulk product workflow finish
+
+Preserved Phase 0–10 functionality and completed automatic preparation for work,
+material and equipment rows, persistent custom codes and export defaults, material
+catalog/history matching, global parameter 89 settings, automatic readiness and
+simplified whole-estimate TXT export. Manual transfer is only an optional fallback.
+Migration 012 extends row types and the derived local search index. No originals
+or licensed archives were modified or bundled.
+
+234 backend + 58 frontend + 15 Playwright tests = 307 passing (17 added).
+Full backend verification used a temporary IPv6 socketpair runner because Windows
+IPv4 ports were exhausted; the ordinary release command passed all 52 PDF tests.
+Ruff, lint, TypeScript, build and migration checks passed. Actual frozen EXE bulk
+TXT/catalog/PDF checks and installer lifecycle checks passed. Setup and Portable
+0.2.1 exist; 0.2.0 artifacts remain byte-identical.
+
+The real PDF prepares all 12 codes without repetitive code/NGR forms. Its fresh
+browser regression still correctly requires 11 real custom-position prices and
+three output-text corrections. The format-valid priced test fixture exports all
+12 rows without Entry Mode. Real SISTELA TXT round-trip acceptance remains pending;
+new-project DBF export reports precise calculation/identifier blockers.
+
+See [release report](release-0.2.1.md), [artifact metadata](release-0.2.1.json),
+[changed files](release-0.2.1-files.md), and ADR 0011. Next: Darius supplies actual
+prices, reviews exceptional rows and tests one whole-estimate TXT in a disposable
+SISTELA estimate. No new phase was started.

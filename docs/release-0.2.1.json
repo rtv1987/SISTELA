@@ -1,0 +1,28 @@
+{
+  "version": "0.2.1",
+  "artifacts": [
+    {
+      "path": "C:\\Users\\rtv19\\Documents\\GitHub\\SISTELA\\dist\\windows\\SISTELA-Assistant-Setup-0.2.1.exe",
+      "size_bytes": 51868096,
+      "sha256": "383d5e37528527ab860355e23d21a2fe87f7ea2332a142398558089e75b0f2eb"
+    },
+    {
+      "path": "C:\\Users\\rtv19\\Documents\\GitHub\\SISTELA\\dist\\windows\\SISTELA-Assistant-Portable-0.2.1.zip",
+      "size_bytes": 68963201,
+      "sha256": "43fe96d8643aa27e3694c88fec50a50011d3484c59a95c1c4ca0066cd25fb2fc"
+    }
+  ],
+  "tests": {
+    "backend": 234,
+    "frontend": 58,
+    "playwright": 15,
+    "total": 307
+  },
+  "backend_environment_note": "Full suite used temporary IPv6 socketpair harness due to Windows IPv4 socket exhaustion; 52 release PDF tests passed with ordinary pytest.",
+  "migration": "012_bulk_preparation",
+  "frozen_smoke": "PASSED",
+  "installer_smoke": "PASSED",
+  "real_sistela_acceptance": "PENDING",
+  "licensed_files_bundled": false,
+  "browser_environment_note": "Standard IPv4 full run: 15 passed. Later screenshot reruns encountered intermittent Windows address-allocation/file-write errors. IPv6 harness verified updated real-project screenshots; lifecycle retry passed. No workaround ships."
+}

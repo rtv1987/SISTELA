@@ -34,7 +34,7 @@ class EntryUpdate(InputModel):
 
 
 def suggestions(session, line):
-    if line.line_type not in {"Work", "Material"}:
+    if line.line_type not in {"Work", "Material", "Equipment"}:
         return []
     normalized = normalize_text(line.project_description)
     mappings = session.scalars(select(SistelaMapping).where(SistelaMapping.system_type == line.system_type,
@@ -64,8 +64,7 @@ def suggestions(session, line):
             "method": method, "confirmed_count": item.confirmed_count, "compatible": compatible,
             "last_used_at": item.last_used_at, "origin": "user", "unit_compatibility": compatibility,
             "priority": 0 if method == "exact" else 1})
-    if line.line_type == 'Work':
-        result.extend(historical_suggestions(session, line))
+    result.extend(historical_suggestions(session, line))
     from .auto_mapping import catalog_candidates
     result.extend(catalog_candidates(session, line))
     # Preserve correction recency within each tier; explicit exact confirmations rank first.
@@ -103,7 +102,7 @@ def confirm_mapping(session, project_id, line_id, request: ConfirmMapping):
     line = owned_line(session, project_id, line_id)
     if line.version != request.version:
         raise ServiceError(409, "Eilutė jau pakeista. Atnaujinkite duomenis.")
-    if line.line_type != "Work":
+    if line.line_type not in {"Work", "Material", "Equipment"}:
         raise ServiceError(422, "Normatyvų istorija skirta darbų eilutėms.")
     unit = normalize_unit(request.normative_unit)
     if not target(line)[2] or unit != normalize_unit(target(line)[1]):
@@ -125,11 +124,11 @@ def confirm_mapping(session, project_id, line_id, request: ConfirmMapping):
             "confidence": line.confidence if previous == request.sistela_code else None, "review_data": review})
         normalized = normalize_text(line.project_description)
         item = session.scalar(select(SistelaMapping).where(SistelaMapping.system_type == line.system_type,
-            SistelaMapping.line_type == 'Work',
+            SistelaMapping.line_type == line.line_type,
             SistelaMapping.normalized_source_text == normalized, SistelaMapping.source_unit == unit,
             SistelaMapping.sistela_code == request.sistela_code))
         if not item:
-            item = SistelaMapping(system_type=line.system_type, source_text=line.project_description,
+            item = SistelaMapping(system_type=line.system_type, line_type=line.line_type, source_text=line.project_description,
                 normalized_source_text=normalized, source_unit=unit, sistela_code=request.sistela_code,
                 sistela_description=request.sistela_original_description)
             session.add(item)

@@ -1,7 +1,7 @@
 """Offline automatic choices, with explicit user edits retained as reusable knowledge."""
 from decimal import Decimal
 
-from rapidfuzz.fuzz import WRatio
+from rapidfuzz.fuzz import WRatio, ratio
 from sqlalchemy import select
 
 from .handoff import target
@@ -17,13 +17,23 @@ def catalog_candidates(session, line):
         return []
     kind = 'rate' if line.line_type == 'Work' else 'material'
     entries = search_catalog(session,line.project_description,kind,limit=60)
-    if line.line_type == 'Material':
+    if line.line_type in {'Material', 'Equipment'}:
         entries += search_catalog(session,line.project_description,'resource',limit=60)
+        entries += search_catalog(session,line.project_description,'resource_price',limit=60)
+        if line.technical_reference:
+            for kind in ('material', 'resource', 'resource_price'):
+                entries += search_catalog(session,line.technical_reference,kind,limit=30)
     categories = {m.sistela_code.split('-')[0] for m in session.scalars(select(SistelaMapping).where(SistelaMapping.system_type==line.system_type))}
     normalized = normalize_text(line.project_description)
     result = []
     for entry in entries:
-        score = WRatio(normalized,normalize_text(entry['description'])) / 100
+        score = (WRatio if line.line_type=='Work' else ratio)(normalized,normalize_text(entry['description'])) / 100
+        model = normalize_text(line.technical_reference)
+        reference_text = normalize_text(entry['description']+' '+entry.get('model_reference',''))
+        model_match = bool(len(model.replace(' ',''))>=3 and any(c.isalpha() for c in model)
+                           and any(c.isdigit() for c in model) and f' {model} ' in f' {reference_text} ')
+        if model_match:
+            score = max(score, .95)
         if score < .45:
             continue
         score = min(.99,score + (.04 if entry['category'] in categories else 0))
@@ -34,25 +44,39 @@ def catalog_candidates(session, line):
             'origin':'catalog', 'confirmed_count':0,'last_used_at':None,'compatible':compatible,
             'priority':4 if score>=.9 else 5,'catalog_id':entry['id'],
             'evidence_eligible':True,'category':entry['category']})
-    return sorted(result,key=lambda r:(not r['compatible'],-float(r['confidence'])))
+    return sorted({r['mapping_id']:r for r in result}.values(),key=lambda r:(not r['compatible'],-float(r['confidence'])))
 
 
 def lookup_code(session, code, line_type='Work'):
     return session.scalar(select(NormEntry).join(NormativeCatalogSource).where(
-        NormativeCatalogSource.active.is_(True), NormEntry.kind.in_(['rate'] if line_type=='Work' else ['material','resource']), NormEntry.code==code).limit(1))
+        NormativeCatalogSource.active.is_(True), NormEntry.kind.in_(['rate'] if line_type=='Work' else ['material','resource','resource_price']), NormEntry.code==code).order_by(NormEntry.kind).limit(1))
 
 
 def automatic_values(session, line):
     from .mapping import suggestions
-    if line.sistela_code or line.line_type not in {'Work','Material'} or (line.review_data or {}).get('manual_code_edit'):
+    if line.sistela_code or line.line_type not in {'Work','Material','Equipment'} or (line.review_data or {}).get('manual_code_edit'):
         return None
     candidates = suggestions(session,line)
-    if not candidates:
-        return None
-    candidate = candidates[0]
-    if Decimal(candidate['confidence']) < Decimal('.45') and not candidate.get('historical_confirmed'):
-        return None
+    # Weak material resemblance is not enough to substitute a different device.
+    candidate = next((c for c in candidates if c['compatible'] and (
+        c['origin']=='user' and c['method'] in {'exact','normalized'}
+        or c.get('historical_confirmed')
+        or Decimal(c['confidence']) >= (Decimal('.85') if line.line_type!='Work' else Decimal('.70')))), None)
+    if candidate is None:
+        from .preparation import custom_code
+        return {'sistela_code':custom_code(session,line), 'mapping_status':'suggested',
+                'review_data':{**(line.review_data or {}),'automatic':True,'generated_code':True,
+                               'code_type':'custom','normative_unit':target(line)[1]}}
     entry = lookup_code(session,candidate['sistela_code'],line.line_type)
+    if entry and entry.kind == 'resource':
+        # Resource-norm codes belong to type 7, not the documented standalone
+        # average-price type 6. Retain the match, prepare a valid custom position.
+        from .preparation import custom_code
+        return {'sistela_code':custom_code(session,line),'mapping_status':'suggested',
+                'review_data':{**(line.review_data or {}),'automatic':True,'generated_code':True,
+                    'code_type':'custom','normative_unit':target(line)[1],
+                    'matched_resource':{'id':entry.id,'code':entry.code,'filename':entry.filename,
+                                        'record_number':entry.record_number}}}
     description = entry.description if entry else candidate['sistela_description']
     normative_unit = entry.unit if entry else candidate['source_unit']
     candidate = {**candidate,'catalog_verified':bool(entry), 'catalog_id':entry.id if entry else None,
@@ -60,17 +84,25 @@ def automatic_values(session, line):
     return {'sistela_code':candidate['sistela_code'], 'sistela_original_description':description,
             'confidence':Decimal(candidate['confidence']), 'mapping_status':'suggested',
             'review_data':{**(line.review_data or {}),'suggestion':candidate,
+                           'code_type':'normative' if entry else 'custom',
                            'normative_unit':normative_unit,'automatic':True}}
 
 
 def populate_automatic(session, project_id):
     from .grid import active_lines, update_versioned
+    from .preparation import ensure_profile, row_options
     from .services import get_project
-    get_project(session, project_id)
+    ensure_profile(session, get_project(session, project_id))
     for line in active_lines(session,project_id):
         values = automatic_values(session,line)
         if values:
             update_versioned(session,line,line.version,values)
+        if line.line_type in {'Work','Material','Equipment'}:
+            options, evidence = row_options(line, lookup_code(session,line.sistela_code,line.line_type))
+            review = dict(line.review_data or {})
+            if 'export_options' not in review:
+                update_versioned(session,line,line.version,{'review_data':{**review,
+                    'export_options':options,'ngr_evidence':evidence}})
 
 
 def learn_code_edit(session,line,previous_code,previous_candidate=None):
@@ -80,6 +112,7 @@ def learn_code_edit(session,line,previous_code,previous_candidate=None):
     previous_candidate = previous_candidate or review.get('suggestion')
     review.update(manual_code_edit=True,automatic=False,normative_unit=entry.unit if entry else target(line)[1],
                   code_type='normative' if entry else 'custom')
+    review.pop('generated_code',None)
     review.pop('suggestion',None)
     line.review_data = review
     if entry:
@@ -113,7 +146,7 @@ def choose_catalog(session, project_id, line_id, entry_id, version):
     from .grid import owned_line, update_versioned
     line=owned_line(session,project_id,line_id)
     entry=session.get(NormEntry,entry_id)
-    if not entry or entry.kind not in ({'rate'} if line.line_type=='Work' else {'material','resource'}):
+    if not entry or entry.kind not in ({'rate'} if line.line_type=='Work' else {'material','resource','resource_price'}):
         raise ServiceError(422,'Pasirinkta ne įkainio ar resurso eilutė.')
     previous=line.sistela_code
     update_versioned(session,line,version,{'sistela_code':entry.code,'sistela_original_description':entry.description,'entered_at':None})

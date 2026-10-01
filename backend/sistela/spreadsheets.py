@@ -121,7 +121,7 @@ def parse_rows(rows, mapping, header_row, system, sheet_name):
         raise ServiceError(422, "Neteisinga antraštės eilutė.")
     result, warnings = [], []
     category = "Other"
-    kinds = {"material": "Material", "medziaga": "Material", "medziagos": "Material", "work": "Work", "darbas": "Work", "darbai": "Work", "montavimodarbai": "Work", "other": "Other", "kita": "Other"}
+    kinds = {"material": "Material", "medziaga": "Material", "medziagos": "Material", "work": "Work", "darbas": "Work", "darbai": "Work", "montavimodarbai": "Work", "equipment":"Equipment", "irenginys":"Equipment", "irenginiai":"Equipment", "other": "Other", "kita": "Other"}
     for index, row in enumerate(rows[header_row:], header_row+1):
         def cell(field):
             at = mapping.get(field)
@@ -166,7 +166,7 @@ def parse_rows(rows, mapping, header_row, system, sheet_name):
             if cell("unit_price"):
                 if kind == "Other":
                     raise ValueError("Unknown type for unit price")
-                values["material_price" if kind == "Material" else "work_price"] = number("unit_price")
+                values["material_price" if kind in {"Material","Equipment"} else "work_price"] = number("unit_price")
             if any("#FORMULA_NOT_EVALUATED" in str(v) for v in values.values()):
                 raise ValueError("Formula not evaluated")
             validated = LineCreate.model_validate(values)
@@ -261,7 +261,7 @@ class ExcelExporter:
             review = line.review_data or {}
             ws.append([project.name] + [getattr(line, f) for f in fields] + [
                 (sections or {}).get(line.section_id, ""), unit if valid else "", quantity if valid else None,
-                line.mapping_status, review.get("price_status", "ENTERED" if (line.material_price if line.line_type == "Material" else line.work_price) is not None else "MISSING"),
+                line.mapping_status, review.get("price_status", "ENTERED" if (line.material_price if line.line_type in {"Material","Equipment"} else line.work_price) is not None else "MISSING"),
                 "TAIP" if review.get("conversion") and valid else "NE" if review.get("conversion") else "NEREIKALINGA"])
         warnings = []
         for row in ws:

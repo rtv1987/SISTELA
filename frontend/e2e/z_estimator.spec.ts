@@ -15,7 +15,7 @@ test('real GSS → human review → explicit conversion → ready → persisted 
   await expect(page.getByText('21 eilučių',{exact:true})).toBeVisible({timeout:30000});
   const originals=await(await request.get(`/projects/${project.id}/lines`)).json();
   await page.getByRole('tab',{name:'Peržiūra',exact:true}).click();
-  await expect(page.locator('.workflow')).toContainText('Blokuoja:');
+  await expect(page.locator('.workflow')).toContainText('Įspėjimai:');
   const initial=await(await request.get(`/projects/${project.id}/validation`)).json();
   expect(initial.summary).toMatchObject({total:21,materials:11,works:10});
   expect(initial.statistics.auto_suggested_mapping_count).toBeGreaterThan(0);
@@ -26,7 +26,7 @@ test('real GSS → human review → explicit conversion → ready → persisted 
     if(row.unit==='m'){
       await page.getByLabel('Normatyvo vienetas',{exact:true}).fill('100m');
       await page.getByRole('button',{name:'Patvirtinti konversiją',exact:true}).click();
-  await expect(page.locator('.review-layout article')).toContainText('Būsena: needs_review');
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: Reikia peržiūros');
   await expect(page.getByText('Išsaugota lokaliai',{exact:true})).toBeVisible();
       await expect(page.getByLabel('Normatyvo vienetas',{exact:true})).toHaveValue('100m');
     }
@@ -40,15 +40,15 @@ test('real GSS → human review → explicit conversion → ready → persisted 
     await expect(page.locator('.confirmation-note')).toBeVisible();
   }
   await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();
-  await page.getByRole('button',{name:'Patikrinti parengtį'}).click();
-  await expect(page.locator('.workflow [role=status]')).toContainText('READY_FOR_SISTELA');
+  await expect(page.getByRole('button',{name:'Patikrinti parengtį'})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'TXT eksportas',exact:true})).toBeVisible();
   const current=await(await request.get(`/projects/${project.id}/lines`)).json();
   expect(current.some((r:{review_data:{conversion?:unknown}})=>r.review_data.conversion)).toBeTruthy();
   expect(current.map((r:Record<string,unknown>)=>[r.quantity,r.unit,r.source_page,r.source_raw_text,r.source_document_id])).toEqual(originals.map((r:Record<string,unknown>)=>[r.quantity,r.unit,r.source_page,r.source_raw_text,r.source_document_id]));
-  await page.getByRole('button',{name:'Atverti SISTELA Entry Mode',exact:true}).click();
+  await page.getByText('Papildomi būdai',{exact:true}).click();await page.getByRole('button',{name:'Rankinis perkėlimas',exact:true}).click();
   await page.locator('.entry-card h3').click();await page.keyboard.press('Enter');
   await expect(page.locator('.entry-progress strong')).toHaveText('1 / 10');
-  await page.reload();await page.getByRole('tab',{name:'SISTELA Entry Mode'}).click();
+  await page.reload();await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();await page.getByText('Papildomi būdai',{exact:true}).click();await page.getByRole('button',{name:'Rankinis perkėlimas',exact:true}).click();
   await expect(page.locator('.entry-progress strong')).toHaveText('1 / 10');
   await expect(page.locator('.entry-card h3')).toHaveText(works[1].project_description);
   await page.keyboard.press('Escape');
@@ -67,18 +67,18 @@ test('review and ready screenshots with synthetic data; Entry Mode fits half a s
   mkdirSync(resolve('../docs/screenshots'),{recursive:true});
   await page.screenshot({path:resolve('../docs/screenshots/phase7-review.png'),fullPage:true,style:'.suggestion{display:none} .project-list button:not(.current){display:none}'});
   await page.getByRole('button',{name:'Patvirtinti konversiją',exact:true}).click();
-  await expect(page.locator('.review-layout article')).toContainText('Būsena: needs_review');
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: Reikia peržiūros');
   await expect(page.getByText('Išsaugota lokaliai',{exact:true})).toBeVisible();
   await expect(page.getByLabel('Normatyvo vienetas',{exact:true})).toHaveValue('100m');
   await page.getByLabel('Patvirtinamas SISTELA kodas').fill('DEMO-N50');
   await page.getByRole('button',{name:'Išsaugoti kodą',exact:true}).click();
   await expect(page.locator('.confirmation-note')).toBeVisible();
   await page.getByRole('tab',{name:'Paruošta SISTELA',exact:true}).click();
-  await page.getByRole('button',{name:'Patikrinti parengtį'}).click();
-  await expect(page.locator('.workflow [role=status]')).toContainText('READY_FOR_SISTELA');
-  await page.getByText('Workflow statistics · vietinė darbo statistika',{exact:true}).click();
+  await expect(page.getByRole('button',{name:'Patikrinti parengtį'})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'TXT eksportas',exact:true})).toBeVisible();
+  await page.getByText('Techninės detalės · darbo statistika',{exact:true}).click();
   await page.screenshot({path:resolve('../docs/screenshots/phase7-ready.png'),fullPage:true,style:'.project-list button:not(.current){display:none}'});
-  await page.getByRole('button',{name:'Atverti SISTELA Entry Mode',exact:true}).click();
+  await page.getByText('Papildomi būdai',{exact:true}).click();await page.getByRole('button',{name:'Rankinis perkėlimas',exact:true}).click();
   await page.setViewportSize({width:800,height:1000});
   await expect(page.locator('.entry-field.quantity output')).toHaveText('6.5');
   await page.screenshot({path:resolve('../docs/screenshots/phase7-entry.png'),fullPage:true});

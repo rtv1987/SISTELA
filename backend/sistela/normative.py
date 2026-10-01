@@ -108,9 +108,9 @@ def ingest_folder(session, folder: Path, label=None):
                 description=description, normalized_description=normalize_text(description), unit=unit,
                 unit_id=unit_id, category=category, filename=snapshot.filename, record_number=record, payload=payload)
             entries.append(entry)
-            if kind in {'rate','resource','material','section','text'}:
+            if kind in {'rate','resource','material','resource_price','section','text'}:
                 index.append(dict(entry_id=entry['id'], source_id=source.id, code=normalize_text(code),
-                                  description=entry['normalized_description'], category=category))
+                                  description=entry['normalized_description']+' '+normalize_text(scalar(row.get('MARKE'))), category=category))
     rates = {e['code'] for e in entries if e['kind']=='rate'}
     resources = {e['code'] for e in entries if e['kind']=='resource'}
     relations = []
@@ -133,6 +133,9 @@ def ingest_folder(session, folder: Path, label=None):
         'unit_conflicts':{k:sorted(v) for k,v in units.items() if len(v)>1},
         'unresolved_relations':sum(not r['resolved'] for r in relations),
         'relationships':len(relations), 'missing_optional':sorted(set(PROFILES)-tables.keys())}
+    # The normalized payloads now own all retained source values. Release the
+    # decoded tables before SQLAlchemy allocates its insert batches.
+    tables.clear()
     try:
         for start in range(0,len(entries),1000):
             session.execute(insert(NormEntry), entries[start:start+1000])
@@ -184,7 +187,7 @@ def source_out(source, reused=False):
 
 def entry_out(entry):
     return {name:getattr(entry,name) for name in ('id','source_id','kind','code','description','unit',
-        'unit_id','category','filename','record_number')}
+        'unit_id','category','filename','record_number')} | {'model_reference':scalar(entry.payload.get('MARKE'))}
 
 
 def search_catalog(session, query='', kind='rate', unit='', category='', limit=30):
@@ -203,7 +206,7 @@ def search_catalog(session, query='', kind='rate', unit='', category='', limit=3
     if not tokens:
         return [entry_out(e) for e in exact]
     match = ' OR '.join('"'+t+'"*' for t in tokens)
-    ids = [r[0] for r in session.execute(text('SELECT entry_id FROM normative_fts WHERE normative_fts MATCH :q AND source_id=:source ORDER BY rank LIMIT 300'), {'q':match,'source':source.id})]
+    ids = [r[0] for r in session.execute(text('SELECT entry_id FROM normative_fts JOIN normative_entries e ON e.id=entry_id WHERE normative_fts MATCH :q AND normative_fts.source_id=:source AND e.kind=:kind ORDER BY rank LIMIT 300'), {'q':match,'source':source.id,'kind':kind})]
     rows = list(session.scalars(base.where(NormEntry.id.in_(ids)))) if ids else []
     order = {id:i for i,id in enumerate(ids)}
     rows.sort(key=lambda e:order[e.id])

@@ -45,13 +45,18 @@ def invalidate_review(line, values):
     if semantic:
         review.pop("suggestion", None)
         review.pop("manual", None)
+    if values.get('line_type',line.line_type) != line.line_type:
+        review.pop('export_options',None)
+        review.pop('ngr_evidence',None)
+    if review.get('generated_code') and not review.get('conversion') and 'unit' in values:
+        review['normative_unit'] = values['unit']
     if any(
         k in values and values[k] != getattr(line, k)
         for k in ("material_price", "work_price", "line_type")
     ):
         field = (
             "material_price"
-            if values.get("line_type", line.line_type) == "Material"
+            if values.get("line_type", line.line_type) in {"Material","Equipment"}
             else "work_price"
         )
         review["price_status"] = (

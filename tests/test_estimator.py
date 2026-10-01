@@ -197,7 +197,7 @@ def test_working_export_and_reload(client):
     assert client.get(f"/projects/{pid}/lines").json()[0]["entered_at"]
     result = report(client, pid)
     assert result["statistics"]["entry_mode_completed_count"] == 1
-    assert result["status"] == "HANDED_OFF"
+    assert result["status"] == "READY_FOR_SISTELA"  # Manual progress never defines product completion.
     wb = load_workbook(io.BytesIO(client.get(f"/projects/{pid}/export.xlsx").content))
     rows = list(wb["Darbo lentelė"].values)
     exported = dict(zip(rows[0], rows[1]))

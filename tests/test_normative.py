@@ -149,7 +149,8 @@ def test_material_correction_is_reused_without_polluting_work_mappings(client):
     line(client,other,line_type='Work',project_description='Viela')
     rows=client.post(f'/projects/{other}/automatic').json()
     assert rows[0]['sistela_code']=='MATERIAL1'
-    assert rows[1]['sistela_code']==''
+    assert rows[1]['sistela_code'].startswith('W')
+    assert rows[1]['review_data']['generated_code']
 
 
 def test_catalog_selection_learns_once_and_preserves_source(client,tmp_path):

@@ -113,7 +113,7 @@ def validate_project_for_sistela(session, project_id):
                     "WARNING",
                     "Galutinis tekstas labai skiriasi nuo istorinių aprašymų.",
                 )
-        price = line.material_price if line.line_type == "Material" else line.work_price
+        price = line.material_price if line.line_type in {"Material","Equipment"} else line.work_price
         price_status = review.get("price_status", "ENTERED" if price is not None else "MISSING")
         if price is None:
             issue("PRICE_MISSING", "WARNING", "Kaina nenurodyta.")
@@ -176,7 +176,7 @@ def validate_project_for_sistela(session, project_id):
         blocking += 1
     confirmed = sum(r.mapping_status == "confirmed" for r in works)
     status = (
-        ("HANDED_OFF" if works and all(r.entered_at for r in works) else "READY_FOR_SISTELA")
+        "READY_FOR_SISTELA"
         if not blocking
         else ("MAPPING_IN_PROGRESS" if any(r.sistela_code for r in works) else "NEEDS_REVIEW")
     )
@@ -222,7 +222,7 @@ def validate_project_for_sistela(session, project_id):
             needs_review=sum(bool(r["issues"]) for r in rows),
             entered=statistics["entry_mode_completed_count"],
             missing_prices=sum(
-                (r.material_price if r.line_type == "Material" else r.work_price) is None
+                (r.material_price if r.line_type in {"Material","Equipment"} else r.work_price) is None
                 for r in lines
             ),
             confirmed_prices=sum(r["price_status"] == "CONFIRMED" for r in rows),
@@ -250,7 +250,7 @@ def review_line(session, project_id, line_id, request):
     review.setdefault("suggestion_offered", bool(suggestions(session, line)))
     values = {"entered_at": None}
     if (
-        request.action in {"convert", "cancel_conversion", "reject", "manual"}
+        request.action in {"reject", "manual"}
         and line.line_type != "Work"
     ):
         raise ServiceError(422, "Šis veiksmas skirtas tik darbams.")
@@ -292,7 +292,7 @@ def review_line(session, project_id, line_id, request):
             set(review.get("duplicates", []) + [duplicate_key(line, other)])
         )
     elif request.action == "price":
-        price = line.material_price if line.line_type == "Material" else line.work_price
+        price = line.material_price if line.line_type in {"Material","Equipment"} else line.work_price
         if request.price_status in {"ENTERED", "CONFIRMED"} and price is None:
             raise ServiceError(422, "Pirma įveskite kainą lentelėje.")
         if request.price_status == "MISSING" and price is not None:
@@ -309,7 +309,16 @@ def workflow_router(session_dependency):
 
     @router.get("/projects/{project_id}/validation")
     def validation(project_id: str, session: Session = Depends(session_dependency)):
-        return validate_project_for_sistela(session, project_id)
+        from .export_model import normalized_estimate
+        from .package_txt import validate_txt_export
+        report = validate_project_for_sistela(session, project_id)
+        txt = validate_txt_export(normalized_estimate(session,project_id))
+        report['common_status'] = report['status']
+        report['status'] = 'READY_FOR_SISTELA' if not txt['errors'] else 'NEEDS_REVIEW'
+        report['txt'] = txt
+        get_project(session,project_id).status = report['status']
+        session.commit()
+        return report
 
     @router.post("/projects/{project_id}/validate")
     def validate(project_id: str, session: Session = Depends(session_dependency)):

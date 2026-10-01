@@ -75,10 +75,11 @@ def test_full_real_pdf_import(client, source_file, tmp_path, caplog):
     lines = client.get(f"/projects/{pid}/lines").json()
     assert len(lines) == 21
     assert all(
-        line["mapping_status"] == "unmapped" and line["confidence"] is None for line in lines
+        line["mapping_status"] == "suggested" and line["confidence"] is None
+        and line['sistela_code'] and line['review_data']['generated_code'] for line in lines
     )
     assert all(line["output_description"] == line["project_description"] for line in lines)
-    assert all(line["sistela_code"] == "" for line in lines)
+    assert len({line["sistela_code"] for line in lines}) == 21
     assert client.post(endpoint, files={"file": ("same.pdf", data)}).status_code == 409
     assert len(client.get(f"/projects/{pid}/lines").json()) == 21
     doc = client.get(f"/projects/{pid}/documents").json()[0]

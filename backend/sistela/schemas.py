@@ -37,7 +37,7 @@ class ProjectOut(ProjectCreate):
 
 class LineCreate(InputModel):
     system_type: str = Field(default="", max_length=100)
-    line_type: Literal["Material", "Work", "Other"] = "Other"
+    line_type: Literal["Material", "Work", "Equipment", "Other"] = "Other"
     project_description: str = Field(min_length=1, max_length=4000)
     technical_reference: str = Field(default="", max_length=500)
     unit: str = Field(default="", max_length=40)

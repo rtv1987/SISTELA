@@ -290,15 +290,15 @@ def review_candidates(session, request: HistoricalReviewRequest):
 
 
 def historical_suggestions(session, current):
-    if current.line_type != "Work":
+    if current.line_type not in {"Work", "Material", "Equipment"}:
         return []
     rows = session.execute(
         select(HistoricalLine, HistoricalEstimate)
         .join(HistoricalEstimate)
         .where(
-            HistoricalLine.status.in_(["CANDIDATE", "CONFIRMED"]),
+            HistoricalLine.status.in_(["CANDIDATE", "CONFIRMED"] if current.line_type=='Work' else ["CANDIDATE", "CONFIRMED", "NOT_APPLICABLE"]),
             HistoricalLine.system_type == current.system_type,
-            HistoricalLine.line_type.in_(["Work", "Other"]),
+            HistoricalLine.line_type.in_(["Work", "Other"] if current.line_type=='Work' else [current.line_type]),
         )
     ).all()
     normalized = normalize_text(current.project_description)

@@ -57,7 +57,7 @@ test('confirmed N50-270 is preferred for detector wording; no unrelated conversi
   await page.goto('/');
   await page.getByRole('button',{name:/Detector review regression GSS/}).click();
   await page.getByRole('tab',{name:'Peržiūra',exact:true}).click();
-  await expect(page.locator('.review-layout article')).toContainText('Būsena: suggested');
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: Parinkta automatiškai');
   await page.getByRole('button',{name:'Istorinės SISTELA sąmatos',exact:true}).click();
   await page.getByLabel('DBF archyvo failai').setInputFiles(files as string[]);
   await expect(page.getByRole('status')).toContainText(/39 darbų kandidatų|nesidubliavo/);
@@ -74,13 +74,13 @@ test('confirmed N50-270 is preferred for detector wording; no unrelated conversi
   await expect(page.locator('.suggestion').first()).toContainText('Patvirtinta istorinė patirtis');
   await expect(page.locator('.conversion-review')).toHaveCount(0);
   await expect(page.getByLabel('Tikslinis konversijos vienetas')).toHaveCount(0);
-  await expect(page.locator('.review-layout article')).toContainText('Būsena: suggested');
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: Parinkta automatiškai');
   await page.locator('.suggestion').first().getByText(/Istoriniai įrodymai/).click();
   await page.locator('.suggestion').first().getByRole('button',{name:'Atverti šaltinį 1'}).click();
   await expect(page.getByRole('dialog')).toContainText('dd25-04-14.dbf');
   await page.getByLabel('Uždaryti įrodymus').click();
   await page.locator('.suggestion').first().getByRole('button',{name:'Pasirinkti kodą'}).click();
-  await expect(page.locator('.review-layout article')).toContainText('Būsena: suggested');
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: Parinkta automatiškai');
   expect((await(await request.get(`/projects/${project.id}/lines`)).json())[0].mapping_status).toBe('suggested');
   await page.getByRole('button',{name:'Išsaugoti kodą',exact:true}).click();
   await expect(page.locator('.confirmation-note')).toBeVisible();
@@ -88,7 +88,7 @@ test('confirmed N50-270 is preferred for detector wording; no unrelated conversi
   expect(saved.mapping_status).toBe('confirmed');expect(saved.sistela_code).toBe('N50-270');
   expect(saved.quantity).toBe(row.quantity);expect(saved.unit).toBe('vnt.');
   await page.reload();await page.getByRole('tab',{name:'Peržiūra',exact:true}).click();
-  await expect(page.locator('.review-layout article')).toContainText('Būsena: confirmed');
+  await expect(page.locator('.review-layout article')).toContainText('Būsena: Išsaugota');
   await expect(page.locator('.conversion-review')).toHaveCount(0);
 });
 

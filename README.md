@@ -194,3 +194,12 @@ Po šios versijos atnaujinimo vykdykite `dev.ps1` – jis sukompiliuoja UI ir pr
 migraciją. Atsarginei kopijai prieš migraciją sustabdykite programą ir kopijuokite
 visą data katalogą. [Importo taisyklės ir ribos](docs/historical-dbf-import.md),
 [PHASE 6 ataskaita](docs/iteration-03.md).
+
+### 0.2.1 bulk workflow
+
+Normal transfer is Import → review exceptions → **TXT eksportas** or **DBF eksportas**.
+**Rankinis perkėlimas** is an optional fallback under **Papildomi būdai**, not product
+acceptance. Unmatched supported rows get stable editable custom codes and derived
+metadata; missing real prices remain precise exceptions. Global parameter 89 and
+persistent hierarchy defaults remove repeated export setup.
+See [product workflow decision](docs/decisions/0011-bulk-product-workflow.md).

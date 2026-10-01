@@ -12,7 +12,7 @@ def database_url(directory: Path) -> URL:
 
 def make_engine(directory: Path):
     directory.mkdir(parents=True, exist_ok=True)
-    engine = create_engine(database_url(directory), connect_args={"check_same_thread": False})
+    engine = create_engine(database_url(directory), connect_args={"check_same_thread": False}, hide_parameters=True)
 
     @event.listens_for(engine, "connect")
     def configure_sqlite(connection, _):

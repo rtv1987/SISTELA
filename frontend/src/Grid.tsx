@@ -28,7 +28,7 @@ export function EstimateGrid({ lines, active, onActive, onEdit, selection, setSe
     const edit = (key: keyof Line, title: string, width: number, options?: string[]): ColumnDef<Line> => ({
       accessorKey: key, header: title, size: width,
       sortingFn: ['quantity','material_price','work_price'].includes(key) ? (a, b) => new Decimal(String(a.original[key] ?? 0)).cmp(String(b.original[key] ?? 0)) : 'alphanumeric',
-      cell: ({ row }) => <><Cell value={String(row.original[key] ?? '')} label={`${title} ${row.original.source_position || row.index + 1}`} options={options} onSave={v => onEdit(row.original.id, key, ['material_price','work_price'].includes(key) && !v ? null : ['quantity','material_price','work_price'].includes(key) ? v.replace(',', '.') : v)} />{key==='sistela_code'&&row.original.sistela_code&&<small>{row.original.review_data?.suggestion?.origin==='catalog'?'Normatyvų katalogas':row.original.review_data?.suggestion?.catalog_verified?'Istorija + katalogas':row.original.review_data?.code_type==='custom'?'Vartotojo kodas':row.original.review_data?.automatic?'Istorinis atitikmuo':'Vartotojo pasirinkimas'}</small>}</>,
+      cell: ({ row }) => <><Cell value={String(row.original[key] ?? '')} label={`${title} ${row.original.source_position || row.index + 1}`} options={options} onSave={v => onEdit(row.original.id, key, ['material_price','work_price'].includes(key) && !v ? null : ['quantity','material_price','work_price'].includes(key) ? v.replace(',', '.') : v)} />{key==='sistela_code'&&row.original.sistela_code&&<small>{row.original.review_data?.generated_code?'Automatiškai sukurtas':row.original.review_data?.suggestion?.origin==='catalog'?'Normatyvų katalogas':row.original.review_data?.suggestion?.catalog_verified?'Istorija + katalogas':row.original.review_data?.code_type==='custom'?'Vartotojo kodas':row.original.review_data?.automatic?'Istorinis atitikmuo':'Vartotojo pasirinkimas'}</small>}</>,
     });
     return [
       { id: 'select', size: 38, header: ({ table }) => <input type="checkbox" aria-label="Pažymėti matomas eilutes" checked={table.getIsAllRowsSelected()} onChange={table.getToggleAllRowsSelectedHandler()} />, cell: ({ row }) => <input type="checkbox" aria-label={`Pažymėti eilutę ${row.index + 1}`} checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()} /> },
@@ -37,7 +37,7 @@ export function EstimateGrid({ lines, active, onActive, onEdit, selection, setSe
       edit('project_description', 'Projekto pavadinimas', 310), edit('technical_reference', 'Modelis / žymuo', 145),
       edit('unit', 'Vnt.', 80), edit('quantity', 'Kiekis', 90), edit('sistela_code', 'SISTELA kodas', 135),
       edit('output_description', 'Galutinis pavadinimas', 290), edit('system_type', 'Sistema', 90),
-      edit('line_type', 'Tipas', 125, ['Material','Work','Other']), edit('material_price', 'Medž. kaina €', 125),
+      edit('line_type', 'Tipas', 125, ['Material','Work','Equipment','Other']), edit('material_price', 'Medž. kaina €', 125),
       edit('work_price', 'Darbo kaina €', 125), edit('sistela_original_description', 'Originalus normatyvo pavadinimas', 300),
       { accessorKey: 'confidence', header: 'Atitikimas', size: 105, cell: ({ getValue }) => { const v = getValue<string | null>(); return v === null ? '—' : new Decimal(v).gte('.9') ? 'High' : new Decimal(v).gte('.7') ? 'Medium' : 'Low'; } },
       edit('notes', 'Pastabos', 250),

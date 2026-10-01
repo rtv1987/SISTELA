@@ -8,7 +8,7 @@ from pydantic import Field
 
 from .export_model import normalized_estimate, save_settings, settings
 from .package_txt import SistelaPackageTxtExporter, validate_txt_export
-from .schemas import InputModel
+from .schemas import InputModel, LineOut
 from .services import ServiceError, get_project
 
 
@@ -35,6 +35,11 @@ class RowOption(InputModel):
     resources: list[ResourceOption] = Field(default_factory=list,max_length=100)
 
 
+class RowDetails(InputModel):
+    version: int = Field(ge=1)
+    options: RowOption
+
+
 class SectionOption(Hierarchy):
     coefficients: dict[str,str] = Field(default_factory=dict)
 
@@ -51,6 +56,19 @@ class ExportProfile(InputModel):
 
 def export_router(session_dependency, directory):
     router=APIRouter()
+
+    @router.put('/projects/{project_id}/lines/{line_id}/export-options', response_model=LineOut)
+    def row_details(project_id:str,line_id:str,request:RowDetails,session=Depends(session_dependency)):
+        from .grid import owned_line, update_versioned
+        line=owned_line(session,project_id,line_id)
+        update_versioned(session,line,request.version,{'review_data':{**(line.review_data or {}),
+            'export_options':request.options.model_dump(), 'ngr_evidence':'user_override'},'entered_at':None})
+        profile=settings(session,'project:'+project_id)
+        if line_id in profile.get('rows',{}):
+            profile['rows'].pop(line_id)
+            save_settings(session,'project:'+project_id,profile)
+        session.commit()
+        return line
 
     @router.get('/settings/sistela')
     def read_settings(session=Depends(session_dependency)):
