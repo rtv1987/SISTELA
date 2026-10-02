@@ -203,3 +203,12 @@ acceptance. Unmatched supported rows get stable editable custom codes and derive
 metadata; missing real prices remain precise exceptions. Global parameter 89 and
 persistent hierarchy defaults remove repeated export setup.
 See [product workflow decision](docs/decisions/0011-bulk-product-workflow.md).
+
+### 0.2.2 maintenance
+
+The current maintenance work removes artificial TXT description blockers and
+shows price evidence, while preserving real missing-price exceptions. It also
+checks installation integrity and bundles SQLAlchemy's native modules and Python
+fallbacks. See [the 12-row investigation and acceptance procedure](docs/release-0.2.2.md).
+TXT remains the bulk path; Rankinis perkėlimas is optional fallback. Real SISTELA
+acceptance and new-project DBF calculation semantics remain unproven.

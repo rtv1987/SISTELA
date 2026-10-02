@@ -52,3 +52,13 @@ it('links genuine missing prices to the work table',async()=>{
 it('a selected valid code is Entry Mode ready without CONFIRMED',()=>{
   expect(entryReady({...blankLine('GSS'),quantity:'1',unit:'m',line_type:'Work',sistela_code:'TEST-1',mapping_status:'suggested'} as Line)).toBe(true);
 });
+
+it('explains catalog versus custom prices and automatic text preparation',async()=>{
+  const model={complex:{code:'T',name:'Test'},object:{code:'1',name:'Test'},estimate:{code:'1',name:'Test'},period:'202610',filename:'TEST',sections:[]};
+  mocks.api.mockImplementation(async(url:string)=>url.endsWith('/model')?model:{errors:[],warnings:[],records:[],price_cases:[{id:'a',description:'Catalog material',category:'B',reason:'No explicit package price required',explicit_price_required:false},{id:'b',description:'Custom material',category:'C',reason:'Documented price required',explicit_price_required:true}],text_preparations:[{id:'b',original:'Pipe, fittings',text:'Pipe; fittings',rules:['list_comma_to_semicolon']}]});
+  render(<Export projectId="p"/>);
+  expect(await screen.findByText(/TXT skyryba sutvarkyta automatiškai: 1/)).toBeVisible();
+  fireEvent.click(screen.getByText('Kainų pagrindimas'));
+  expect(screen.getByText(/Kainą parenka SISTELA/)).toBeVisible();
+  expect(screen.getByText(/Vartotojo pozicija/)).toBeVisible();
+});

@@ -44,7 +44,7 @@ def test_parameter_one_unscaled_unit_is_allowed():
 
 @pytest.mark.parametrize('change',[
     {'selected_code':'X'*19},{'target_quantity':'100000'},{'target_quantity':'0.0000001'},
-    {'target_quantity':'NaN'},{'output_description':'a'*121},{'output_description':'a,b'},
+    {'target_quantity':'NaN'},{'output_description':'a<b'},{'output_description':'a=b'},
     {'output_description':'Emoji 😀'},{'conversion_valid':False},{'selected_code':''},
     {'options':{'resources':[{'code':'unknown'}]}}, {'selected_code':'N5P-1'},
 ])

@@ -50,6 +50,10 @@ if (-not $Makensis) {
 & $Python -m PyInstaller --clean --noconfirm --distpath $outputPath --workpath $buildPath packaging/windows.spec
 if ($LASTEXITCODE -ne 0) { throw 'Backend packaging failed.' }
 $bundlePath = Join-Path $outputPath 'SISTELA-Assistant'
+& $Python -c "import hashlib,json,pathlib,sys; p=pathlib.Path(sys.argv[1]); files={str(f.relative_to(p)).replace(chr(92),'/'):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file() and f.name!='INSTALL-MANIFEST.json'}; (p/'INSTALL-MANIFEST.json').write_text(json.dumps(files,sort_keys=True),encoding='utf-8')" $bundlePath
+if ($LASTEXITCODE -ne 0) { throw 'Bundle integrity manifest failed.' }
+& "$bundlePath\SISTELA-Assistant.exe" --verify-install
+if ($LASTEXITCODE -ne 0) { throw 'Frozen dependency/integrity verification failed.' }
 $manifest = Join-Path $buildPath 'uninstall-files.nsh'
 # Delete only shipped files, never recursively delete a user-selected installation directory.
 $entries = @()

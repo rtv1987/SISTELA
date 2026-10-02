@@ -36,17 +36,29 @@ FunctionEnd
 Section "SISTELA Assistant (būtina)" Main
   SectionIn RO
   SetShellVarContext current
-  IfFileExists "$INSTDIR\SISTELA-Assistant.exe" 0 install
-  nsExec::ExecToStack '"$INSTDIR\SISTELA-Assistant.exe" --shutdown'
+  ; Use the new bundled runtime to shut down safely: the installed copy may be
+  ; incomplete and unable to import SQLAlchemy. Never depend on its executable.
+  InitPluginsDir
+  SetOutPath "$PLUGINSDIR\repair-runtime"
+  File /r "${Bundle}\*"
+  nsExec::ExecToStack '"$PLUGINSDIR\repair-runtime\SISTELA-Assistant.exe" --shutdown'
   Pop $0
   Pop $1
   ${If} $0 != 0
-    MessageBox MB_ICONSTOP "Uždarykite SISTELA Assistant ir pakartokite diegimą."
+    SetErrorLevel 2
+    MessageBox MB_ICONSTOP "Uždarykite SISTELA Assistant ir pakartokite diegimą." /SD IDOK
     Abort
   ${EndIf}
-  install:
   SetOutPath "$INSTDIR"
+  ClearErrors
   File /r "${Bundle}\*"
+  IfErrors install_failed
+  nsExec::ExecToStack '"$INSTDIR\SISTELA-Assistant.exe" --verify-install'
+  Pop $0
+  Pop $1
+  ${If} $0 != 0
+    Goto install_failed
+  ${EndIf}
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateDirectory "$SMPROGRAMS\SISTELA Assistant"
   CreateShortcut "$SMPROGRAMS\SISTELA Assistant\SISTELA Assistant.lnk" "$INSTDIR\SISTELA-Assistant.exe"
@@ -58,6 +70,12 @@ Section "SISTELA Assistant (būtina)" Main
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\SISTELAAssistant" "InstallLocation" "$INSTDIR"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\SISTELAAssistant" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\SISTELAAssistant" "NoRepair" 1
+  Goto install_done
+  install_failed:
+  SetErrorLevel 2
+  MessageBox MB_ICONSTOP "Diegimas nepilnas. Patikrinkite laisvą vietą ir pakartokite diegimą." /SD IDOK
+  Abort
+  install_done:
 SectionEnd
 
 Section /o "Nuoroda darbalaukyje" Desktop

@@ -332,3 +332,33 @@ See [release report](release-0.2.1.md), [artifact metadata](release-0.2.1.json),
 [changed files](release-0.2.1-files.md), and ADR 0011. Next: Darius supplies actual
 prices, reviews exceptional rows and tests one whole-estimate TXT in a disposable
 SISTELA estimate. No new phase was started.
+
+## 0.2.2 maintenance — software validation
+
+Continued from the existing 0.2.1 tree without restarting a phase. Investigated
+all 12 production PDF rows against the read-only normative/history evidence.
+Removed three punctuation blockers through a reversible TXT projection and the
+unsupported 120-character row-description cap. Added A/B/C/D price evidence and
+DBF field classifications. Prevented a weak shared-word work match from replacing
+the full requested scope. Genuine custom-position prices remain unresolved.
+
+The local SQLAlchemy failure came from a partial old 0.2.0 installation (36/556
+files), not an absent module in the complete 0.2.1 ZIP. Added explicit SQLAlchemy
+runtime/fallback collection, bundle integrity verification and repair using the
+new installer runtime. The cause of the partial installation remains unknown.
+
+Validation: 247 backend tests with required private fixtures, 59 frontend tests,
+16 Playwright tests (322 total), Ruff, frontend lint/TypeScript/build and Alembic
+upgrade/check pass. No migration added; head remains 012_bulk_preparation.
+Windows IPv4 socket exhaustion required a temporary IPv6 harness for the full
+backend/browser suites; this harness is not packaged. The ordinary release PDF
+regressions also passed. See release-0.2.2.md and ADR 0012 for evidence and the
+remaining real SISTELA acceptance requirements. Packaged validation follows.
+
+0.2.2 packaged validation is complete: frozen workflow, clean Portable,
+0.2.0/0.2.1 copied-data upgrades and actual Setup installation/reinstall/repair/
+uninstall all pass. Native SQLAlchemy fallback and manifest rejection of partial
+bundles pass. User data survives; original broken local folder and previous
+releases remain untouched. Setup/Portable paths, hashes, screenshots and the full
+changed-file list are in [release-0.2.2.md](release-0.2.2.md). Real SISTELA acceptance
+remains pending; no new phase was started.

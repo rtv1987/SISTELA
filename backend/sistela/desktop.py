@@ -17,10 +17,6 @@ import webbrowser
 from datetime import datetime, timezone
 from pathlib import Path
 
-from alembic.config import Config
-from alembic.script import ScriptDirectory
-
-from .db import migrate
 from .paths import data_dir, ensure_data_directories, resource_root
 from .version import VERSION
 
@@ -29,6 +25,10 @@ BIND_HOST = "127.0.0.1"
 
 def prepare_database(directory: Path):
     """Online SQLite backup before every pending schema upgrade; fail closed on error."""
+    from alembic.config import Config
+    from alembic.script import ScriptDirectory
+
+    from .db import migrate
     ensure_data_directories(directory)
     config = Config()
     config.set_main_option("script_location", str(resource_root() / "backend/migrations"))

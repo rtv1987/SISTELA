@@ -5,6 +5,7 @@ Experimental until real SISTELA acceptance. Unknown grammar is rejected.
 import re
 from decimal import Decimal, InvalidOperation
 
+from .package_evidence import package_description
 from .parsers.common import normalize_unit
 
 PRICE_REQUIRED = 'Trūksta kainos: dokumentuotas vartotojo pozicijos formatas reikalauja kainos. Įveskite tikrą kainą darbo lentelėje; nulis automatiškai nepriskiriamas.'
@@ -45,6 +46,8 @@ def coefficients(values, allowed):
 
 
 def row_record(row, parameter89):
+    if row.get('price_case',{}).get('category') == 'D':
+        raise ValueError(row['price_case']['reason'])
     if row.get('row_type') == 'Other':
         raise ValueError('Pirmiausia nustatykite eilutės tipą (darbas / medžiaga).')
     if not row['conversion_valid']:
@@ -69,11 +72,9 @@ def row_record(row, parameter89):
     if row['code_type'] == 'custom':
         if mark not in {'S','G','I'}:
             raise ValueError('Pasirinkite žymę S, G arba I.')
-        # Price precision/description width are not specified in the package manual.
-        # Reject unsupported text length rather than assume DBF's unrelated 240 limit.
-        description = field(row['output_description'])
-        if len(description)>120:
-            raise ValueError('Ilgesnio kaip 120 ženklų eilutės teksto profilis dar nepatikrintas.')
+        # The manual gives no P= description width. Do not invent a 120-character
+        # cap from hierarchy fields; preserve the full description.
+        description = field(package_description(row['output_description'])['text'])
         if row['price'] is None:
             raise ValueError(PRICE_REQUIRED)
         price = number(row['price'], 4, 7, positive=False)
@@ -88,9 +89,7 @@ def row_record(row, parameter89):
     else:
         # Normative rows can keep the catalogue description; explicit output changes use P=.
         if row['output_description'] != ref['description']:
-            description = field(row['output_description'])
-            if len(description)>120:
-                raise ValueError('Ilgesnio kaip 120 ženklų eilutės teksto profilis dar nepatikrintas.')
+            description = field(package_description(row['output_description'])['text'])
             result.append('P='+description)
         if 'P' in code.upper():
             params = options.get('parameters')
@@ -159,7 +158,7 @@ def validate_txt_export(model):
         if value:
             records.append(value)
         for row in section['rows']:
-            if row['code_type']=='custom' and row['price'] is None:
+            if row['code_type']=='custom' and row['price'] is None and row.get('price_case',{}).get('category') != 'D':
                 errors.append({'context':row['id'],'message':PRICE_REQUIRED})
             value=attempt(row['id'],lambda r=row:row_record(r,model.get('parameter89')))
             if value:
@@ -171,8 +170,10 @@ def validate_txt_export(model):
             'ready_rows':sum(r['id'] not in {e['context'] for e in errors} for s in model.get('sections',[]) for r in s['rows']),
             'total_rows':sum(len(s['rows']) for s in model.get('sections',[])),
             'errors':errors, 'records':records if not errors else [],
+            'price_cases':[{**r['price_case'],'id':r['id'],'description':r['output_description']} for s in model.get('sections',[]) for r in s['rows'] if 'price_case' in r],
+            'text_preparations':[{**package_description(r['output_description']),'id':r['id']} for s in model.get('sections',[]) for r in s['rows'] if package_description(r['output_description'])['rules']],
             'warnings':['Tik eksperimentinis perdavimas. Priėmimas tikroje SISTELA dar nepatvirtintas.',
-                'cp1257 ir 120 ženklų eilutės teksto profilis turi būti patikrintas realiame teste.']}
+                'cp1257 ir ilgo P= teksto priėmimą būtina patikrinti realiame teste; tekstas netrumpinamas.']}
 
 
 def parse_generated_txt(data):

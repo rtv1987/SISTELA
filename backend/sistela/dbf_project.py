@@ -20,6 +20,14 @@ PROJECT_BLOCKERS = [
     "NEW_ARCHIVE_NAMING_AND_REQUIRED_FIELDS_UNKNOWN: naujo projekto šešių failų privalomų laukų profilis nepatvirtintas.",
 ]
 
+FIELD_EVIDENCE = [
+    {'fields':['PAVADIN','IKAINIS','MATO_PAV'], 'classification':'INPUT', 'evidence':'Prepared estimate and retained source provenance'},
+    {'fields':['MATOVNT'], 'classification':'NORMATIVE_LOOKUP', 'evidence':'Per-unit catalog candidates; ambiguous IDs remain blocked'},
+    {'fields':['target_quantity'], 'classification':'DERIVED_PROVEN', 'evidence':'Only explicitly confirmed supported unit conversions'},
+    {'fields':['dd.KIEKIS','dd.NORMA','dd.KAINA','dd.VERTE','sd.IMLUMAS','sd.UZMOKEST','sd.MEDZIAG','sd.MECHANIZ','pd.KAINA','td totals','od totals'], 'classification':'UNKNOWN', 'evidence':'Field meanings/calculation ownership not proven by real clone/mutation acceptance'},
+    {'fields':['KOMPLEKSAS','OBJEKTAS','SAMATA'], 'classification':'UNKNOWN', 'evidence':'Proposed IDs do not prove SISTELA collision/import behavior'},
+]
+
 
 def allocate_identifiers(project_id, section_rows, reserved_complexes=()):
     """Deterministic proposal, not an accepted SISTELA identifier protocol."""
@@ -111,5 +119,5 @@ def project_export_plan(session, project_id):
     return {"mode": "PROJECT_EXPORT", "status": "BLOCKED", "production": False,
             "normalized_estimate": model, "project_id": project.id, "project_name": project.name, "estimate_name": project.name,
             "blockers": blockers, "rows": rows, "proposed_identifiers": identifiers,
-            "unit_resolution":unit_resolution,
+            "unit_resolution":unit_resolution, "field_evidence":FIELD_EVIDENCE,
             "warnings": ["Plan only: no financial values or normative resources generated."]}

@@ -15,6 +15,32 @@ from sistela.package_txt import parse_generated_txt
 client = workflow_client
 
 
+def test_shared_work_word_is_not_an_automatic_full_scope_match(client,tmp_path):
+    folder=catalog(tmp_path/'source')
+    client.post('/normative/folder',json={'path':str(folder)})
+    pid=project(client)
+    line(client,pid,line_type='Work',project_description='Kabelio montavimas dokumentacijos parengimas ir visos sistemos bandymai',unit='m')
+    row=client.post(f'/projects/{pid}/automatic').json()[0]
+    assert row['sistela_code'].startswith('W')
+    assert row['review_data']['generated_code'] is True
+
+
+def test_price_classification_and_clean_text_reach_export_without_source_mutation(client):
+    pid=project(client)
+    source='Vamzdelis D20, su tvirtinimo elementais'
+    original=line(client,pid,line_type='Material',project_description=source,output_description=source,material_price='2.40')
+    client.post(f'/projects/{pid}/automatic')
+    client.put('/settings/sistela',json={'parameter89':0})
+    report=client.get(f'/projects/{pid}/export/txt/validation').json()
+    assert report['errors']==[] and report['price_cases'][0]['category']=='C'
+    assert report['text_preparations'][0]['original']==source
+    assert report['text_preparations'][0]['text']=='Vamzdelis D20; su tvirtinimo elementais'
+    saved=client.get(f'/projects/{pid}/lines').json()[0]
+    assert saved['project_description']==original['project_description']
+    assert saved['output_description']==source
+    assert client.post(f'/projects/{pid}/export/txt').status_code==200
+
+
 @pytest.mark.parametrize('kind,prefix,mark',[('Material','A','S'),('Work','W','S'),('Equipment','I','I')])
 def test_stable_custom_codes_metadata_and_bulk_export(client,kind,prefix,mark):
     pid=project(client)

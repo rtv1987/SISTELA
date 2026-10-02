@@ -34,14 +34,19 @@ and prose do not establish an unambiguous complete field sequence.
 
 `validate_txt_export` checks hierarchy, field widths, duplicate sections, required
 codes, quantities, units, explicit conversions, prices for custom entries,
-parameterized-rate G values and allowed syntax. Text is never truncated. Commas,
-newlines, control characters and reserved syntax in user fields are rejected;
-quoting/escaping such text is not documented. Prices are never invented.
+parameterized-rate G values and allowed syntax. Text is never truncated. In row
+descriptions, decimal commas become decimal dots, list commas become semicolons,
+and whitespace is normalized in the export projection only. Original text and
+the applied rules remain visible. Other reserved syntax and control characters
+are rejected; quoting/escaping is not documented. Prices are never invented.
 
 The experimental encoding is cp1257 with CRLF, to be checked in Darius's real
 SISTELA. **DERIVED conservative profile limits**, not documented package maxima:
-120 characters for row descriptions, price 7.4 and resource norm 5.6. Longer or
-more precise forms remain blocked until verified. Section/rate coefficient and
+price 7.4 and resource norm 5.6. More precise forms remain blocked until verified.
+The artificial 120-character row-description limit was removed in 0.2.2: the
+manual assigns 120 to hierarchy names, not P= descriptions. Long descriptions
+are preserved; their retention in real SISTELA remains an acceptance check.
+Section/rate coefficient and
 resource adjustment options are exposed through the typed export profile API;
 the work table exposes marks/NGR and G only in advanced row details. The normal export view has bulk TXT/DBF buttons; hierarchy settings are optional.
 

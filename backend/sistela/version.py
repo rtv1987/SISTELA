@@ -1,2 +1,2 @@
 """Single application/distribution version (also read by the Windows builder)."""
-VERSION = "0.2.1"
+VERSION = "0.2.2"

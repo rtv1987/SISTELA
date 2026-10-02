@@ -11,6 +11,7 @@ import winreg
 from pathlib import Path
 
 import httpx
+from smoke_portable import clean_environment
 from smoke_windows import wait_state
 
 from sistela.version import VERSION
@@ -28,12 +29,9 @@ def main():
                     raise RuntimeError("Existing installation detected; refusing installer smoke test")
             except FileNotFoundError:
                 pass
-    work = Path(tempfile.mkdtemp(prefix="installer-smoke-", dir=ROOT / "tmp"))
+    work = Path(tempfile.mkdtemp(prefix="installer-smoke-"))
     install, data = work / "Application", work / "User data"
-    env = {**os.environ, "SISTELA_DATA_DIR": str(data),
-           "PATH": os.path.join(os.environ["SystemRoot"], "System32")}
-    env.pop("PYTHONPATH", None)
-    env.pop("PYTHONHOME", None)
+    env = clean_environment(data)
     options = dict(env=env, cwd=work, creationflags=subprocess.CREATE_NO_WINDOW)
     setup = ROOT / f"dist/windows/SISTELA-Assistant-Setup-{VERSION}.exe"
     exe = install / "SISTELA-Assistant.exe"
@@ -48,6 +46,11 @@ def main():
         process = subprocess.Popen([str(exe), "--no-browser"], **options)
         state = wait_state(data, process)
         with httpx.Client(base_url=state["url"], trust_env=False) as client:
+            assert client.get('/health').status_code == 200
+            assert client.get('/app/info').json()['version'] == VERSION
+            assert '<html' in client.get('/').text.lower()
+            time.sleep(2)
+            assert process.poll() is None
             project = client.post("/projects", json={"name": "Upgrade keeps me", "system_type": "GSS"}).json()
         # Reinstall over a running application: graceful shutdown and preservation.
         subprocess.run(install_command, **options, timeout=120, check=True)
@@ -56,6 +59,18 @@ def main():
         state = wait_state(data, process)
         with httpx.Client(base_url=state["url"], trust_env=False) as client:
             assert client.get(f"/projects/{project['id']}").json()["name"] == "Upgrade keeps me"
+            client.post('/app/quit',headers={'X-Sistela-Token':state['token']}).raise_for_status()
+        assert process.wait(timeout=30)==0
+        # Simulate a damaged installation in our isolated test folder. Repair must
+        # not depend on the old runtime's database imports.
+        for path in (install/'_internal/sqlalchemy/util').glob('_collections_cy.*'):
+            path.rename(path.with_suffix(path.suffix+'.damaged'))
+        subprocess.run(install_command, **options, timeout=120, check=True)
+        subprocess.run([str(exe),'--verify-install'], **options, timeout=60, check=True)
+        process = subprocess.Popen([str(exe),'--no-browser'], **options)
+        state = wait_state(data,process)
+        with httpx.Client(base_url=state['url'],trust_env=False) as client:
+            assert client.get(f"/projects/{project['id']}").json()['name']=='Upgrade keeps me'
         # An unrelated file in the chosen installation folder must not be removed.
         (install / "user-owned.txt").write_text("keep")
         subprocess.run([str(install / "Uninstall.exe"), "/S"], **options, timeout=120, check=True)

@@ -1,0 +1,67 @@
+{
+  "version": "0.2.2",
+  "artifacts": [
+    {
+      "path": "C:\\Users\\rtv19\\Documents\\GitHub\\SISTELA\\dist\\windows\\SISTELA-Assistant-Setup-0.2.2.exe",
+      "size_bytes": 53263749,
+      "sha256": "69394b2057b0f24233c729ffd5275bf1337436dd49ebd7e1e6289eb5c3a87825"
+    },
+    {
+      "path": "C:\\Users\\rtv19\\Documents\\GitHub\\SISTELA\\dist\\windows\\SISTELA-Assistant-Portable-0.2.2.zip",
+      "size_bytes": 71053416,
+      "sha256": "0da6854935d3ab2ecacbc9f8ccc31a248e1044a2594d88866b617feac6dea3ba"
+    }
+  ],
+  "tests": {
+    "backend": 247,
+    "frontend": 59,
+    "playwright": 16,
+    "total": 322,
+    "release_pdf_subset": 52
+  },
+  "checks": {
+    "ruff": "PASS",
+    "frontend_lint": "PASS",
+    "typescript": "PASS",
+    "production_build": "PASS",
+    "migrations": "PASS",
+    "diff_check": "PASS"
+  },
+  "migration": "012_bulk_preparation",
+  "migrations_added": 0,
+  "smokes": {
+    "frozen_workflow": {
+      "result": "PASS",
+      "evidence": "C:\\Users\\rtv19\\Documents\\GitHub\\SISTELA\\tmp\\packaged-smoke-i75qa85q"
+    },
+    "clean_portable": {
+      "result": "PASS",
+      "evidence": "C:\\Users\\rtv19\\AppData\\Local\\Temp\\sistela-portable-clean-5nnhmw9u"
+    },
+    "upgrade_020": {
+      "result": "PASS",
+      "evidence": "C:\\Users\\rtv19\\AppData\\Local\\Temp\\sistela-portable-clean-yvseoe5k"
+    },
+    "upgrade_021": {
+      "result": "PASS",
+      "evidence": "C:\\Users\\rtv19\\AppData\\Local\\Temp\\sistela-portable-clean-in18yazi"
+    },
+    "installed_setup_reinstall_repair_uninstall": {
+      "result": "PASS",
+      "evidence": "C:\\Users\\rtv19\\AppData\\Local\\Temp\\installer-smoke-z1fs9n9c"
+    }
+  },
+  "native_sqlalchemy_fallback": "PASS with all SQLAlchemy pyd files removed from disposable extractions",
+  "previous_releases_unchanged": true,
+  "licensed_files_bundled": false,
+  "environment_note": "Windows IPv4 socket exhaustion affected the initial full backend/browser runs. Temporary IPv6 test harnesses passed all 247/16 tests; no workaround ships. Ordinary pytest passed the 52 real-PDF release checks. Frozen EXE uses ordinary IPv4 successfully.",
+  "real_sistela_acceptance": "PENDING",
+  "real_project": {
+    "rows": 12,
+    "text_preparations": 3,
+    "artificial_text_blockers": 0,
+    "unresolved_price_scope_fields": 12,
+    "fabricated_prices": 0,
+    "importable_real_txt_created": false
+  }
+}

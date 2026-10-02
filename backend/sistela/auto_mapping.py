@@ -42,6 +42,7 @@ def catalog_candidates(session, line):
             'sistela_description':entry['description'], 'source_unit':entry['unit'],
             'confidence':str(round(score,2)), 'method':'exact' if normalized==normalize_text(entry['description']) else 'fuzzy',
             'origin':'catalog', 'confirmed_count':0,'last_used_at':None,'compatible':compatible,
+            'automatic_eligible': model_match or ratio(normalized,normalize_text(entry['description'])) >= 85,
             'priority':4 if score>=.9 else 5,'catalog_id':entry['id'],
             'evidence_eligible':True,'category':entry['category']})
     return sorted({r['mapping_id']:r for r in result}.values(),key=lambda r:(not r['compatible'],-float(r['confidence'])))
@@ -61,7 +62,7 @@ def automatic_values(session, line):
     candidate = next((c for c in candidates if c['compatible'] and (
         c['origin']=='user' and c['method'] in {'exact','normalized'}
         or c.get('historical_confirmed')
-        or Decimal(c['confidence']) >= (Decimal('.85') if line.line_type!='Work' else Decimal('.70')))), None)
+        or c.get('automatic_eligible', c['origin']!='catalog') and Decimal(c['confidence']) >= (Decimal('.85') if line.line_type!='Work' else Decimal('.70')))), None)
     if candidate is None:
         from .preparation import custom_code
         return {'sistela_code':custom_code(session,line), 'mapping_status':'suggested',

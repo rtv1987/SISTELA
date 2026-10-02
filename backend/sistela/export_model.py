@@ -1,11 +1,14 @@
 """Single immutable-by-convention projection consumed by both SISTELA exporters."""
 from decimal import Decimal
 
+from rapidfuzz.fuzz import ratio
 from sqlalchemy import select
 
 from .grid import active_lines
 from .handoff import target
 from .models import EstimateSection, ExportSettings, NormRelation
+from .package_evidence import package_description, price_case
+from .parsers.common import normalize_text
 from .services import get_project
 
 
@@ -35,6 +38,7 @@ def normalized_estimate(session, project_id):
     sections = {s.id: s for s in session.scalars(select(EstimateSection).where(
         EstimateSection.project_id == project_id))}
     grouped = {}
+    mapping_issues = []
     for line in active_lines(session, project_id):
         quantity, unit, valid = target(line)
         section_id = line.section_id or 'manual-' + line.line_type
@@ -44,6 +48,11 @@ def normalized_estimate(session, project_id):
             'name': name, 'coefficients': {}, 'rows': []})
         reference = lookup_code(session,line.sistela_code,line.line_type)
         review = line.review_data or {}
+        if reference and review.get('automatic') and not review.get('manual_code_edit'):
+            suggested = review.get('suggestion', {})
+            if reference.kind == 'rate' and suggested.get('origin') == 'catalog' and ratio(
+                    normalize_text(line.project_description), normalize_text(reference.description)) < 85:
+                mapping_issues.append({'context':line.id,'message':'Automatinio kodo aprašas neatitinka viso darbo turinio. Patikrinkite kodą lentelėje; vien bendro žodžio nepakanka.'})
         extra, ngr_evidence = row_options(line, reference)
         extra.update(profile.get('rows', {}).get(line.id, {}))
         if extra.get('resources'):
@@ -79,11 +88,18 @@ def normalized_estimate(session, project_id):
             'options': extra,
         })
     for section in grouped.values():
+        for row in section['rows']:
+            row['text_preparation'] = package_description(row['output_description'])
+            ref = lookup_code(session,row['selected_code'],row['row_type'])
+            if not ref and row['provenance']['review'].get('matched_resource'):
+                from .models import NormEntry
+                ref = session.get(NormEntry,row['provenance']['review']['matched_resource']['id'])
+            row['price_case'] = price_case(row, ref, profile['period'])
         overrides = profile.get('sections', {}).get(section['id'], {})
         section.update({k: overrides[k] for k in ('code', 'name', 'coefficients') if k in overrides})
     session.commit()
     return {'project_id': project_id,
-        'common_issues': [{'context':row['id'],'message':issue['message']} for row in common['rows']
+        'common_issues': mapping_issues + [{'context':row['id'],'message':issue['message']} for row in common['rows']
             for issue in row['issues'] if issue['severity']=='BLOCKING'],
         'complex': profile.get('complex', {'code': '', 'name': project.name}),
         'object': profile.get('object', {'code': '', 'name': project.name}),

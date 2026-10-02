@@ -15,6 +15,13 @@ for package in ('pypdfium2', 'pymupdf', 'rapidfuzz'):
     hiddenimports += h
 for package in ('alembic', 'sqlalchemy'):
     datas += copy_metadata(package)
+# SQLAlchemy 2.1 has eight distributed *_cy modules. Ship both native modules
+# and their upstream Python fallbacks, rather than relying on static analysis.
+d, b, h = collect_all('sqlalchemy', filter_submodules=lambda name: '.testing' not in name,
+                      exclude_datas=['testing/**'], include_py_files=True)
+datas += d
+binaries += b
+hiddenimports += h
 
 a = Analysis([str(root / 'packaging/windows_launcher.py')], pathex=[str(root / 'backend')],
     binaries=binaries, datas=datas, hiddenimports=hiddenimports + ['uvicorn.loops.asyncio',

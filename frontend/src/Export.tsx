@@ -6,7 +6,7 @@ import { DbfExport } from './DbfExport';
 interface Hierarchy {code:string;name:string}
 interface ExportRow {id:string;selected_code:string;code_type:string;output_description:string;target_quantity:string;target_unit:string;options:{mark?:string;ngr?:number;parameters?:number[]}}
 interface Model {complex:Hierarchy;object:Hierarchy;estimate:Hierarchy;period:string;filename:string;parameter89:number|null;sections:{id:string;code:string;name:string;coefficients:Record<string,string>;rows:ExportRow[]}[]}
-interface Report {errors:{context:string;message:string}[];warnings:string[];records:string[]}
+interface Report {errors:{context:string;message:string}[];warnings:string[];records:string[];price_cases?:{id:string;description:string;category:string;reason:string;explicit_price_required:boolean|null}[];text_preparations?:{id:string;original:string;text:string;rules:string[]}[]}
 
 export function Export({projectId,onSettings,onGrid}:{projectId:string;onSettings?:()=>void;onGrid?:(id:string)=>void}) {
   const [model,setModel]=useState<Model>(),[report,setReport]=useState<Report>(),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
@@ -35,6 +35,8 @@ export function Export({projectId,onSettings,onGrid}:{projectId:string;onSetting
     <p>{readyCount} iš {total} eilučių paruošta</p>
     <div className="workflow-actions"><button className="primary" disabled={busy||!report||report.errors.length>0} onClick={()=>void run(true)}>TXT eksportas</button><span>Informacija pakete · Eksperimentinis</span></div>
     <DbfExport projectId={projectId}/>
+    {!!report?.text_preparations?.length&&<p>TXT skyryba sutvarkyta automatiškai: {report.text_preparations.length} eilutės. Pradinis tekstas išsaugotas.</p>}
+    {!!report?.price_cases?.length&&<details><summary>Kainų pagrindimas</summary>{report.price_cases.map(r=><p key={r.id}><strong>{r.description}</strong> · {({A:'Katalogo kaina nurodytam laikotarpiui',B:'Kainą parenka SISTELA',C:'Vartotojo pozicija',D:'Neįrodyta forma'} as Record<string,string>)[r.category]}: {r.reason}</p>)}</details>}
     {report?.errors.length ? <div className="export-exceptions"><h3>Reikia sutvarkyti</h3><ul>{report.errors.map((e,i)=>{
       const row=model?.sections.flatMap(s=>s.rows).find(r=>r.id===e.context);
       return <li key={i}>{row?.output_description}: {e.message} {row&&onGrid&&<button onClick={()=>onGrid(row.id)}>Redaguoti lentelėje</button>}{e.context==='parameter89'&&onSettings&&<button onClick={onSettings}>Atverti SISTELA nustatymus</button>}</li>;
